@@ -1,0 +1,118 @@
+{
+  "_comment": "project-coord/1.0 positive cases — every case MUST validate when validator runs in profile-aware mode for project-coord/1.0.",
+  "cases": [
+    {
+      "name": "delta-canonically-sorted",
+      "notes": "delta sorted by (op, id) ascending",
+      "msg": {
+        "v": "0.3.0",
+        "from": ["Ralph", "DEV"],
+        "to": ["Ledger", "PM"],
+        "id": "m-1",
+        "intent": "sprint-closeout",
+        "profile": "project-coord/1.0",
+        "delta": [
+          ["block", "US-718", "no source"],
+          ["complete", "US-713", "fix already in main"],
+          ["complete", "US-714", "warnOnly impl"],
+          ["start", "US-719", "switched in"]
+        ]
+      }
+    },
+    {
+      "name": "status-sorted-by-metric",
+      "notes": "status sorted by metric ascending",
+      "msg": {
+        "v": "0.3.0",
+        "from": ["Ralph", "DEV"],
+        "to": ["Ledger", "PM"],
+        "id": "m-2",
+        "intent": "status-report",
+        "profile": "project-coord/1.0",
+        "status": [["dq-tests", [21, 21]], ["preflight", [878, 878]], ["ruff", "pass"]]
+      }
+    },
+    {
+      "name": "actions-emission-order",
+      "notes": "actions are NOT sorted; emission order is correct",
+      "msg": {
+        "v": "0.3.0",
+        "from": ["Hawkeye", "QA"],
+        "to": ["Ledger", "PM"],
+        "id": "m-3",
+        "intent": "next-actions",
+        "profile": "project-coord/1.0",
+        "actions": [
+          ["Ralph", "implement", "US-689"],
+          ["Hawkeye", "verify", "US-689"],
+          ["Ledger", "approve-merge", "US-689"]
+        ]
+      }
+    },
+    {
+      "name": "risk-sev-desc-vec-asc",
+      "notes": "risk sorted by sev descending then vector ascending",
+      "msg": {
+        "v": "0.3.0",
+        "from": ["Audrey", "SEC"],
+        "to": ["Ledger", "PM"],
+        "id": "m-4",
+        "intent": "risk-brief",
+        "profile": "project-coord/1.0",
+        "risk": [
+          ["crit", "rce-zero-click", "full-system", "patch"],
+          ["high", "ssrf", "internal-network", "egress-allowlist"],
+          ["high", "tool-collision", "redirect", "unique-namespaces"],
+          ["med", "exposed-mcp", "creds-leak", "bind-localhost"]
+        ]
+      }
+    },
+    {
+      "name": "gates-scope-then-invariant",
+      "notes": "gates sorted by (scope, invariant) ascending",
+      "msg": {
+        "v": "0.3.0",
+        "from": ["Hawkeye", "QA"],
+        "to": ["Ralph", "DEV"],
+        "id": "m-5",
+        "intent": "gates-update",
+        "profile": "project-coord/1.0",
+        "gates": [
+          ["CI", "lint passes"],
+          ["US-858", "AST guard exists"],
+          ["US-858", "spark integration test exercises legacy cache path"]
+        ]
+      }
+    },
+    {
+      "name": "decision-by-key",
+      "notes": "decision sorted by key ascending",
+      "msg": {
+        "v": "0.3.0",
+        "from": ["Ledger", "PM"],
+        "to": ["Hawkeye", "QA"],
+        "id": "m-6",
+        "intent": "decision",
+        "profile": "project-coord/1.0",
+        "decision": [["approve", "yes"], ["owner", "Ralph"], ["priority", 4]]
+      }
+    },
+    {
+      "name": "inventory-sorted-by-kind-id",
+      "notes": "inventory items sorted by (kind, id); KVs sorted by k",
+      "msg": {
+        "v": "0.3.0",
+        "from": ["DevOps", "DEVOPS"],
+        "to": ["Ledger", "PM"],
+        "id": "m-7",
+        "intent": "inventory-update",
+        "profile": "project-coord/1.0",
+        "inventory": [
+          ["db", "DW_Silver", [["region", "east-us"], ["sku", "Gen5"], ["tier", "serverless"]]],
+          ["api", "3E_API", [["auth", "OAuth2"], ["env", "prod"], ["rate", "1rps"]]],
+          ["service", "Purview", [["mode", "planned"]]]
+        ]
+      }
+    }
+  ]
+}
