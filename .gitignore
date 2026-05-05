@@ -10,6 +10,7 @@ Thumbs.db
 
 # Claude Code local settings
 .claude/
+CLAUDE.md
 
 # Build / scratch
 dist/
