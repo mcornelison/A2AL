@@ -1,0 +1,3 @@
+US-718 blocked: no household source in Silver. Defer next sprint.
+Switched to US-719 -- deps met, source unambiguous.
+PM: accept US-718 slip; plan HubSpot Contact-Household extractor next sprint.
