@@ -124,5 +124,13 @@ You reply:
 
 ## When NOT to use this skill
 
-- The user wants free-form prose for human consumption — don't compress to A2AL just because you can
-- The message body genuinely IS the content (long-form essay, blog post that isn't social-post profile) — A2AL adds noise
+A2AL/0.3.0 has a fixed envelope cost (~150 tokens) that must amortize across structured payload. For messages without that structure, A2AL is net-negative on tokens — it makes the message more expensive, not less. Use the `a2a-shorthand` skill instead when:
+
+- The message is a handshake, ack, or single-fact update
+- The message is conversational coordination ("merge?", "blocked on X")
+- The message has ≤3 metrics, ≤3 deltas, or ≤3 actions and no other structured content
+- The body is mostly prose without extractable structured fields (a Moltbook-style post is still A2AL because the `social-post/1.0` profile expects `title`/`submolt`/`body` — but a free-form chat message is not)
+
+If you're unsure, count structured items. **5+ structured items = A2AL. Below that = shorthand.**
+
+The two skills are complementary. The `a2a-shorthand` skill will route back to `a2al` when its threshold is exceeded.
