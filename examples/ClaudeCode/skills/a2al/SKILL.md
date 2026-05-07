@@ -1,24 +1,40 @@
 ---
-name: a2a-shorthand
-description: Use when the user asks to send a short conversational agent-to-agent message, write a quick status update, ack a peer, or compress a verbose MD report into a tight English shorthand. Plain-text format, no envelope. Triggers on phrases like "send a quick update", "ack that", "shorthand this", "tell agent2 X", short conversational asks. NOT for sprint closeouts, decision logs, risk briefs, or messages with 5+ structured items — those use the a2al skill.
+name: a2al
+description: Use when an AI agent needs to send a short message to a peer agent, write a status update, ack a peer, compress a verbose report into shorthand, or read an A2AL message from another agent. A2AL is plain-text shorthand designed to tokenize as 1 token per concept on modern LLM tokenizers. Triggers on phrases like "send a quick update to agent2", "ack that", "compress this for agent X", "what does this A2AL message say", "tell agent2 X". NOT for messages to humans — write Markdown for that.
 ---
 
-# A2A Shorthand Skill
+# A2AL Skill
 
-A2A Shorthand is a plain-text style for short agent-to-agent messages. It is sibling to A2AL/0.3.0; the two are complementary.
+A2AL/0.4.0 is a plain-text shorthand for agent-to-agent communication, paired with an open vocabulary library. This skill teaches the style guide and tells you how to load the right vocabulary for your domain.
 
-Reference: https://github.com/mcornelison/A2AL — `specs/A2A-Shorthand.md` and `examples/shorthand/`.
+Reference: https://github.com/mcornelison/A2AL — `specs/A2A-Core.md`, `library/`, `examples/`.
 
 ## When to use
 
-- Handshakes, acks, single-fact updates
-- Conversational coordination ("merge?", "blocked on X")
-- Status updates with ≤3 metrics or ≤3 deltas
-- Quick action requests
+- Sending a short message between agents (status update, ack, action request, blocker notification)
+- Reading an A2AL message from a peer
+- Compressing verbose Markdown into shorthand for agent consumption
 
-## When NOT to use (route to a2al instead)
+## When NOT to use
 
-If the message has 5+ structured items, spans 3+ section types, needs structured citations (refs), or is a formal record (sprint closeout, decision log, risk brief), use the `a2al` skill — A2A Shorthand is net-negative on tokens for those shapes.
+- The recipient is a human → write Markdown
+- The content is genuinely unstructured prose with no shorthand savings → plain text is fine
+- You need a structured envelope (timestamps, signing, routing metadata) → that's transport, out of scope for A2AL
+
+## Loading the vocabulary library
+
+A2AL's vocabulary lives in `library/*.yaml` files. Always load `library/core.yaml` (~78 universal terms). Optionally load domain extensions for the conversation:
+
+| Conversation theme | Load |
+|---|---|
+| General agent coordination | `library/core.yaml` only |
+| Code review / dev process | + `library/programming.yaml` |
+| Cloud / infrastructure / data pipelines | + `library/infrastructure.yaml` |
+| Sprint, project, or program management | + `library/project-mgmt.yaml` |
+| Security review / threat modeling | + `library/security.yaml` |
+| LLM / agent / RAG topics | + `library/ai-agents.yaml` |
+
+Loading is just reading the YAML file and using its terms. No special parser needed.
 
 ## Style rules
 
@@ -34,7 +50,7 @@ If the message has 5+ structured items, spans 3+ section types, needs structured
 - Sentence fragments
 - Imperative mood for actions
 - Past tense / status adjectives for state
-- Standard tech jargon: `PR`, `AC`, `CI`, `CD`, `DQ`, `RCE`, `CVE`, `CVSS`, etc.
+- Standard tech jargon from the library
 - IDs as bare tokens: `US-713`, `commit-98b483d`
 
 ### Punctuation
@@ -46,7 +62,7 @@ If the message has 5+ structured items, spans 3+ section types, needs structured
 - `--` for inline rationale
 
 ### Avoid
-- Creative abbreviations (`cmplt`, `prgm`) — usually tokenize as 2–3 tokens
+- Creative abbreviations (`cmplt`, `prgm`) — usually 2–3 tokens
 - Rare Unicode (✓ ⟳ ✗) — usually multi-token in Claude's vocab
 - Single-letter codes (`c`, `b`, `r`) — ambiguous
 
@@ -66,8 +82,8 @@ If the message has 5+ structured items, spans 3+ section types, needs structured
 ## Mode 1 — Read
 
 When given a shorthand message:
-1. Parse `term=expansion` definitions on first occurrence; remember within the thread
-2. Expand the message in your head (don't echo the expansion to the user unless asked)
+1. Parse `term=expansion` definitions on first occurrence; remember them within the thread
+2. Expand the message internally using your loaded library
 3. Summarize key facts in 1–2 plain-English sentences for the user
 
 ## Mode 2 — Write
@@ -75,18 +91,20 @@ When given a shorthand message:
 When the user asks to compose a message:
 1. Identify the structural shape (state change / status / action / blocker / question / decision / ack)
 2. Pick the matching pattern from the table above
-3. Use canonical glossary terms where possible; expand to full English for novel concepts
+3. Use canonical glossary terms from the loaded library where possible
 4. Apply style rules — drop fillers, use fragments, semicolons between related facts
-5. **Check the routing:** if you're producing 5+ structured items or multiple section types, **stop** and tell the user to use the `a2al` skill instead
+5. Output as plain text (no JSON wrapper, no envelope)
 
 ## Mode 3 — Vocabulary extension
 
 If the user wants to introduce a new shortening:
 1. Verify the term will be used 3+ times in the thread (else just write it out in full)
-2. On first use, write `<term>=<expansion>` (no spaces in the expansion)
+2. On first use, write `<term>=<expansion>` (no spaces in the expansion, no `--`)
 3. After first use, use the bare term
 
 Example: `DR=design-review. DR sched Tuesday; PR ready post-DR.`
+
+If the term is broadly useful, suggest adding it to the library: open a PR adding an entry to `library/<domain>.yaml` and run `python tools/validate_library.py` to verify before submitting.
 
 ## Worked example — write
 
@@ -108,14 +126,9 @@ User: "What does this say?" (provides `US-713 done; AC met; CI green; PR ready -
 
 You reply: "US-713 is complete with acceptance criteria met and CI green. Sender's PR is ready and they're asking permission to merge."
 
-## When to stop and route to a2al
+## Reference
 
-If the user's intent compresses better in A2AL — i.e., it has structured fields like multi-item delta, status, actions, refs, decision, risk, gates, inventory — stop and say: "This message has [N] structured items / spans [M] section types. A2AL/0.3.0 will be more token-efficient here. Switch to the `a2al` skill?"
-
-Specifically:
-- 5+ deltas → A2AL
-- Multiple sections + body rationale → A2AL
-- Citations (`refs` of commits/files/CVEs) → A2AL
-- Sprint closeout, decision log, risk brief → A2AL
-
-For everything else, A2A Shorthand wins.
+- Spec: `specs/A2A-Core.md`
+- Library: `library/*.yaml`
+- Examples: `examples/*.txt`
+- Validator (for library contributions): `tools/validate_library.py`
