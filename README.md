@@ -62,6 +62,86 @@ pip install pyyaml
 python tools/validate_library.py
 ```
 
+## Configuring your agent
+
+Once the skill files are in `.claude/skills/` and `.claude/commands/`, the skill is **auto-discovered** by Claude Code on next restart — no manual "enable" step. What you do need is a CLAUDE.md block telling the agent its identity, where to find the library, and (if peers exist) the inbox conventions. Same recipe for new and existing agents — only difference is whether you create CLAUDE.md from scratch or append to an existing one.
+
+### CLAUDE.md block (copy / paste)
+
+For an **existing CLAUDE.md**: append this section. For a **new project**: this can be the whole file, or supplement with project-specific guidance.
+
+````markdown
+## A2AL/0.4.0 — Agent-to-Agent Communication
+
+This project uses [A2AL/0.4.0](https://github.com/mcornelison/A2AL) for peer-to-peer agent messages.
+
+### Identity
+You are **[AgentName]**, a [role] agent. When sending A2AL messages, sign as `[AgentName]/[role]` (e.g., `Hawkeye/QA`, `Byte/DEV`). Roles are free-form.
+
+### Repo location
+The A2AL repo is cloned at `[/absolute/path/to/A2AL]`. The vocabulary library is at `[/absolute/path/to/A2AL]/library/`.
+
+### When to use A2AL
+- **A2AL shorthand** for peer agent messages: status updates, acks, action requests, blockers, decisions
+- **Markdown** when the audience is human
+- **Plain text** when the content is unstructured prose with no shorthand savings
+
+### Loading the library
+Always have `[/absolute/path/to/A2AL]/library/core.yaml` available (~77 universal terms). Add domain extensions per the conversation:
+
+| Topic | Load |
+|---|---|
+| Code review / dev process | + `programming.yaml` |
+| Cloud / orchestration / data | + `infrastructure.yaml` |
+| Sprint, project, program management | + `project-mgmt.yaml` |
+| Security review / threat modeling | + `security.yaml` |
+| LLM / agent / RAG topics | + `ai-agents.yaml` |
+
+The `a2al` skill and `/a2al` command both use these.
+
+### Inbox / outbox (only if you have peer agents)
+- **Your inbox:** `[/absolute/path/to/your-inbox/]` (`.txt` files, one A2AL message per file)
+- **Filename:** `<sender>-<intent>-<unix-ts>.txt`
+- **Threading:** reference prior message id in the body — `re: <id>` or `in-reply-to: <id>`
+
+### Reference
+- Spec: `[/absolute/path/to/A2AL]/specs/A2A-Core.md`
+- Library schema: `[/absolute/path/to/A2AL]/library/README.md`
+- Validator (validates library YAML, not messages): `python [/absolute/path/to/A2AL]/tools/validate_library.py`
+````
+
+The bracketed `[...]` placeholders are what you fill in:
+
+- `[AgentName]` and `[role]` — your agent's name and what it does
+- `[/absolute/path/to/A2AL]` — wherever you cloned this repo
+- `[/absolute/path/to/your-inbox/]` — only if peers can send you messages
+
+If the agent is solo (no peers), the inbox section is optional. The skill is still useful for "compress this report" or "send this to <other agent>" prompts.
+
+### Verifying the install
+
+After restarting Claude Code, prompt the agent:
+
+```
+Verify A2AL is wired up:
+1. Read [/absolute/path/to/A2AL]/library/core.yaml and report how many entries it has plus 3 sample terms.
+2. Compose this as A2AL shorthand: "all tests pass, build is green, PR ready to merge"
+3. Confirm /a2al is registered as a slash command.
+```
+
+Expected: ~77 entries reported (sample terms like `done`, `merge`, `PR`); shorthand output something like `tests pass; build green; PR ready -- merge?`; `/a2al` recognized. If any step fails, check that the skill files actually copied into `.claude/skills/a2al/` and `.claude/commands/a2al.md`, and that you restarted Claude Code.
+
+### Multi-agent setup
+
+If you have multiple agents talking to each other peer-to-peer, each agent gets its own `.claude/skills/a2al/`, its own `.claude/commands/a2al.md`, and its own CLAUDE.md with its own `[AgentName]/[role]` identity. The path to the A2AL repo and the library is the same for all of them; only identity and inbox path differ.
+
+### What you don't need to do
+
+- ❌ No "enable skill" command — Claude Code auto-discovers skills on startup
+- ❌ No daemon, server, or service
+- ❌ No registration step in any external system
+- ❌ No special launch flag — just restart Claude Code after copying the files
+
 ## How to use
 
 ### Sending a message to a peer agent
