@@ -1,0 +1,244 @@
+# Universal vocabulary used across all agent communication.
+# Always loaded by any A2AL agent. Domain extensions are opt-in.
+domain: core
+description: Universal A2AL vocabulary — states, actions, severity, and tech abbreviations every agent should know.
+
+entries:
+  # ---- States ----
+  - term: done
+    expansion: complete or finished
+    example: "US-713 done"
+  - term: complete
+    expansion: complete
+    example: "code-complete; tests pending"
+  - term: finished
+    expansion: finished
+    example: "review finished; awaiting approval"
+  - term: shipped
+    expansion: shipped to production
+    example: "feature shipped 2026-05-01"
+  - term: deployed
+    expansion: deployed
+    example: "deployed to staging"
+  - term: merged
+    expansion: merged into target branch
+    example: "merged ralph/auth-fix -> main"
+  - term: released
+    expansion: released
+    example: "v1.4 released"
+  - term: passed
+    expansion: passed
+    example: "all tests passed"
+  - term: passing
+    expansion: passing
+    example: "CI passing"
+  - term: ok
+    expansion: ok
+    example: "ruff ok; mypy ok"
+  - term: green
+    expansion: passing or healthy
+    example: "build green"
+  - term: healthy
+    expansion: healthy
+    example: "service healthy"
+  - term: working
+    expansion: working
+    example: "feature working as expected"
+  - term: ready
+    expansion: ready for next step
+    example: "PR ready -- merge?"
+  - term: pending
+    expansion: pending
+    example: "review pending"
+  - term: waiting
+    expansion: waiting on a dependency or response
+    example: "waiting on Hawkeye sign-off"
+  - term: queued
+    expansion: queued
+    example: "deploy queued"
+  - term: started
+    expansion: started
+    example: "US-719 started"
+  - term: active
+    expansion: in progress
+    example: "sprint active"
+  - term: paused
+    expansion: paused
+    example: "US-722 paused -- need clarification"
+  - term: stalled
+    expansion: stalled with no progress
+    example: "US-718 stalled -- no source in Silver"
+  - term: deferred
+    expansion: deferred to later
+    example: "US-718 deferred next sprint"
+  - term: blocked
+    expansion: blocked on a dependency
+    example: "US-718 blocked: no household source"
+  - term: failed
+    expansion: failed
+    example: "deploy failed"
+  - term: failing
+    expansion: failing
+    example: "test_dq failing"
+  - term: broken
+    expansion: broken
+    example: "build broken"
+  - term: red
+    expansion: failing or unhealthy
+    example: "CI red"
+  - term: yellow
+    expansion: warning state
+    example: "build yellow -- 2 warnings"
+
+  # ---- Actions ----
+  - term: merge
+    expansion: merge a branch
+    example: "merge ralph/auth-fix"
+  - term: ship
+    expansion: ship to production
+    example: "ship the hotfix"
+  - term: deploy
+    expansion: deploy
+    example: "deploy to staging"
+  - term: release
+    expansion: release
+    example: "release v1.4 Tuesday"
+  - term: push
+    expansion: push commits
+    example: "push the rebased branch"
+  - term: pull
+    expansion: pull latest
+    example: "pull main; rebase"
+  - term: revert
+    expansion: revert a commit
+    example: "revert 98b483d"
+  - term: rollback
+    expansion: roll back a deployment
+    example: "rollback prod -- regression"
+  - term: review
+    expansion: review
+    example: "Hawkeye: review US-713 PR"
+  - term: approve
+    expansion: approve
+    example: "approve US-713 sign-off"
+  - term: reject
+    expansion: reject
+    example: "reject -- AC not met"
+  - term: sign-off
+    expansion: sign-off
+    example: "QA sign-off pending"
+  - term: block
+    expansion: mark blocked
+    example: "block US-718 -- no source"
+  - term: unblock
+    expansion: unblock
+    example: "unblock US-718 -- HubSpot extractor ready"
+  - term: defer
+    expansion: defer to later
+    example: "defer US-718 next sprint"
+  - term: escalate
+    expansion: escalate to a higher authority
+    example: "escalate to PMO -- security finding"
+  - term: assign
+    expansion: assign work
+    example: "assign US-720 -> Byte"
+  - term: claim
+    expansion: claim a task
+    example: "claim US-721"
+  - term: test
+    expansion: run tests
+    example: "test US-713 changes"
+  - term: verify
+    expansion: verify
+    example: "verify deploy in staging"
+  - term: validate
+    expansion: validate
+    example: "validate against spec"
+  - term: implement
+    expansion: implement
+    example: "implement US-714 warnOnly flag"
+  - term: fix
+    expansion: fix
+    example: "fix race in mdm_common.py"
+  - term: patch
+    expansion: patch
+    example: "patch DQ_Shared.py:1151"
+  - term: refactor
+    expansion: refactor
+    example: "refactor master_person_id resolution"
+  - term: document
+    expansion: document
+    example: "document the new warnOnly flag"
+  - term: add
+    expansion: add
+    example: "add dept to MASTER_HASH_COLUMNS"
+  - term: remove
+    expansion: remove
+    example: "remove unused fields"
+  - term: modify
+    expansion: modify
+    example: "modify maxClusterSize 3 -> 4"
+
+  # ---- Severity ----
+  - term: crit
+    expansion: critical
+    example: "crit -- RCE in MCP stdio config"
+  - term: high
+    expansion: high severity
+    example: "high -- SSRF possible"
+  - term: med
+    expansion: medium severity
+    example: "med -- exposed endpoint"
+  - term: low
+    expansion: low severity
+    example: "low -- verbose logs"
+  - term: info
+    expansion: informational
+    example: "info -- vendor advisory"
+
+  # ---- Universal tech abbreviations ----
+  - term: PR
+    expansion: pull request
+    example: "PR ready -- merge?"
+  - term: AC
+    expansion: acceptance criteria
+    example: "US-713 done; AC met"
+  - term: CI
+    expansion: continuous integration
+    example: "CI green"
+  - term: CD
+    expansion: continuous delivery
+    example: "CD pipeline broken"
+  - term: DQ
+    expansion: data quality
+    example: "21/21 DQ tests"
+  - term: PM
+    expansion: project manager
+    example: "Ledger (PM): merge?"
+  - term: QA
+    expansion: quality assurance
+    example: "Hawkeye (QA): review observations"
+  - term: DEV
+    expansion: developer
+    example: "Byte (DEV): US-719 started"
+  - term: SEC
+    expansion: security
+    example: "Audrey (SEC): risk-brief"
+  - term: DEVOPS
+    expansion: devops
+    example: "DEVOPS: rollback prod"
+  - term: ARCH
+    expansion: architect
+    example: "ARCH: design-review pending"
+  - term: PMO
+    expansion: program management office
+    example: "PMO: cross-project status"
+  - term: API
+    expansion: application programming interface
+    example: "3E API rate-limited"
+  - term: SDK
+    expansion: software development kit
+    example: "Anthropic SDK 0.18 released"
+  - term: CLI
+    expansion: command line interface
+    example: "CLI install instructions in README"
