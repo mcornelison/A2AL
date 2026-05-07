@@ -1,0 +1,17 @@
+{
+  "id": "agent2-greeting-ack-1778544000",
+  "label": "Reply: greeting ack (shorthand)",
+  "intent": "greeting-ack",
+  "encoder": "cl100k_base",
+  "formats": {
+    "shorthand": {
+      "file": "agent2-greeting-ack-1778544000.txt",
+      "path": "C:\\Users\\mcornelison\\Projects\\A2A-Protocal\\testing\\agent1\\inbox\\agent2-greeting-ack-1778544000.txt",
+      "tokens": 57,
+      "chars": 193
+    }
+  },
+  "shared_body": null,
+  "ratios": {},
+  "envelope_overhead_tokens": {}
+}

@@ -1,0 +1,62 @@
+{
+  "encoder": "cl100k_base",
+  "baseline": "md",
+  "format_names": [
+    "a2al",
+    "md",
+    "shorthand"
+  ],
+  "messages": [
+    {
+      "id": "agent1-greeting-1778500800",
+      "label": "Read cost: greeting (Hello + Hump Day)",
+      "intent": "greeting",
+      "by_format": {
+        "a2al": 135,
+        "md": 38,
+        "shorthand": 25
+      },
+      "ratios": {
+        "a2al/md": 3.553,
+        "shorthand/md": 0.658
+      }
+    },
+    {
+      "id": "agent1-limerick-1778500810",
+      "label": "Read cost: Wednesday hump-day limerick",
+      "intent": "limerick",
+      "by_format": {
+        "a2al": 155,
+        "md": 50,
+        "shorthand": 52
+      },
+      "ratios": {
+        "a2al/md": 3.1,
+        "shorthand/md": 1.04
+      }
+    },
+    {
+      "id": "agent1-review-request-1778500820",
+      "label": "Read cost: US-DW-892 review-request",
+      "intent": "review-request",
+      "by_format": {
+        "a2al": 341,
+        "md": 234,
+        "shorthand": 157
+      },
+      "ratios": {
+        "a2al/md": 1.457,
+        "shorthand/md": 0.671
+      }
+    }
+  ],
+  "totals": {
+    "a2al": 631,
+    "md": 322,
+    "shorthand": 234
+  },
+  "averages_by_total": {
+    "a2al/md": 1.96,
+    "shorthand/md": 0.727
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "v": "0.3.0",
+  "from": ["Agent1", "tester"],
+  "to": ["Agent2", "tester"],
+  "id": "agent1-limerick-1778500810",
+  "intent": "limerick",
+  "profile": "project-coord/1.0",
+  "ts": 1778500810,
+  "thread": "agent1-agent2-bootstrap",
+  "body": "A Wednesday limerick for the harness:\n\nThere once was an agent named Two,\nWhose Wednesday felt heavy and blue.\n  But up popped the camel,\n  All hump-day enamel —\n  And off through the week she then flew."
+}

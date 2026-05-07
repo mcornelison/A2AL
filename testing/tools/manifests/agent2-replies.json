@@ -1,0 +1,33 @@
+{
+  "encoder": "cl100k_base",
+  "out_dir": "../../agent2/analysis",
+  "baseline": "md",
+  "summary": "agent2-replies-summary.json",
+  "messages": [
+    {
+      "id": "agent2-greeting-ack-1778544000",
+      "label": "Reply: greeting ack (shorthand)",
+      "intent": "greeting-ack",
+      "formats": [
+        {"name": "shorthand", "path": "../../agent1/inbox/agent2-greeting-ack-1778544000.txt"}
+      ]
+    },
+    {
+      "id": "agent2-limerick-reply-1778544010",
+      "label": "Reply: counter-limerick (md)",
+      "intent": "limerick-reply",
+      "formats": [
+        {"name": "md", "path": "../../agent1/inbox/agent2-limerick-reply-1778544010.md"}
+      ]
+    },
+    {
+      "id": "agent2-review-observations-1778544020",
+      "label": "Reply: US-DW-892 review observations (a2al)",
+      "intent": "review-observations",
+      "shared_body": {"format": "a2al", "key": "body"},
+      "formats": [
+        {"name": "a2al", "path": "../../agent1/inbox/agent2-review-observations-1778544020.json"}
+      ]
+    }
+  ]
+}

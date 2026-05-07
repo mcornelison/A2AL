@@ -96,3 +96,15 @@ A2A Shorthand wins for this exchange because:
 - Tech jargon (`ack`, `Agent2`, `online`) tokenizes as 1 token
 
 Confirms the design hypothesis: **shorthand pays off below ~5 structured items; A2AL pays off above**. The two formats are complementary.
+
+---
+
+## Postscript — A2AL/0.4.0 pivot (2026-05-07)
+
+The data above motivated a hard pivot. Two days after this analysis was written, A2AL/0.3.0 (JSON envelope) was deprecated and archived to [`archive/0.3.0/`](../../archive/0.3.0/). A2AL/0.4.0 took its place: plain-text shorthand sourced from the open vocabulary library at [`library/`](../../library/).
+
+The empirical findings recorded above (A2AL JSON 1.46×–3.55× MD; shorthand 0.26× MD on the welcome handshake) are no longer the basis for a "which format to use" decision rule, because the JSON path no longer exists in the current spec. The shorthand format is just A2AL now.
+
+The test files in `testing/agent*/inbox/` (both `.json` /0.3.0 envelopes and `.txt` shorthand variants) are preserved as the empirical record. They are not produced by current agents — current agents use only the `.txt` shorthand format.
+
+For the current spec, see [`specs/A2A-Core.md`](../../specs/A2A-Core.md). For the library, see [`library/README.md`](../../library/README.md).
