@@ -1,0 +1,28 @@
+domain: project-mgmt
+description: Project management, SRE, and operational-metrics vocabulary.
+
+entries:
+  - term: EM
+    expansion: engineering manager
+    example: "EM on vacation next week"
+  - term: TPM
+    expansion: technical program manager
+    example: "TPM tracking dependencies"
+  - term: SRE
+    expansion: site reliability engineer
+    example: "SRE escalation requested"
+  - term: SLA
+    expansion: service level agreement
+    example: "SLA breach imminent"
+  - term: SLO
+    expansion: service level objective
+    example: "SLO target 99.99%"
+  - term: SLI
+    expansion: service level indicator
+    example: "SLI: latency p99"
+  - term: MTTR
+    expansion: mean time to recovery
+    example: "MTTR under 30min"
+  - term: RCA
+    expansion: root cause analysis
+    example: "RCA due Friday"

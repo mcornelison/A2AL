@@ -1,0 +1,34 @@
+domain: infrastructure
+description: Infrastructure, data-pipeline, and cloud-platform vocabulary for distributed systems.
+
+entries:
+  - term: DAG
+    expansion: directed acyclic graph
+    example: "DAG scheduler misconfigured"
+  - term: ETL
+    expansion: extract, transform, load
+    example: "ETL job failed at transform"
+  - term: ELT
+    expansion: extract, load, transform
+    example: "ELT pattern faster here"
+  - term: DB
+    expansion: database
+    example: "DB primary OOM"
+  - term: k8s
+    expansion: Kubernetes
+    example: "k8s namespace quota exceeded"
+  - term: AWS
+    expansion: Amazon Web Services
+    example: "AWS region outage"
+  - term: Azure
+    expansion: Microsoft Azure
+    example: "Azure container registry down"
+  - term: GCP
+    expansion: Google Cloud Platform
+    example: "GCP quota spike"
+  - term: VPC
+    expansion: virtual private cloud
+    example: "VPC peering misconfigured"
+  - term: VNet
+    expansion: virtual network
+    example: "VNet routing loop"

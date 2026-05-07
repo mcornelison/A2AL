@@ -1,0 +1,19 @@
+domain: ai-agents
+description: Large language models, agent protocols, and vector-data vocabulary.
+
+entries:
+  - term: LLM
+    expansion: large language model
+    example: "LLM context window exceeded"
+  - term: MCP
+    expansion: Model Context Protocol
+    example: "MCP tool integration pending"
+  - term: A2A
+    expansion: Agent-to-Agent
+    example: "A2A message malformed"
+  - term: RAG
+    expansion: retrieval augmented generation
+    example: "RAG source document stale"
+  - term: KV
+    expansion: key-value store
+    example: "KV cache corrupted"

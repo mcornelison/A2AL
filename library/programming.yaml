@@ -1,0 +1,26 @@
+domain: programming
+description: Code-review and software-development-process vocabulary specific to programming work.
+
+entries:
+  - term: MR
+    expansion: merge request
+    example: "MR pending review"
+    notes: "GitLab/Bitbucket terminology; use PR (in core) when on GitHub."
+  - term: CR
+    expansion: code review
+    example: "CR sched Tuesday"
+  - term: IaC
+    expansion: infrastructure as code
+    example: "IaC pipeline broken"
+  - term: code-complete
+    expansion: code complete
+    example: "US-714 code-complete; QA pending"
+  - term: feature-flag
+    expansion: feature flag
+    example: "warnOnly feature-flag enabled"
+  - term: dead-letter
+    expansion: dead letter queue or message
+    example: "3 messages in dead-letter -- investigate"
+  - term: fast-follow
+    expansion: fast-follow patch
+    example: "ship now; fast-follow null-name fix"

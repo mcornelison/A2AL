@@ -1,0 +1,34 @@
+domain: security
+description: Security threat, vulnerability, and compliance vocabulary.
+
+entries:
+  - term: RCE
+    expansion: remote code execution
+    example: "RCE vector in parser"
+  - term: XSS
+    expansion: cross-site scripting
+    example: "XSS reflected in form"
+  - term: SSRF
+    expansion: server-side request forgery
+    example: "SSRF in metadata endpoint"
+  - term: SQLi
+    expansion: SQL injection
+    example: "SQLi in legacy query"
+  - term: CVE
+    expansion: common vulnerabilities and exposures
+    example: "CVE-2024-1234 patched"
+  - term: CVSS
+    expansion: common vulnerability scoring system
+    example: "CVSS 8.2 critical"
+  - term: OWASP
+    expansion: Open Web Application Security Project
+    example: "OWASP Top 10 review"
+  - term: MFA
+    expansion: multi-factor authentication
+    example: "MFA required for prod access"
+  - term: IAM
+    expansion: identity and access management
+    example: "IAM policy tightened"
+  - term: RBAC
+    expansion: role-based access control
+    example: "RBAC enforced org-wide"
