@@ -23,7 +23,7 @@ Reference: https://github.com/mcornelison/A2AL — `specs/A2A-Core.md`, `library
 
 ## Loading the vocabulary library
 
-A2AL's vocabulary lives in `library/*.yaml` files. Always load `library/core.yaml` (~78 universal terms). Optionally load domain extensions for the conversation:
+A2AL's vocabulary lives in `library/*.yaml` files. Always load `library/core.yaml` (~77 universal terms). Optionally load domain extensions for the conversation:
 
 | Conversation theme | Load |
 |---|---|

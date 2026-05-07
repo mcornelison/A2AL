@@ -6,13 +6,13 @@ The open vocabulary for A2AL/0.4.0 agent-to-agent communication. Each file is a 
 
 | File | Purpose | Entries |
 |---|---|---:|
-| [`core.yaml`](./core.yaml) | Universal terms — always load | ~78 |
-| [`programming.yaml`](./programming.yaml) | Code review and dev process | ~7 |
-| [`infrastructure.yaml`](./infrastructure.yaml) | Cloud, orchestration, data pipelines | ~10 |
-| [`project-mgmt.yaml`](./project-mgmt.yaml) | Specialized roles, SRE/ops | ~8 |
-| [`security.yaml`](./security.yaml) | Security threats and controls | ~10 |
-| [`ai-agents.yaml`](./ai-agents.yaml) | AI/LLM/agent terms | ~5 |
-| **Total** | | **~118** |
+| [`core.yaml`](./core.yaml) | Universal terms — always load | 77 |
+| [`programming.yaml`](./programming.yaml) | Code review and dev process | 7 |
+| [`infrastructure.yaml`](./infrastructure.yaml) | Cloud, orchestration, data pipelines | 10 |
+| [`project-mgmt.yaml`](./project-mgmt.yaml) | Specialized roles, SRE/ops | 8 |
+| [`security.yaml`](./security.yaml) | Security threats and controls | 10 |
+| [`ai-agents.yaml`](./ai-agents.yaml) | AI/LLM/agent terms | 5 |
+| **Total** | | **117** |
 
 ## Loading model
 

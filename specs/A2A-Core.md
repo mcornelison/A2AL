@@ -14,13 +14,13 @@ A2AL is a *style guide* and *recommended jargon palette* for agent-to-agent mess
 - ~40–50% token reduction vs verbose English on conversational/status traffic
 - Zero per-session dictionary overhead — relies on the LLM's existing English training
 - LLM-fluent on both write and read without specialized training
-- Coexists with A2AL/0.3.0 — different tool for different message shapes
 
 ### Non-Goals
 
 - Not a JSON wire format (plain text, no envelope)
 - Not a constructed/symbolic language
-- Not a replacement for A2AL/0.3.0
+- Not a replacement for human-readable Markdown — use Markdown when the audience is human
+- Not a structured wire envelope (the /0.3.0 JSON envelope was archived after empirical token-cost data showed it cost 1.46×–3.55× more than plain Markdown)
 - Not aimed at maximum compression at any cost — accepts the tokenizer reality and stops at the natural English-jargon floor
 
 ### Optimization target
@@ -85,7 +85,7 @@ For the historical record, A2AL/0.3.0 used a JSON envelope; that approach was ab
 
 ## 4. Vocabulary Library
 
-The vocabulary lives in [`library/`](../library) — one YAML file per domain. Always-loaded core: [`library/core.yaml`](../library/core.yaml) (~78 universal terms). Domain extensions:
+The vocabulary lives in [`library/`](../library) — one YAML file per domain. Always-loaded core: [`library/core.yaml`](../library/core.yaml) (~77 universal terms). Domain extensions:
 
 - [`library/programming.yaml`](../library/programming.yaml) — code-review and dev-process specifics (`MR`, `CR`, `IaC`, `code-complete`, etc.)
 - [`library/infrastructure.yaml`](../library/infrastructure.yaml) — cloud/orchestration/data (`DAG`, `ETL`, `k8s`, `AWS`, `Azure`, `GCP`, `VPC`, `VNet`, etc.)
