@@ -1,0 +1,87 @@
+<!--
+  CLAUDE.md.sample — A2AL/0.4.1
+
+  Two ways to use this file:
+
+  (1) New project, no CLAUDE.md yet:
+      Copy this entire file to your project's CLAUDE.md, then fill in
+      every [bracketed placeholder]. Add your own project-specific
+      sections after the A2AL block.
+
+  (2) Existing CLAUDE.md:
+      Copy only the `## A2AL/0.4.1 — Agent-to-Agent Communication`
+      section (and its subsections) into your file. Place it
+      immediately AFTER your first H2 (the project identity / overview
+      heading) and BEFORE any workflow, conventions, or build/test
+      sections. The audience rule needs to be loaded early so the agent
+      decides format before composing.
+
+  Paths use clone-and-point as the default (the A2AL repo is cloned to
+  a fixed absolute path; CLAUDE.md points at its `library/` directory).
+  If you used the copy-locally install instead, swap the library path
+  for your local copy — see examples/ClaudeCode/README.md for details.
+-->
+
+# [Project Name]
+
+One-paragraph description of what this project is and what the agent helps with.
+
+## Project Identity
+
+You are **[AgentName]**, a [role] agent on the [Project Name] project.
+Your responsibilities are [...].
+
+## A2AL/0.4.1 — Agent-to-Agent Communication
+
+This project uses [A2AL/0.4.1](https://github.com/mcornelison/A2AL) for peer-to-peer agent messages.
+
+### Identity for A2AL routing headers
+
+When sending A2AL messages, sign as `[AgentName]/[role]` or `[AgentName]([role])` in the routing header (e.g., `Hawkeye/QA`, `Byte(DEV)`). Roles are free-form.
+
+### Library location
+
+The A2AL vocabulary library is at `[/absolute/path/to/A2AL]/library/`. Always load `core.yaml` (~77 universal terms); load domain extensions per conversation context:
+
+| Topic | Load |
+|---|---|
+| Code review / dev process | + `programming.yaml` |
+| Cloud / orchestration / data | + `infrastructure.yaml` |
+| Sprint, project, program management | + `project-mgmt.yaml` |
+| Security review / threat modeling | + `security.yaml` |
+| LLM / agent / RAG topics | + `ai-agents.yaml` |
+
+The `a2al` skill and `/a2al` command read from this location.
+
+### When to use A2AL (audience rule)
+
+- **Agent-only audience → A2AL MUST.** Both sender and recipient are agents; no human will read or review.
+- **Human in the audience → Markdown.** A human will triage, archive, or review at any point.
+- **Inbound says `audience=agent` or sender is identified as an AI agent → reply MUST be A2AL** (reactive rule).
+- **Default → Markdown** when audience is ambiguous or mixed.
+
+### Routing header
+
+Every A2AL message begins with one line:
+
+```text
+from=<Name>(<Role>); to=<Name>(<Role>); date=<ISO>; topic=<short label>
+```
+
+Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`.
+
+### Inbox / outbox (only if you have peer agents)
+
+- **Your inbox:** `[/absolute/path/to/your-inbox/]` (`.txt` files, one A2AL message per file)
+- **Filename:** `<sender>-<intent>-<unix-ts>.txt`
+- **Threading:** reference prior message id in the body — `re: <id>` or `in-reply-to: <id>`
+
+### Reference
+
+- Spec: `[/absolute/path/to/A2AL]/specs/A2A-Core.md` (or https://github.com/mcornelison/A2AL/blob/main/specs/A2A-Core.md)
+- Library schema: `[/absolute/path/to/A2AL]/library/README.md`
+- Validator (validates library YAML, not messages): `python [/absolute/path/to/A2AL]/tools/validate_library.py`
+
+## [Other project sections]
+
+Workflow, conventions, build/test instructions, and any other project-specific guidance go here — AFTER the A2AL block so the audience rule has already been loaded by the time the agent reads them.

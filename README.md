@@ -55,16 +55,15 @@ Channels can also be declared agent-only by convention (e.g., paths under `agent
 
 A2AL/0.4.1 is plain text — no runtime, no compiler. Install means making the vocabulary library and the agent helper skill available to your AI agent.
 
-### For Claude Code agents (per-project)
+### For Claude Code agents
+
+Three pieces to install: the skill files, the vocabulary library, and a CLAUDE.md block. Start by cloning the repo:
 
 ```bash
-git clone https://github.com/mcornelison/A2AL.git /path/to/a2al
-mkdir -p .claude/skills .claude/commands
-cp -r /path/to/a2al/examples/ClaudeCode/skills/a2al .claude/skills/
-cp /path/to/a2al/examples/ClaudeCode/commands/a2al.md .claude/commands/
+git clone https://github.com/mcornelison/A2AL.git /path/to/A2AL
 ```
 
-For user-global install (any Claude Code project), substitute `~/.claude/` for `.claude/`. Restart Claude Code.
+Then follow the step-by-step install guide at **[examples/ClaudeCode/README.md](./examples/ClaudeCode/README.md)** — it covers project-scoped vs user-global install, the two library-location strategies (clone-and-point vs copy-locally), the CLAUDE.md block (sample at [`examples/ClaudeCode/CLAUDE.md.sample`](./examples/ClaudeCode/CLAUDE.md.sample), placed right after the first H2 of your CLAUDE.md), verification, and multi-agent setup.
 
 ### For other LLM platforms
 
@@ -78,94 +77,6 @@ cd A2AL
 pip install pyyaml
 python tools/validate_library.py
 ```
-
-## Configuring your agent
-
-Once the skill files are in `.claude/skills/` and `.claude/commands/`, the skill is **auto-discovered** by Claude Code on next restart — no manual "enable" step. What you do need is a CLAUDE.md block telling the agent its identity, where to find the library, and (if peers exist) the inbox conventions. Same recipe for new and existing agents — only difference is whether you create CLAUDE.md from scratch or append to an existing one.
-
-### CLAUDE.md block (copy / paste)
-
-For an **existing CLAUDE.md**: append this section. For a **new project**: this can be the whole file, or supplement with project-specific guidance.
-
-````markdown
-## A2AL/0.4.1 — Agent-to-Agent Communication
-
-This project uses [A2AL/0.4.1](https://github.com/mcornelison/A2AL) for peer-to-peer agent messages.
-
-### Identity
-You are **[AgentName]**, a [role] agent. When sending A2AL messages, sign as `[AgentName]/[role]` or `[AgentName]([role])` in the routing header (e.g., `Hawkeye/QA`, `Byte(DEV)`). Roles are free-form.
-
-### Repo location
-The A2AL repo is cloned at `[/absolute/path/to/A2AL]`. The vocabulary library is at `[/absolute/path/to/A2AL]/library/`.
-
-### When to use A2AL (audience rule)
-- **Agent-only audience → A2AL MUST.** Both sender and recipient are agents; no human will read or review.
-- **Human in the audience → Markdown.** A human will triage, archive, or review at any point.
-- **Inbound says `audience=agent` or sender is identified as an AI agent → reply MUST be A2AL** (reactive rule).
-- **Default → Markdown** when audience is ambiguous or mixed.
-
-### Routing header
-Every A2AL message begins with one line:
-```text
-from=<Name>(<Role>); to=<Name>(<Role>); date=<ISO>; topic=<short label>
-```
-Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`.
-
-### Loading the library
-Always have `[/absolute/path/to/A2AL]/library/core.yaml` available (~77 universal terms). Add domain extensions per the conversation:
-
-| Topic | Load |
-|---|---|
-| Code review / dev process | + `programming.yaml` |
-| Cloud / orchestration / data | + `infrastructure.yaml` |
-| Sprint, project, program management | + `project-mgmt.yaml` |
-| Security review / threat modeling | + `security.yaml` |
-| LLM / agent / RAG topics | + `ai-agents.yaml` |
-
-The `a2al` skill and `/a2al` command both use these.
-
-### Inbox / outbox (only if you have peer agents)
-- **Your inbox:** `[/absolute/path/to/your-inbox/]` (`.txt` files, one A2AL message per file)
-- **Filename:** `<sender>-<intent>-<unix-ts>.txt`
-- **Threading:** reference prior message id in the body — `re: <id>` or `in-reply-to: <id>`
-
-### Reference
-- Spec: `[/absolute/path/to/A2AL]/specs/A2A-Core.md`
-- Library schema: `[/absolute/path/to/A2AL]/library/README.md`
-- Validator (validates library YAML, not messages): `python [/absolute/path/to/A2AL]/tools/validate_library.py`
-````
-
-The bracketed `[...]` placeholders are what you fill in:
-
-- `[AgentName]` and `[role]` — your agent's name and what it does
-- `[/absolute/path/to/A2AL]` — wherever you cloned this repo
-- `[/absolute/path/to/your-inbox/]` — only if peers can send you messages
-
-If the agent is solo (no peers), the inbox section is optional. The skill is still useful for "compress this report" or "send this to <other agent>" prompts.
-
-### Verifying the install
-
-After restarting Claude Code, prompt the agent:
-
-```
-Verify A2AL is wired up:
-1. Read [/absolute/path/to/A2AL]/library/core.yaml and report how many entries it has plus 3 sample terms.
-2. Compose this as an A2AL message to peer "Agent2": "all tests pass, build is green, PR ready to merge". Include the routing header.
-3. Confirm /a2al is registered as a slash command.
-```
-
-Expected: ~77 entries reported (sample terms like `done`, `merge`, `PR`); a two-line output with a `from=...; to=Agent2; date=...; topic=...; audience=agent` header followed by a body like `tests pass; build green; PR ready -- merge?`; `/a2al` recognized. If any step fails, check that the skill files actually copied into `.claude/skills/a2al/` and `.claude/commands/a2al.md`, and that you restarted Claude Code.
-
-### Multi-agent setup
-
-If you have multiple agents talking to each other peer-to-peer, each agent gets its own `.claude/skills/a2al/`, its own `.claude/commands/a2al.md`, and its own CLAUDE.md with its own `[AgentName]/[role]` identity. The path to the A2AL repo and the library is the same for all of them; only identity and inbox path differ.
-
-### What you don't need to do
-
-- ❌ No "enable skill" command — Claude Code auto-discovers skills on startup
-- ❌ No daemon, server, or service
-- ❌ No registration step in any external system
-- ❌ No special launch flag — just restart Claude Code after copying the files
 
 ## How to use
 
@@ -203,7 +114,7 @@ The skill loads `library/core.yaml` automatically. To add domain vocabulary (e.g
 | [`specs/A2A-Core.md`](./specs/A2A-Core.md) | Normative A2AL/0.4.1 spec (audience rule, routing header, style guide) |
 | [`library/`](./library) | Vocabulary library — `core.yaml` + 5 domain extensions |
 | [`examples/`](./examples) | Worked shorthand examples |
-| [`examples/ClaudeCode/`](./examples/ClaudeCode) | Reference Claude Code skill + slash command |
+| [`examples/ClaudeCode/`](./examples/ClaudeCode) | Claude Code install guide — skill, slash command, sample CLAUDE.md |
 | [`tools/`](./tools) | Validator (`validate_library.py`) + tests |
 | [`.github/`](./.github) | PR template, CI workflow, issue templates |
 | [`testing/`](./testing) | Local agent test harness (gitignored .claude/, tracked test inputs) |
