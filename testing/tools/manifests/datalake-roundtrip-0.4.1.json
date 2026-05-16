@@ -1,0 +1,68 @@
+{
+  "encoder": "cl100k_base",
+  "out_dir": "../../agent2/analysis/datalake-roundtrip-0.4.1",
+  "baseline": "md",
+  "summary": "summary.json",
+  "messages": [
+    {
+      "id": "agent1-us-dl401",
+      "label": "Read: US-DL-401 user story (clickstream Bronze)",
+      "intent": "user-story",
+      "formats": [
+        {"name": "shorthand-0.4.0", "path": "../../agent2/inbox/agent1-us-dl401-1778500900.txt"},
+        {"name": "shorthand-0.4.1", "path": "../../agent2/analysis/datalake-shorthand-0.4.1/agent1-us-dl401.txt"},
+        {"name": "md", "path": "../../agent2/analysis/datalake-md/agent1-us-dl401.md"}
+      ]
+    },
+    {
+      "id": "agent1-us-dl407",
+      "label": "Read: US-DL-407 user story (Silver customer_360)",
+      "intent": "user-story",
+      "formats": [
+        {"name": "shorthand-0.4.0", "path": "../../agent2/inbox/agent1-us-dl407-1778500910.txt"},
+        {"name": "shorthand-0.4.1", "path": "../../agent2/analysis/datalake-shorthand-0.4.1/agent1-us-dl407.txt"},
+        {"name": "md", "path": "../../agent2/analysis/datalake-md/agent1-us-dl407.md"}
+      ]
+    },
+    {
+      "id": "agent1-pipeline-error",
+      "label": "Read: INC-DL-0517 pipeline OOM incident",
+      "intent": "incident",
+      "formats": [
+        {"name": "shorthand-0.4.0", "path": "../../agent2/inbox/agent1-pipeline-error-1778500920.txt"},
+        {"name": "shorthand-0.4.1", "path": "../../agent2/analysis/datalake-shorthand-0.4.1/agent1-pipeline-error.txt"},
+        {"name": "md", "path": "../../agent2/analysis/datalake-md/agent1-pipeline-error.md"}
+      ]
+    },
+    {
+      "id": "agent2-us-dl401-signoff",
+      "label": "Write: US-DL-401 QA sign-off",
+      "intent": "sign-off",
+      "formats": [
+        {"name": "shorthand-0.4.0", "path": "../../agent1/inbox/agent2-us-dl401-signoff-1778544100.txt"},
+        {"name": "shorthand-0.4.1", "path": "../../agent2/analysis/datalake-shorthand-0.4.1/agent2-us-dl401-signoff.txt"},
+        {"name": "md", "path": "../../agent2/analysis/datalake-md/agent2-us-dl401-signoff.md"}
+      ]
+    },
+    {
+      "id": "agent2-us-dl407-signoff",
+      "label": "Write: US-DL-407 QA sign-off",
+      "intent": "sign-off",
+      "formats": [
+        {"name": "shorthand-0.4.0", "path": "../../agent1/inbox/agent2-us-dl407-signoff-1778544110.txt"},
+        {"name": "shorthand-0.4.1", "path": "../../agent2/analysis/datalake-shorthand-0.4.1/agent2-us-dl407-signoff.txt"},
+        {"name": "md", "path": "../../agent2/analysis/datalake-md/agent2-us-dl407-signoff.md"}
+      ]
+    },
+    {
+      "id": "agent2-inc-dl0517-ack",
+      "label": "Write: INC-DL-0517 SRE incident response",
+      "intent": "incident-response",
+      "formats": [
+        {"name": "shorthand-0.4.0", "path": "../../agent1/inbox/agent2-inc-dl0517-ack-1778544120.txt"},
+        {"name": "shorthand-0.4.1", "path": "../../agent2/analysis/datalake-shorthand-0.4.1/agent2-inc-dl0517-ack.txt"},
+        {"name": "md", "path": "../../agent2/analysis/datalake-md/agent2-inc-dl0517-ack.md"}
+      ]
+    }
+  ]
+}

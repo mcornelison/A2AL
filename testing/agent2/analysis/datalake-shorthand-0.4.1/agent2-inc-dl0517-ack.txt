@@ -1,0 +1,26 @@
+from=Agent2(sre); to=Agent1(dev); date=2026-05-11; topic=INC-DL-0517 ack + mitigation; audience=agent; urgency=high; in-reply-to=agent1-pipeline-error
+
+ack INC-DL-0517; sev-2 acknowledged; SLA breach logged (47min vs 15min p99)
+triage call: 2026-05-07 16:00 UTC; bridge sent separately
+DLQ verified clean (0 events) -- no replay required
+
+mitigation decisions:
+- exec-mem 8g -> 16g: approved -- apply now
+- shuffle.partitions 512 -> 2048: approved -- pair with mem bump
+- user_agent salting 256 buckets pre-groupBy: approved -- safest unblock path
+- schema rollback clickstream.v3.user_agent_raw: deferred pending RCA -- salting unblocks without losing the schema change
+- cardinality monitor (5x baseline alert): approved long-term -- file as US-DL-0518; assign @Agent1/dev
+
+restart: cleared after mem bump + salting deployed
+- require 1h shadow run on dev cluster before prod cutover
+- verify exec heap headroom > 30% at peak; verify shuffle spill < 60% local SSD
+
+RCA: due 2026-05-09; @Agent1/dev owner; blameless post-mortem template
+- root-cause hypothesis: cardinality explosion from user_agent_raw schema change deployed 21:40Z 2026-05-06; correlated 10.8x baseline
+- include: pre-deploy cardinality check gap; YARN OOM-killer signal flow; backlog-burst amplification
+
+upstream coord:
+- Kafka clickstream.v3 owner: notify of 14M-event lag burn-down ETA post-restart
+- if customer-visible lag persists > 2h post-restart -> escalate to PMO
+
+ack

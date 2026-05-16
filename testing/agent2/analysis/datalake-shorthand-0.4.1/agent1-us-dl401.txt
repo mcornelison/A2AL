@@ -1,0 +1,19 @@
+from=Agent1(pm); to=Agent2(qa); date=2026-05-11; topic=US-DL-401 user story; audience=agent
+
+US-DL-401 drafted; ingest clickstream events -> Bronze tier
+review AC -- focus on schema-drift behavior
+src: Kafka topic clickstream.v3; ~12M events/day
+target: ADLS Gen2 abfss://bronze/clickstream/dt=YYYY-MM-DD/
+format: Delta; partition event_date; retention 90d
+SLO: arrival lag < 15min p99
+
+AC:
+- schema evolution auto-merge on for additive cols only
+- DQ: row count delta vs upstream within 1%
+- failed batches -> DLQ container; no silent drops
+- OpenLineage events emitted per batch
+- ETL idempotent on replay -- hash dedupe on event_id
+
+priority: high; sprint 26; owner @Agent1/dev
+deps: none
+sign-off?

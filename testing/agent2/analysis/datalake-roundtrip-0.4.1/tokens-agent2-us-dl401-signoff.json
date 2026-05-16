@@ -1,0 +1,32 @@
+{
+  "id": "agent2-us-dl401-signoff",
+  "label": "Write: US-DL-401 QA sign-off",
+  "intent": "sign-off",
+  "encoder": "cl100k_base",
+  "formats": {
+    "shorthand-0.4.0": {
+      "file": "agent2-us-dl401-signoff-1778544100.txt",
+      "path": "C:\\Users\\mcornelison\\Projects\\A2A-Protocal\\testing\\agent1\\inbox\\agent2-us-dl401-signoff-1778544100.txt",
+      "tokens": 152,
+      "chars": 586
+    },
+    "shorthand-0.4.1": {
+      "file": "agent2-us-dl401-signoff.txt",
+      "path": "C:\\Users\\mcornelison\\Projects\\A2A-Protocal\\testing\\agent2\\analysis\\datalake-shorthand-0.4.1\\agent2-us-dl401-signoff.txt",
+      "tokens": 163,
+      "chars": 605
+    },
+    "md": {
+      "file": "agent2-us-dl401-signoff.md",
+      "path": "C:\\Users\\mcornelison\\Projects\\A2A-Protocal\\testing\\agent2\\analysis\\datalake-md\\agent2-us-dl401-signoff.md",
+      "tokens": 221,
+      "chars": 859
+    }
+  },
+  "shared_body": null,
+  "ratios": {
+    "shorthand-0.4.0/md": 0.688,
+    "shorthand-0.4.1/md": 0.738
+  },
+  "envelope_overhead_tokens": {}
+}
