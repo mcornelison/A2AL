@@ -308,4 +308,22 @@ Restart Claude Code to load the new skill and command for normal use.
 
 ## Error handling
 
-_(filled in by Task 14)_
+Six failure modes have defined behavior. Anything outside these is unexpected — surface the actual error to the operator and stop.
+
+| # | Failure | What you do |
+|---|---|---|
+| 1 | `git clone` fails (network, auth, disk) | Stop. Print the git error verbatim, then print the manual clone command for the operator to run themselves. Do not proceed to Phase 2. |
+| 2 | `~/A2AL` exists but is not the A2AL repo | Stop. Ask the operator for an alternate clone path. Do not overwrite. Retry e1 with their answer. |
+| 3 | `git pull --ff-only` fails (local commits in clone, divergent history, etc.) | Warn but continue. Library files in the existing clone are still usable. Add this line to the final summary: "your clone is N commits behind upstream — `git pull` it manually when convenient." |
+| 4 | Target CLAUDE.md exists but has no H2 sections at all (fresh-mode Case B) | Insert the A2AL block at the very top of the file. Add this line to the final summary: "no existing H2 found in CLAUDE.md — A2AL block placed at the top; you may want to add a project-identity H2 above it." |
+| 5 | Diff loop — operator picks "Merge manually" then disconnects without finishing | Do not write anything for that subsection. The next run of the install will re-fire the diff for any subsection still drifted (file-state-driven idempotency). |
+| 6 | e5 verification step fails one of the three probes | Print the matching troubleshooting row from `examples/ClaudeCode/README.md`. Do not roll back; partial installs are recoverable by re-running. |
+
+### What does NOT have automatic recovery
+
+- Operator hand-edited `skills/a2al/SKILL.md` or `commands/a2al.md` directly — these files are deterministic mirrors of upstream and were overwritten without warning. (The final summary always notes this is a possibility.)
+- Library YAML files hand-edited in `copy-locally` mode — overwritten without warning. Clone-and-point operators have git as their backup.
+
+### No rollback
+
+Phase 2's file operations are write-once and deterministic. If the operator hits Ctrl+C mid-install, re-running the prompt picks up cleanly — that's what "idempotent" buys. Do not implement backup files; they would only add confusion.
