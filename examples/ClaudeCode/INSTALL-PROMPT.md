@@ -110,6 +110,37 @@ By the end of e1, you have `clone_path` (defaulting to `~/A2AL`) pointing at an 
 - If `library_mode == clone-and-point`: the clone is at `dirname(dirname(library_path))`. Run `git -C <clone-path> pull --ff-only`. Warn but continue on failure.
 - If `library_mode == copy-locally`: there is no clone tied to the install. Use a scratch clone at `~/A2AL` (or clone there if missing) so e3 has fresh upstream library files to copy from.
 
+### e2 — Copy skill + command into chosen scope
+
+Compute the destination scope dir:
+- `scope == project` → `<project-root>/.claude/`
+- `scope == user-global` → `~/.claude/`
+
+Create the dirs if missing:
+```
+mkdir -p <scope-dir>/skills/a2al
+mkdir -p <scope-dir>/commands
+```
+
+Copy these two files unconditionally (overwrite if they exist):
+```
+<clone_path>/examples/ClaudeCode/skills/a2al/SKILL.md  ->  <scope-dir>/skills/a2al/SKILL.md
+<clone_path>/examples/ClaudeCode/commands/a2al.md      ->  <scope-dir>/commands/a2al.md
+```
+
+If you suspect the operator hand-edited either file (you can't actually tell from here; this is informational), add a single line to the final summary: "If you edited `skills/a2al/SKILL.md` or `commands/a2al.md` directly, those edits were overwritten."
+
+### e3 — Place library files
+
+- If `library_mode == clone-and-point`: do nothing. The library is at `<clone_path>/library/`. Record `library_path = <clone_path>/library/` for CLAUDE.md.
+
+- If `library_mode == copy-locally`: copy every `.yaml` file from `<clone_path>/library/` into `<scope-dir>/a2al-library/`, overwriting unconditionally:
+  ```
+  mkdir -p <scope-dir>/a2al-library
+  cp <clone_path>/library/*.yaml <scope-dir>/a2al-library/
+  ```
+  Record `library_path = <scope-dir>/a2al-library/` for CLAUDE.md.
+
 ## Re-sync diff loop (Phase 2 step e4 alternate)
 
 _(filled in by Task 11)_
