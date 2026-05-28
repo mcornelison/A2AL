@@ -197,7 +197,99 @@ If any probe fails, print the matching troubleshooting row from `examples/Claude
 
 ## Re-sync diff loop (Phase 2 step e4 alternate)
 
-_(filled in by Task 11)_
+This replaces e4's "Case A / Case B" write logic when you are in re-sync mode. The goal: refresh the operator's CLAUDE.md A2AL block to match the current sample, but surface real spec changes for operator review while ignoring their own legitimate placeholder fill-ins.
+
+### Step 1 — Extract both sides at section granularity
+
+The A2AL block has six H3 subsections (per `CLAUDE-sample.md`):
+
+```
+### Identity for A2AL routing headers
+### Library location
+### When to use A2AL (audience rule)
+### Routing header
+### Inbox / outbox (only if you have peer agents)
+### Reference
+```
+
+Parse both the existing CLAUDE.md A2AL block and `<clone_path>/examples/ClaudeCode/CLAUDE-sample.md` into a `{subsection_heading -> body_text}` map. Treat subsections by their heading text verbatim; do not fuzzy-match.
+
+### Step 2 — Normalize placeholders before diffing
+
+Without normalization, every install would show every subsection as drifted (operator put real values where the sample has `[bracketed]` placeholders). Do a one-time extraction pass over the operator's existing block to learn their substitutions:
+
+| Sample placeholder | Read from operator's CLAUDE.md |
+|---|---|
+| `[AgentName]`, `[role]` | Identity subsection — the `<Name>/<Role>` token |
+| `[/absolute/path/to/A2AL]` | Library location subsection — the absolute path before `/library/` |
+| `[/absolute/path/to/your-inbox/]` | Inbox/outbox subsection — the "Your inbox:" path |
+| `[Project Name]` | The CLAUDE.md file's first H1 (if present) |
+
+Build a `placeholder_map = { '[AgentName]': 'Byte', '[role]': 'DEV', ... }`. In the operator's block, replace each real value back with its placeholder. Both sides now use bracketed tokens.
+
+### Step 3 — Diff section-by-section
+
+For each subsection in the sample (and also each subsection present in operator's block but missing from sample):
+
+- **Equal** (after collapsing trailing whitespace on both sides): silent. No operator prompt. Mark this subsection "unchanged" for the summary.
+
+- **In sample, not in operator's block:** prompt:
+  > A new subsection `### <heading>` has been added in the current sample. Paste it into your CLAUDE.md? (yes / no — keep yours unchanged)
+  
+  If yes, append the new subsection to the operator's A2AL block (with placeholder substitution from `placeholder_map` re-applied). Mark "new subsection added" for the summary.
+
+- **In operator's block, not in sample:** prompt:
+  > The subsection `### <heading>` exists in your CLAUDE.md but has been removed from the current sample. Keep it or drop it? (keep / drop)
+  
+  Mark "kept removed-subsection" or "dropped" for the summary.
+
+- **Both present, normalized bodies differ:** show a unified diff (or line-by-line if the diff is short) and prompt:
+  ```
+  === Subsection: <heading> ===
+  Differences (your CLAUDE.md vs current sample):
+
+    - <removed line>
+    + <added line>
+
+  How do you want to handle this?
+    1. Take the new version (replace yours with the sample text)
+    2. Keep yours (do nothing; you've customized this on purpose)
+    3. Merge manually (show me both and I'll dictate the final text)
+  ```
+  
+  After operator chooses:
+  - Option 1: write the sample's body for this subsection, with `placeholder_map` re-substituted, back into CLAUDE.md.
+  - Option 2: leave operator's body unchanged.
+  - Option 3: print the operator's full subsection body and the sample's full subsection body; ask the operator to dictate the final text; write what they dictate, with `placeholder_map` re-substituted.
+
+  Mark this subsection's resolution for the summary ("TOOK NEW", "KEPT YOURS", "MERGED MANUALLY").
+
+### Step 4 — Update the H2 version heading
+
+After the per-subsection loop, look at the operator's H2 heading line (`## A2AL/0.4.X — Agent-to-Agent Communication`). Compare its version-suffix against the sample's. If the sample is higher, rewrite the operator's heading line to match the sample's. (For 0.4.2, where the sample's H2 may still say 0.4.1, this is a no-op.)
+
+### Step 5 — Summary
+
+Print:
+
+```
+A2AL re-sync complete.
+  Skill, command, library: refreshed.
+  CLAUDE.md A2AL block: <old-version> -> <new-version>.
+    Identity: <unchanged | TOOK NEW | KEPT YOURS | MERGED MANUALLY>
+    Library location: <...>
+    Audience rule: <...>
+    Routing header: <...>
+    Inbox/outbox: <...>
+    Reference: <...>
+```
+
+### What this loop deliberately does NOT do
+
+- No automatic merging. Every substantive difference is operator-confirmed.
+- No structural edits outside the A2AL block. The rest of CLAUDE.md is untouched.
+- No fuzzy matching of H3 headings. A renamed subsection is treated as removed + new (fail-safe).
+- No saved progress mid-loop. If the operator interrupts during "merge manually" and re-runs the install later, the diff loop re-fires for whatever subsections are still drifted — idempotency comes from re-reading the file, not from saved state.
 
 ## Verification
 
