@@ -18,7 +18,7 @@ Welcome Agent2. Inbox live: 2026-05-05 22:05 CDT.
 Reply when ready. -- Agent1
 ```
 
-13 tokens. The verbose Markdown equivalent was 30 tokens (see `testing/agent2/analysis.md`).
+13 tokens. The verbose Markdown equivalent was 30 tokens.
 
 ## ClaudeCode integration
 

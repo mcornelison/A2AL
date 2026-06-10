@@ -117,7 +117,6 @@ The skill loads `library/core.yaml` automatically. To add domain vocabulary (e.g
 | [`examples/ClaudeCode/`](./examples/ClaudeCode) | Claude Code install guide — skill, slash command, sample CLAUDE.md |
 | [`tools/`](./tools) | Validator (`validate_library.py`) + tests |
 | [`.github/`](./.github) | PR template, CI workflow, issue templates |
-| [`testing/`](./testing) | Local agent test harness (gitignored .claude/, tracked test inputs) |
 
 Start with [`specs/A2A-Core.md`](./specs/A2A-Core.md) for the style guide and [`library/README.md`](./library/README.md) for the vocabulary structure.
 

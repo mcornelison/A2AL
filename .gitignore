@@ -15,8 +15,10 @@ CLAUDE.md
 # Archived spec — removed from the working tree; preserved at tag v0.3.0-archive
 archive/
 
-# Top-level scratch inbox (root only; testing/agent*/inbox/ stays tracked)
+# Internal dev artifacts — kept locally, not part of the public repo
 /inbox/
+testing/
+docs/design/
 
 # Build / scratch
 dist/

@@ -2,8 +2,6 @@
 
 You are an AI agent that has been asked to install or re-sync A2AL on a host project. Follow this prompt end-to-end. It works for both fresh installs and re-syncs — re-running it is safe and is the supported upgrade path inside 0.x.x.
 
-Reference design (read if confused): https://github.com/mcornelison/A2AL/blob/main/docs/design/specs/2026-05-21-a2al-0.4.2-install-prompt-design.md
-
 ## How this prompt is structured
 
 Two phases. Run them in order:

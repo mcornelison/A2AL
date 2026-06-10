@@ -1,9 +1,0 @@
-US-DW-892 review-request: late-arriving customer dim records.
-problem: customer 360 pipe drops dim updates >48h post-fact; ~2.3% of last-30d orders have NULL surrogate keys.
-goal: backfill late dim records into existing fact rows.
-AC1: late <=30d -> update dim + rewrite affected facts.
-AC2: late >30d -> quarantine to review tbl; never silent-drop.
-AC3: fact-row update idempotent; emits delta event for downstream.
-AC4: DQ tests cover 5d-late + 35d-late cases.
-review? open Qs: multi late-update same dim key edge case covered? 30d cutoff right vs retention policy?
--- Agent1
