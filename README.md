@@ -2,7 +2,7 @@
 
 A2AL is an open, contributable vocabulary library that lets AI agents communicate in token-efficient shorthand. It is plain text, English-derived, designed to tokenize as 1 token per concept on modern LLM tokenizers. Agents share a common dictionary and extend it for their domain.
 
-**Status:** A2AL/0.4.1. Pre-1.0; subject to refinement before /1.0.
+**Status:** A2AL/0.5.0. Pre-1.0; subject to refinement before /1.0.
 
 **License:** Apache-2.0 — see [LICENSE](./LICENSE).
 
@@ -53,7 +53,7 @@ Channels can also be declared agent-only by convention (e.g., paths under `agent
 
 ## How to install
 
-A2AL/0.4.1 is plain text — no runtime, no compiler. Install means making the vocabulary library and the agent helper skill available to your AI agent.
+A2AL/0.5.0 is plain text — no runtime, no compiler. Install means making the vocabulary library and the agent helper skill available to your AI agent.
 
 ### For Claude Code agents
 
@@ -111,8 +111,8 @@ The skill loads `library/core.yaml` automatically. To add domain vocabulary (e.g
 
 | Path | Purpose |
 |---|---|
-| [`specs/A2A-Core.md`](./specs/A2A-Core.md) | Normative A2AL/0.4.1 spec (audience rule, routing header, style guide) |
-| [`library/`](./library) | Vocabulary library — `core.yaml` + 5 domain extensions |
+| [`specs/A2A-Core.md`](./specs/A2A-Core.md) | Normative A2AL/0.5.0 spec (audience rule, routing header, style guide) |
+| [`library/`](./library) | Vocabulary library — `core.yaml` + 6 domain extensions |
 | [`examples/`](./examples) | Worked shorthand examples |
 | [`examples/ClaudeCode/`](./examples/ClaudeCode) | Claude Code install guide — skill, slash command, sample CLAUDE.md |
 | [`tools/`](./tools) | Validator (`validate_library.py`) + tests |
@@ -142,10 +142,10 @@ A2AL follows semantic versioning. Adding library entries is a minor bump. Renami
 |---|---|---|
 | 0.3.0 | JSON envelope (deprecated) | archived at tag [`v0.3.0-archive`](https://github.com/mcornelison/A2AL/tree/v0.3.0-archive/archive/0.3.0) |
 | 0.4.0 | Hard pivot — shorthand library is A2AL | superseded by 0.4.1 |
-| **0.4.1** | **Audience rule + routing header (normative)** | **current** |
-| 0.4.2 | Install prompt (idempotent — same flow handles installs and re-syncs) | future |
-| 0.4.3 | `thread=<id>` optional header field | future |
-| 0.4.4 | Tokenization validator tooling (Claude, GPT, Llama) | future |
-| 0.4.5 | Auto-harvested PR candidates from agent traffic | future |
-| 0.5.0 | Moltbook beta — cross-LLM validation | future |
+| 0.4.1 | Audience rule + routing header (normative) | superseded by 0.5.0 |
+| 0.4.2 | Install prompt (idempotent — same flow handles installs and re-syncs) | shipped |
+| **0.5.0** | **Optional header fields (`thread`, `status`, `cc`, `priority`) + vocabulary expansion (core +10, new `azure` domain)** | **current** |
+| 0.5.1 | Tokenization validator tooling (Claude, GPT, Llama) | future |
+| 0.5.2 | Auto-harvested PR candidates from agent traffic | future |
+| 0.6.0 | Moltbook beta — cross-LLM validation | future |
 | 1.0.0 | Production agents using A2AL successfully + Moltbook beta proven | gated on real-world adoption |

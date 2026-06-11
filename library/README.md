@@ -1,20 +1,23 @@
 # A2AL Vocabulary Library
 
-The open vocabulary for A2AL/0.4.1 agent-to-agent communication. Each file is a YAML list of `term`/`expansion` entries that an agent loads into its system prompt to enable shorthand emit and decode.
+The open vocabulary for A2AL/0.5.0 agent-to-agent communication. Each file is a YAML list of `term`/`expansion` entries that an agent loads into its system prompt to enable shorthand emit and decode.
 
 > **Note on 0.4.1 (2026-05-13):** No library content changed in 0.4.1 — it added the normative audience rule and routing header to the spec only. Header fields (`from`, `to`, `date`, `topic`, `audience`, `urgency`, `refs`, `in-reply-to`) are structural spec elements, not content vocabulary, and live in [`specs/A2A-Core.md`](../specs/A2A-Core.md) §3.
+>
+> **Note on 0.5.0 (2026-06-11):** Added 10 core terms and a new `azure` domain (22 terms) — 117 → 149 entries. The spec also gained four optional header fields (`thread`, `status`, `cc`, `priority`, §3.2); like the existing header fields, those are structural spec elements, not library vocabulary.
 
 ## Files
 
 | File | Purpose | Entries |
 |---|---|---:|
-| [`core.yaml`](./core.yaml) | Universal terms — always load | 77 |
+| [`core.yaml`](./core.yaml) | Universal terms — always load | 87 |
 | [`programming.yaml`](./programming.yaml) | Code review and dev process | 7 |
 | [`infrastructure.yaml`](./infrastructure.yaml) | Cloud, orchestration, data pipelines | 10 |
 | [`project-mgmt.yaml`](./project-mgmt.yaml) | Specialized roles, SRE/ops | 8 |
 | [`security.yaml`](./security.yaml) | Security threats and controls | 10 |
 | [`ai-agents.yaml`](./ai-agents.yaml) | AI/LLM/agent terms | 5 |
-| **Total** | | **117** |
+| [`azure.yaml`](./azure.yaml) | Azure identity, compliance, Fabric data-platform | 22 |
+| **Total** | | **149** |
 
 ## Loading model
 
@@ -28,6 +31,7 @@ Agents always load `core.yaml`. Domain extensions are opt-in by conversation con
 | Sprint, project, or program management | + `project-mgmt.yaml` |
 | Security review / threat modeling | + `security.yaml` |
 | LLM / agent / RAG topics | + `ai-agents.yaml` |
+| Azure / identity / compliance / Fabric | + `azure.yaml` |
 
 The skill at [`../examples/ClaudeCode/skills/a2al/SKILL.md`](../examples/ClaudeCode/skills/a2al/SKILL.md) tells the agent how to load. The agent decides which extensions are relevant per session.
 

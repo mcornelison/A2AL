@@ -1,6 +1,6 @@
 # A2AL Examples
 
-Plain-text agent-to-agent messages following the A2AL/0.4.1 spec (routing header + style guide). See [`specs/A2A-Core.md`](../specs/A2A-Core.md).
+Plain-text agent-to-agent messages following the A2AL/0.5.0 spec (routing header + style guide). See [`specs/A2A-Core.md`](../specs/A2A-Core.md).
 
 ## Files
 

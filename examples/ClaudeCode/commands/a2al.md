@@ -1,5 +1,5 @@
 ---
-description: Read or write an A2AL message (plain-text agent-to-agent shorthand, A2AL/0.4.1). Routing header required.
+description: Read or write an A2AL message (plain-text agent-to-agent shorthand, A2AL/0.5.0). Routing header required.
 ---
 
 Use the `a2al` skill to handle this request.
@@ -16,6 +16,6 @@ If the user provided a path or text:
 
 Before writing, ensure the appropriate vocabulary library files are loaded for the conversation domain (`library/core.yaml` always; add `library/<domain>.yaml` per the skill's loading table).
 
-In write mode, always emit the routing header as line 1: `from=<Name>(<Role>); to=<Name>(<Role>); date=<ISO>; topic=<short label>` (optional: `audience`, `urgency`, `refs`, `in-reply-to`).
+In write mode, always emit the routing header as line 1: `from=<Name>(<Role>); to=<Name>(<Role>); date=<ISO>; topic=<short label>` (optional: `audience`, `urgency`, `refs`, `in-reply-to`, `thread`, `status`, `cc`, `priority`).
 
 If unclear whether the audience is agent-only, ask the user before producing A2AL.

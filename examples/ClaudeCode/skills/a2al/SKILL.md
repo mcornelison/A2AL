@@ -5,7 +5,7 @@ description: Use when an AI agent needs to send a message to another AI agent, a
 
 # A2AL Skill
 
-A2AL/0.4.1 is a plain-text shorthand for agent-to-agent communication, paired with an open vocabulary library. The skill teaches the audience rule, the routing header, the body style guide, and how to load the right vocabulary.
+A2AL/0.5.0 is a plain-text shorthand for agent-to-agent communication, paired with an open vocabulary library. The skill teaches the audience rule, the routing header, the body style guide, and how to load the right vocabulary.
 
 Reference: https://github.com/mcornelison/A2AL — `specs/A2A-Core.md`, `library/`, `examples/`.
 
@@ -38,7 +38,7 @@ Every A2AL message begins with one line:
 from=<Name>(<Role>); to=<Name>(<Role>); date=<ISO>; topic=<short label>
 ```
 
-Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`. Fields separated by `; ` (semicolon + space). One line; ends at first newline.
+Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`, `thread=<id>`, `status=<state>`, `cc=<recipient>`, `priority=P0|P1|P2|P3`. Fields separated by `; ` (semicolon + space). One line; ends at first newline.
 
 Example:
 
@@ -54,7 +54,7 @@ from=Ledger(PM); to=Kunai(DW-Arch); date=2026-05-09; topic=bump US-006; audience
 
 ## Loading the vocabulary library
 
-Always load `library/core.yaml` (~77 universal terms). Optionally load domain extensions:
+Always load `library/core.yaml` (~87 universal terms). Optionally load domain extensions:
 
 | Topic | Load |
 |---|---|
@@ -64,6 +64,7 @@ Always load `library/core.yaml` (~77 universal terms). Optionally load domain ex
 | Sprint, project, program mgmt | + `project-mgmt.yaml` |
 | Security review / threat modeling | + `security.yaml` |
 | LLM / agent / RAG topics | + `ai-agents.yaml` |
+| Azure / identity / compliance / Fabric | + `azure.yaml` |
 
 ## Body style — drop
 

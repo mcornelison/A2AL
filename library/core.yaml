@@ -89,6 +89,15 @@ entries:
   - term: yellow
     expansion: warning state
     example: "build yellow -- 2 warnings"
+  - term: PARTIAL
+    expansion: partially complete
+    example: "US-013 PARTIAL -- 3 of 4 bugs fixed"
+  - term: WITHDRAWN
+    expansion: withdrawn or cancelled
+    example: "D-71 WITHDRAWN"
+  - term: superseded
+    expansion: replaced by a newer item
+    example: "ADR-011 superseded by ADR-014"
 
   # ---- Actions ----
   - term: merge
@@ -178,6 +187,29 @@ entries:
   - term: modify
     expansion: modify
     example: "modify maxClusterSize 3 -> 4"
+
+  # ---- Workflow / coordination ----
+  - term: ack
+    expansion: acknowledge or acknowledged
+    example: "ack US-713 closeout"
+  - term: endorse
+    expansion: endorse, approve with conditions
+    example: "endorse design -- 4 verify conditions"
+  - term: supersede
+    expansion: replace with a newer item
+    example: "supersede prior route-to-pm wording"
+  - term: heads-up
+    expansion: informational notice, no action needed
+    example: "heads-up: master-gold stale"
+  - term: gate
+    expansion: gating check or approval
+    example: "freshness gate never passed"
+  - term: spike
+    expansion: timeboxed investigation
+    example: "US-091 spike -- outcome B"
+  - term: hotfix
+    expansion: urgent production fix
+    example: "hotfix grew 4 -> 7 stories"
 
   # ---- Severity ----
   - term: crit

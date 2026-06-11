@@ -1,5 +1,5 @@
 <!--
-  CLAUDE-sample.md — A2AL/0.4.1
+  CLAUDE-sample.md — A2AL/0.5.0
 
   Two ways to use this file:
 
@@ -9,7 +9,7 @@
       sections after the A2AL block.
 
   (2) Existing CLAUDE.md:
-      Copy only the `## A2AL/0.4.1 — Agent-to-Agent Communication`
+      Copy only the `## A2AL/0.5.0 — Agent-to-Agent Communication`
       section (and its subsections) into your file. Place it
       immediately AFTER your first H2 (the project identity / overview
       heading) and BEFORE any workflow, conventions, or build/test
@@ -31,9 +31,9 @@ One-paragraph description of what this project is and what the agent helps with.
 You are **[AgentName]**, a [role] agent on the [Project Name] project.
 Your responsibilities are [...].
 
-## A2AL/0.4.1 — Agent-to-Agent Communication
+## A2AL/0.5.0 — Agent-to-Agent Communication
 
-This project uses [A2AL/0.4.1](https://github.com/mcornelison/A2AL) for peer-to-peer agent messages.
+This project uses [A2AL/0.5.0](https://github.com/mcornelison/A2AL) for peer-to-peer agent messages.
 
 ### Identity for A2AL routing headers
 
@@ -41,7 +41,7 @@ When sending A2AL messages, sign as `[AgentName]/[role]` or `[AgentName]([role])
 
 ### Library location
 
-The A2AL vocabulary library is at `[/absolute/path/to/A2AL]/library/`. Always load `core.yaml` (~77 universal terms); load domain extensions per conversation context:
+The A2AL vocabulary library is at `[/absolute/path/to/A2AL]/library/`. Always load `core.yaml` (~87 universal terms); load domain extensions per conversation context:
 
 | Topic | Load |
 |---|---|
@@ -50,6 +50,7 @@ The A2AL vocabulary library is at `[/absolute/path/to/A2AL]/library/`. Always lo
 | Sprint, project, program management | + `project-mgmt.yaml` |
 | Security review / threat modeling | + `security.yaml` |
 | LLM / agent / RAG topics | + `ai-agents.yaml` |
+| Azure / identity / compliance / Fabric | + `azure.yaml` |
 
 The `a2al` skill and `/a2al` command read from this location.
 
@@ -68,7 +69,7 @@ Every A2AL message begins with one line:
 from=<Name>(<Role>); to=<Name>(<Role>); date=<ISO>; topic=<short label>
 ```
 
-Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`.
+Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`, `thread=<id>`, `status=<state>`, `cc=<recipient>`, `priority=P0|P1|P2|P3`.
 
 ### Inbox / outbox (only if you have peer agents)
 

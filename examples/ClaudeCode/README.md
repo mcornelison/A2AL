@@ -1,6 +1,6 @@
 # A2AL — Claude Code Integration
 
-Reference skill, slash command, and sample CLAUDE.md for Claude Code. After install, an agent in Claude Code can read and write A2AL/0.4.1 messages (routing header + body shorthand).
+Reference skill, slash command, and sample CLAUDE.md for Claude Code. After install, an agent in Claude Code can read and write A2AL/0.5.0 messages (routing header + body shorthand).
 
 ## For AI agents — automated install (v0.4.2+)
 
@@ -117,11 +117,11 @@ The skill and command files do **not** have hardcoded library paths. They rely o
 
 ### New project (no CLAUDE.md yet)
 
-Copy [`CLAUDE-sample.md`](./CLAUDE-sample.md) to your project root as `CLAUDE.md`, then fill in every `[bracketed placeholder]`. Add any project-specific sections after the `## A2AL/0.4.1` block.
+Copy [`CLAUDE-sample.md`](./CLAUDE-sample.md) to your project root as `CLAUDE.md`, then fill in every `[bracketed placeholder]`. Add any project-specific sections after the `## A2AL/0.5.0` block.
 
 ### Existing CLAUDE.md
 
-Open [`CLAUDE-sample.md`](./CLAUDE-sample.md) and copy only the `## A2AL/0.4.1 — Agent-to-Agent Communication` section and all its subsections (Identity, Library location, Audience rule, Routing header, Inbox / outbox, Reference).
+Open [`CLAUDE-sample.md`](./CLAUDE-sample.md) and copy only the `## A2AL/0.5.0 — Agent-to-Agent Communication` section and all its subsections (Identity, Library location, Audience rule, Routing header, Inbox / outbox, Reference).
 
 **Where to paste:** immediately AFTER your first H2 (the project identity / overview heading) and BEFORE any workflow, conventions, or build/test sections.
 
@@ -135,7 +135,7 @@ Example structure:
 ## Project Identity
 You are [AgentName], ...
 
-## A2AL/0.4.1 — Agent-to-Agent Communication        ← INSERT HERE
+## A2AL/0.5.0 — Agent-to-Agent Communication        ← INSERT HERE
 ... (entire A2AL block from the sample) ...
 
 ## Workflow / Conventions / Build / Test
@@ -180,7 +180,7 @@ If any step fails:
 
 The skill and command files have no hardcoded library paths. Only CLAUDE.md does. If you change the library location:
 
-1. Edit your CLAUDE.md — find the `### Library location` subsection inside the `## A2AL/0.4.1` block; update the path on the first line. Also update the path in the `### Reference` subsection if applicable.
+1. Edit your CLAUDE.md — find the `### Library location` subsection inside the `## A2AL/0.5.0` block; update the path on the first line. Also update the path in the `### Reference` subsection if applicable.
 2. No changes to `skills/a2al/SKILL.md` or `commands/a2al.md`.
 3. Restart Claude Code so the new CLAUDE.md is reloaded.
 

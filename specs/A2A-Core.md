@@ -1,6 +1,6 @@
-# A2AL — `A2AL/0.4.1` Core Specification
+# A2AL — `A2AL/0.5.0` Core Specification
 
-**Status:** Normative. Supersedes A2AL/0.4.0 with two normative additions (audience rule, routing header) drawn from real-agent usage feedback. Replaces the deprecated A2AL/0.3.0 JSON envelope spec.
+**Status:** Normative. A2AL/0.5.0 adds four optional routing-header fields (`thread`, `status`, `cc`, `priority`) and a substantial vocabulary expansion (core additions + the new `azure` identity/compliance/Fabric domain), all backward-compatible with 0.4.x. Supersedes A2AL/0.4.1 (audience rule + routing header). The deprecated A2AL/0.3.0 JSON envelope spec is archived.
 **See also:** [`README.md`](../README.md), [`library/`](../library), [`examples/`](../examples), [`examples/ClaudeCode/skills/a2al/`](../examples/ClaudeCode/skills/a2al)
 
 A2AL is an open vocabulary library and shorthand style guide for token-efficient agent-to-agent communication. It is plain text — no JSON envelope, no parser dependency. Agents share a common dictionary (`library/core.yaml`) and load domain extensions (`library/<domain>.yaml`) as needed.
@@ -84,9 +84,15 @@ Fields are separated by `; ` (semicolon + space). The header is one line and end
 | Field | Purpose |
 |---|---|
 | `audience=agent\|mixed` | Declares agent-only intent (§2.2). When `agent`, replies MUST be A2AL. |
-| `urgency=low\|medium\|high\|urgent` | Receiver-side prioritization signal. |
+| `urgency=low\|medium\|high\|urgent` | Receiver-side prioritization signal (how *fast*). |
 | `refs=<id>, <id>, ...` | Citations to commits, story IDs, file paths, prior messages. Comma-separated. |
-| `in-reply-to=<message-id>` | Thread continuity when the channel has message IDs. |
+| `in-reply-to=<message-id>, ...` | Immediate-parent reply link(s) when the channel has message IDs. Comma-separated for a reply that closes multiple parents. |
+| `thread=<id>` | Stable conversation/topic-group id — often a ticket or epic key (`thread=US-940`). Distinct from `in-reply-to`: `thread` groups a whole multi-message conversation; `in-reply-to` links one prior message. |
+| `status=<state>` | Overall status of the message's subject, as a core state token (`green`, `red`, `blocked`, `done`, `sent`). Useful for status/stoplight traffic. |
+| `cc=<recipient>, ...` | Informational (copy) recipients, same shape as `to`. Comma-separated. |
+| `priority=P0\|P1\|P2\|P3` | Triage priority — distinct from `urgency` (how fast) and from severity tokens (`crit`/`high`/`med`/`low`). |
+
+All §3.2 fields are genuinely optional and channel-dependent — a richly-routed office inbox may use several; a public channel like Moltbook may use none. Emit only the optional fields that carry signal in your context; never pad the header.
 
 ### 3.3 Example
 
@@ -98,6 +104,14 @@ deadline=2026-05-09T17:00 -- F-SKU trial closes EOD
 ```
 
 The header is line 1. The body follows on subsequent lines per the style rules (§4).
+
+With the optional 0.5.0 fields, a richly-routed office message looks like:
+
+```text
+from=Kunai(DW-Arch); to=Ledger(PM); cc=Audrey(SEC), Archer(Arch); date=2026-06-10; topic=B-293 gates MCP groom; thread=B-293; status=blocked; priority=P1; in-reply-to=atlas-joint-workstream
+B-293 blocked: MCP groom must land first -- Fabric connector contract not frozen.
+ack?
+```
 
 ### 3.4 Why the header is mandatory
 
@@ -144,13 +158,14 @@ Live-usage feedback from three independent agents converged on the same finding:
 
 ## 5. Vocabulary Library
 
-The vocabulary lives in [`library/`](../library) — one YAML file per domain. Always-loaded core: [`library/core.yaml`](../library/core.yaml) (~77 universal terms). Domain extensions:
+The vocabulary lives in [`library/`](../library) — one YAML file per domain. Always-loaded core: [`library/core.yaml`](../library/core.yaml) (~87 universal terms). Domain extensions:
 
 - [`library/programming.yaml`](../library/programming.yaml) — code-review and dev-process specifics (`MR`, `CR`, `IaC`, `code-complete`, etc.)
 - [`library/infrastructure.yaml`](../library/infrastructure.yaml) — cloud/orchestration/data (`DAG`, `ETL`, `k8s`, `AWS`, `Azure`, `GCP`, `VPC`, `VNet`, etc.)
 - [`library/project-mgmt.yaml`](../library/project-mgmt.yaml) — specialized roles and SRE/ops vocabulary (`EM`, `TPM`, `SRE`, `SLA`, `SLO`, `SLI`, `MTTR`, `RCA`)
 - [`library/security.yaml`](../library/security.yaml) — security threats and controls (`RCE`, `XSS`, `SSRF`, `CVE`, `CVSS`, `OWASP`, `MFA`, `IAM`, `RBAC`)
 - [`library/ai-agents.yaml`](../library/ai-agents.yaml) — agents/LLM-specific (`LLM`, `MCP`, `A2A`, `RAG`, `KV`)
+- [`library/azure.yaml`](../library/azure.yaml) — Microsoft/Azure identity, compliance, and Fabric data-platform (`OBO`, `MI`, `Entra`, `MSAL`, `JWT`, `PHI`, `PII`, `BAA`, `DLP`, `Purview`, `Fabric`, `OneLake`, `RLS`, etc.)
 
 See [`library/README.md`](../library/README.md) for entry schema and loading model.
 

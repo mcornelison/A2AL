@@ -1,6 +1,6 @@
 # Contributing to A2AL
 
-Thanks for your interest in A2AL/0.4.1. Here's how to contribute.
+Thanks for your interest in A2AL/0.5.0. Here's how to contribute.
 
 ## What you can contribute
 

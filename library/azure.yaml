@@ -1,0 +1,75 @@
+domain: azure
+description: Microsoft Azure identity, compliance/governance, and Fabric data-platform vocabulary for Microsoft-stack agents.
+
+entries:
+  # ---- Identity & auth ----
+  - term: Entra
+    expansion: Microsoft Entra ID identity platform
+    example: "Entra app registration created"
+  - term: MI
+    expansion: managed identity
+    example: "MI granted Silver + Gold, no Bronze"
+  - term: OBO
+    expansion: on-behalf-of token flow
+    example: "real-OBO works; audit pipeline fires"
+  - term: FIC
+    expansion: federated identity credential
+    example: "FIC configured for the MI"
+  - term: SPN
+    expansion: service principal
+    example: "SPN client secret rotated"
+  - term: MSAL
+    expansion: Microsoft Authentication Library
+    example: "MSAL token acquisition failing"
+  - term: JWT
+    expansion: JSON Web Token
+    example: "JWT aud claim mismatch"
+  - term: SSO
+    expansion: single sign-on
+    example: "SSO required for field-level perms"
+  - term: aud
+    expansion: JWT audience claim
+    example: "aud claim makes it delegation, not passthrough"
+
+  # ---- Compliance & governance ----
+  - term: PHI
+    expansion: protected health information
+    example: "PHI gate blocks the calendar scope"
+  - term: PII
+    expansion: personally identifiable information
+    example: "PII gating on Fabric tools"
+  - term: BAA
+    expansion: business associate agreement
+    example: "BAA gates the first real-data pilot"
+  - term: DLP
+    expansion: data loss prevention
+    example: "DLP policy blocks the export"
+  - term: ZDR
+    expansion: zero data retention
+    example: "ZDR is a retention control, not a waiver"
+  - term: Purview
+    expansion: Microsoft Purview governance
+    example: "Purview audit retention set 90d"
+  - term: UAL
+    expansion: unified audit log
+    example: "UAL confirms the read happened"
+
+  # ---- Fabric data platform ----
+  - term: Fabric
+    expansion: Microsoft Fabric analytics platform
+    example: "Fabric connector contract not frozen"
+  - term: OneLake
+    expansion: Fabric unified data lake
+    example: "OneLake shortcut to Bronze"
+  - term: lakehouse
+    expansion: lakehouse storage
+    example: "Silver lakehouse repointed"
+  - term: RLS
+    expansion: row-level security
+    example: "RLS enforced on Gold dims"
+  - term: CLS
+    expansion: column-level security
+    example: "CLS masks the SSN column"
+  - term: SCD2
+    expansion: slowly changing dimension type 2
+    example: "SCD2 history on the customer dim"

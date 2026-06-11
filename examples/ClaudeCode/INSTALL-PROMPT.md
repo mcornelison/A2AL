@@ -264,7 +264,7 @@ For each subsection in the sample (and also each subsection present in operator'
 
 ### Step 4 — Update the H2 version heading
 
-After the per-subsection loop, look at the operator's H2 heading line (`## A2AL/0.4.X — Agent-to-Agent Communication`). Compare its version-suffix against the sample's. If the sample is higher, rewrite the operator's heading line to match the sample's. (For 0.4.2, where the sample's H2 may still say 0.4.1, this is a no-op.)
+After the per-subsection loop, look at the operator's H2 heading line (`## A2AL/<version> — Agent-to-Agent Communication`). Compare its version-suffix against the sample's. If the sample is higher, rewrite the operator's heading line to match the sample's. (e.g. an operator still on 0.4.1 is bumped to the sample's current 0.5.0.)
 
 ### Step 5 — Summary
 

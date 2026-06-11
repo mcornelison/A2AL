@@ -1,6 +1,6 @@
 # A2AL Tools
 
-Validation and helper tooling for the A2AL/0.4.1 library.
+Validation and helper tooling for the A2AL/0.5.0 library.
 
 ## `validate_library.py`
 
@@ -59,7 +59,7 @@ Eight broken YAML files (one per failure mode) plus one valid fixture. Used by `
 | `expansion-with-newline.yaml` | `expansion` contains a newline |
 | `valid.yaml` | clean fixture (happy path) |
 
-## Future tools (deferred to v0.4.1+)
+## Future tools (deferred to v0.5.1+)
 
 - `tokenize_library.py` — auto-populate per-entry `tokens: {claude, gpt, llama}` field using the Anthropic API and tiktoken
 - `harvest_terms.py` — scan agent inboxes for `term=expansion` definitions used 5+ times, output PR-ready candidates
