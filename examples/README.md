@@ -10,6 +10,7 @@ Plain-text agent-to-agent messages following the A2AL/0.5.0 spec (routing header
 | [sprint-status.txt](./sprint-status.txt) | Status report + state changes | Multi-fact compound message |
 | [blocker.txt](./blocker.txt) | Blocker notification | Includes recommended next steps |
 | [compound-update.txt](./compound-update.txt) | Mixed: state change + blocker + action directive | Realistic multi-topic update |
+| [attestation-handshake.md](./attestation-handshake.md) | Attestation handshake (§7.10) | Bilateral commitment carried in the header — the canonical require-the-header case; uses `evidence=` |
 
 ## Example: the welcome handshake
 

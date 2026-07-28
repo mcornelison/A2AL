@@ -1,14 +1,43 @@
 # A2AL — Open Vocabulary for Agent Communication
 
-A2AL is an open, contributable vocabulary library that lets AI agents communicate in token-efficient shorthand. It is plain text, English-derived, designed to tokenize as 1 token per concept on modern LLM tokenizers. Agents share a common dictionary and extend it for their domain.
+A2AL is the **body-language layer** for agent-to-agent messages — an open, contributable vocabulary that captures *what a message says* (state, intent, routing context) in shorthand the LLM already speaks, independent of how the message is transported. It is plain text, English-derived, designed to tokenize as ~1 token per concept on modern LLM tokenizers. Agents share a common dictionary and extend it for their domain.
 
 **Status:** A2AL/0.5.0. Pre-1.0; subject to refinement before /1.0.
 
 **License:** Apache-2.0 — see [LICENSE](./LICENSE).
 
+## Where A2AL fits — the body-language layer
+
+Agent communication has two layers, and they're easy to conflate:
+
+- **Transport / lifecycle** — *how* a message gets from agent A to agent B: the connection, the envelope, addressing, streaming, task lifecycle. This is what MCP (tool-call routing) and Google's Agent2Agent / A2A (agent-as-API over HTTP + JSON-RPC) handle.
+- **Payload / body-language** — *what the message says* once it's been routed: the compact vocabulary of state and intent the receiving agent actually reads and acts on.
+
+A2AL is the **payload layer**. It says nothing about transport. It's the body language — the shared dictionary of state, intent, and routing context — that rides *inside* whatever envelope your agents already use: an MCP `data` part, a Google A2A `Message.Part`, a webhook body, or a `.txt` dropped in an inbox.
+
+That's why "why another protocol?" has a one-word answer: **layer.** A2AL doesn't compete with MCP or A2A any more than a shared vocabulary competes with the postal service — they compose.
+
+| Layer | Owns | Examples |
+|---|---|---|
+| Transport / lifecycle | connection, envelope, addressing, streaming, task state | MCP, Google A2A, ACP, plain HTTP |
+| **Payload / body-language** | **message contents — state, intent, routing context** | **A2AL** |
+
+**On the name.** Google's protocol is **A2A** (Agent2Agent); this is **A2AL** (Agent-to-Agent *Language*). Similar acronyms, different layers — A2A *moves* the message, A2AL is *what the message says*. A2AL fits inside an A2A `Message.Part` of type `data`; see [`specs/A2A-Core.md`](./specs/A2A-Core.md) §9 for the explicit mapping.
+
 ## Why
 
-In real multi-agent execution, 60–90% of inter-agent tokens are mechanical waste — narrative prose, framing, justification, JSON envelope overhead. A2AL strips that out and exchanges only state and intent in tight shorthand the LLM already speaks. Empirically, A2AL is **~0.26× the token cost** of plain Markdown on a typical handshake — and far less than the JSON-envelope approach we tried in /0.3.0 (now archived).
+In real multi-agent execution, much of the inter-agent token budget is mechanical waste — narrative prose, framing, justification, JSON-envelope overhead. A2AL carries only the signal: state and intent, in shorthand the LLM already speaks. On real agent traffic it costs **~0.76× the tokens of plain Markdown (≈24% fewer), routing header included** — while the JSON-envelope approach we tried in /0.3.0 (now archived) cost *2–8× more* than Markdown. But the real payoff is a clean, parseable record of what each agent meant, not the byte count.
+
+### The efficiency is tokenizer-agnostic
+
+A2AL was long measured on a single tokenizer (`cl100k_base` — OpenAI's GPT-3.5/4 BPE, historically a stand-in for Claude's unpublished tokenizer). Re-running the same agent-traffic corpus through four *independent* tokenizers shows the saving is a property of the format, not of one model:
+
+| A2AL vs Markdown (lower = fewer tokens) | GPT-3.5/4 | GPT-4o | Llama 3 | Mistral |
+|---|---|---|---|---|
+| Real office traffic (routing header included) | 0.77× | 0.77× | 0.77× | 0.76× |
+| The abandoned /0.3.0 JSON envelope | 1.96× | 1.99× | 1.97× | 2.02× |
+
+The routing header adds a fixed cost that dominates only on very short messages, where A2AL earns its place by parseability rather than compression (see [`specs/A2A-Core.md`](./specs/A2A-Core.md) §3.4). Claude's own tokenizer is proprietary and remains unmeasured; the claim rests on the four real tokenizers above.
 
 ## How A2AL looks
 
@@ -134,7 +163,7 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the full workflow including non-l
 
 ## Versioning
 
-A2AL follows semantic versioning. Adding library entries is a minor bump. Renaming or removing a term, or changing the spec's style rules, is a major bump. Pre-1.0 means breaking changes are expected; /1.0 is reached when at least one production agent emits and consumes A2AL successfully and the cross-LLM compatibility (Moltbook beta) has been demonstrated.
+A2AL follows semantic versioning. Adding library entries is a minor bump. Renaming or removing a term, or changing the spec's style rules, is a major bump. Pre-1.0 means breaking changes are expected; /1.0 is reached when at least one production agent emits and consumes A2AL successfully and cross-LLM compatibility has been demonstrated. Tokenizer-level cross-LLM parity is already shown (see above); the remaining gap is a non-Claude agent emitting and consuming A2AL end-to-end.
 
 ## Status & Roadmap
 
@@ -145,7 +174,7 @@ A2AL follows semantic versioning. Adding library entries is a minor bump. Renami
 | 0.4.1 | Audience rule + routing header (normative) | superseded by 0.5.0 |
 | 0.4.2 | Install prompt (idempotent — same flow handles installs and re-syncs) | shipped |
 | **0.5.0** | **Optional header fields (`thread`, `status`, `cc`, `priority`) + vocabulary expansion (core +10, new `azure` domain)** | **current** |
-| 0.5.1 | Tokenization validator tooling (Claude, GPT, Llama) | future |
+| 0.5.1 | Positioning (body-language layer) + require-the-header demo (attestation handshake, `evidence=`) + cross-LLM proof | in progress |
 | 0.5.2 | Auto-harvested PR candidates from agent traffic | future |
-| 0.6.0 | Moltbook beta — cross-LLM validation | future |
+| 0.6.0 | Cross-LLM validation — tokenizer parity shown; next is a non-Claude agent emitting/consuming A2AL | future |
 | 1.0.0 | Production agents using A2AL successfully + Moltbook beta proven | gated on real-world adoption |

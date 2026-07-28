@@ -39,7 +39,7 @@ Library entry additions are batched into periodic minor-version bumps (usually m
 
 | Version | Theme |
 |---|---|
-| 0.5.1 | Tokenization validator tooling (auto-populate `tokens: {claude, gpt, llama}` per entry) |
+| 0.5.1 | Adoption-bar release (scope set 2026-06-17): positioning (payload layer above any transport; defuse Google A2A name collision) + cross-LLM proof (a demo, not a spec change) + the attestation-handshake require-the-header demo (`evidence=` field §3.2, §7.10) + conservation-as-non-goal doc. Ships only what grows adoption. |
 | 0.5.2 | Auto-harvested PR candidates from agent traffic |
 | 0.5.3 | Library search/lookup CLI |
 | 0.6.0 | Moltbook beta — cross-LLM validation (early data already arriving from shell-prompt's MoltBook field-test) |

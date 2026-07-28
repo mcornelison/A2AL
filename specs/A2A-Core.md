@@ -1,6 +1,6 @@
 # A2AL — `A2AL/0.5.0` Core Specification
 
-**Status:** Normative. A2AL/0.5.0 adds four optional routing-header fields (`thread`, `status`, `cc`, `priority`) and a substantial vocabulary expansion (core additions + the new `azure` identity/compliance/Fabric domain), all backward-compatible with 0.4.x. Supersedes A2AL/0.4.1 (audience rule + routing header). The deprecated A2AL/0.3.0 JSON envelope spec is archived.
+**Status:** Normative. A2AL/0.5.0 adds four optional routing-header fields (`thread`, `status`, `cc`, `priority`) and a substantial vocabulary expansion (core additions + the new `azure` identity/compliance/Fabric domain), all backward-compatible with 0.4.x. Supersedes A2AL/0.4.1 (audience rule + routing header). In-progress since 0.5.1 (backward-compatible): the optional `evidence=` field (§3.2) and the attestation-handshake pattern (§7.10). The deprecated A2AL/0.3.0 JSON envelope spec is archived.
 **See also:** [`README.md`](../README.md), [`library/`](../library), [`examples/`](../examples), [`examples/ClaudeCode/skills/a2al/`](../examples/ClaudeCode/skills/a2al)
 
 A2AL is an open vocabulary library and shorthand style guide for token-efficient agent-to-agent communication. It is plain text — no JSON envelope, no parser dependency. Agents share a common dictionary (`library/core.yaml`) and load domain extensions (`library/<domain>.yaml`) as needed.
@@ -88,9 +88,10 @@ Fields are separated by `; ` (semicolon + space). The header is one line and end
 | `refs=<id>, <id>, ...` | Citations to commits, story IDs, file paths, prior messages. Comma-separated. |
 | `in-reply-to=<message-id>, ...` | Immediate-parent reply link(s) when the channel has message IDs. Comma-separated for a reply that closes multiple parents. |
 | `thread=<id>` | Stable conversation/topic-group id — often a ticket or epic key (`thread=US-940`). Distinct from `in-reply-to`: `thread` groups a whole multi-message conversation; `in-reply-to` links one prior message. |
-| `status=<state>` | Overall status of the message's subject, as a core state token (`green`, `red`, `blocked`, `done`, `sent`). Useful for status/stoplight traffic. |
+| `status=<state>` | Overall status of the message's subject, as a core state token (`green`, `red`, `blocked`, `done`, `sent`, `pending`, `unknown`). Useful for status/stoplight traffic. `pending` marks work not yet started or awaiting a counterparty; `unknown` marks a state the sender cannot determine (metadata-negative — distinguishes "no status" from "status not yet known"). |
 | `cc=<recipient>, ...` | Informational (copy) recipients, same shape as `to`. Comma-separated. |
 | `priority=P0\|P1\|P2\|P3` | Triage priority — distinct from `urgency` (how fast) and from severity tokens (`crit`/`high`/`med`/`low`). |
+| `evidence=<verifiable-pointer>` | *(since 0.5.1)* Pointer to an append-only / content-addressed record that attests the message's claim — a commit hash, content digest, or ledger URI neither party solely controls. Distinct from `refs=` (general citations): `evidence=` asserts a *tamper-evident, verifiable* record, for attestation/commitment traffic. See §7.10. |
 
 All §3.2 fields are genuinely optional and channel-dependent — a richly-routed office inbox may use several; a public channel like Moltbook may use none. Emit only the optional fields that carry signal in your context; never pad the header.
 
@@ -263,3 +264,9 @@ Each pattern below shows only the body line(s). Every real message also carries 
 from=Byte(DEV); to=Ledger(PM); date=2026-05-13; topic=US-713 closeout; audience=agent
 US-713 done; AC met; CI green; PR ready -- merge?
 ```
+
+### 7.10 Attestation handshake
+
+**Form:** a multi-message bilateral commitment carried in the routing header — `thread=` (ceremony id), `status=` transitions (`pending` → `ack` → `done`, `endorse` for the witness), `in-reply-to=` (commitment order), `cc=` (neutral witness), `evidence=` (verifiable record). The body enumerates committed scope and an explicit `EXCLUDES {…}` list.
+
+This is the canonical **require-the-header** case (§3.4): the commitment record lives in the header, not the body, so the header is not elidable. Full worked example: [`examples/attestation-handshake.md`](../examples/attestation-handshake.md).
