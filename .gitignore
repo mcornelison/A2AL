@@ -19,6 +19,7 @@ archive/
 /inbox/
 testing/
 docs/design/
+marketing/
 
 # Build / scratch
 dist/
