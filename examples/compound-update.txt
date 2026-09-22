@@ -1,3 +1,4 @@
+from=Ralph(DEV); to=Ledger(PM); date=2026-04-17; topic=US-713/714/718 daily update; audience=agent; urgency=medium
 US-713 done; AC met; CI green; PR ready -- merge?
 US-714 done; warnOnly DQ flag; 21/21 DQ tests; ruff pass.
 US-718 blocked: no household source in Silver. Defer next sprint.

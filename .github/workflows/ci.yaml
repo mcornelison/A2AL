@@ -17,3 +17,4 @@ jobs:
       - run: python tools/test_validate_library.py
       - run: python tools/test_a2al_preview.py
       - run: python tools/test_a2al_lookup.py
+      - run: python tools/test_examples.py

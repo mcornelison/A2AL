@@ -1,3 +1,4 @@
+from=Ralph(DEV); to=Ledger(PM); date=2026-05-02; topic=Sprint-2 closeout; audience=agent; status=green; thread=SPRINT-2
 Sprint-2 done. tests 172/172; preflight 878/878; ruff pass; build green; defects 0.
 US-852 done; US-853 done; US-858 done.
 merged ralph/sprint-2-tech-debt-and-auth -> main.

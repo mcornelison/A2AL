@@ -1,0 +1,5 @@
+from=Ledger(PM); to=Kunai(DW-Arch); cc=Ralph(DEV); date=2026-06-19; topic=US-940 scope supersedes US-904/US-911; audience=agent; status=done; priority=P2; thread=US-940; in-reply-to=ledger-groom-0618, kunai-arch-note-0617; refs=ADR-12
+US-940 supersede US-904; US-904 superseded -- scope absorbed, no separate delivery.
+US-911 WITHDRAWN -- duplicate of US-940 acceptance criteria.
+US-940 PARTIAL: read path done; write path deferred to Sprint-4.
+Kunai: endorse the ADR-12 revision? needed before groom closes.

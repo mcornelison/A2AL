@@ -112,6 +112,27 @@ Stdlib only. Needing `pip install` before you can check a word is exactly the fr
 
 That is only safe if the two parsers agree, so `test_a2al_lookup.py` compares them entry by entry against the real library and fails on any drift.
 
+## `test_examples.py`
+
+Conformance tests for the [`examples/`](../examples) corpus. Stdlib only.
+
+A2AL never validates messages, by design. This does not change that — it validates *this repository's own examples*, which are documentation, and documentation that contradicts the spec is a bug.
+
+```bash
+python tools/test_examples.py
+```
+
+Asserts:
+
+1. **Every message carries a conformant routing header** (§3) — required fields present, no unrecognised field names.
+2. **Every header field the spec documents appears in at least one example.** The field list is parsed out of `specs/A2A-Core.md` §3.1 and §3.2, so the test cannot drift from the spec: add a field to the spec table without exercising it and this fails.
+3. **Every term a release adds appears in at least one example**, per the `NEW_IN_RELEASE` manifest at the top of the file (a whole new domain is named `domain:<name>`). Add a row when a release adds vocabulary.
+4. No rare Unicode anywhere in the corpus (§4.4).
+
+Checks 2 and 3 fail on the *next* release, which is the point — they turn "we shipped a feature" into something CI can prove. They were written after a sweep found that 8 of the 10 terms added in 0.5.0 existed only inside the changelog announcing them, and that none of 0.5.0's four new header fields was demonstrated anywhere.
+
+`INTENTIONAL_UNKNOWN_FIELDS` narrowly exempts `version-skew.md`, whose whole subject is a field this version does not recognise.
+
 ## `test_a2al_lookup.py`
 
 Tests `a2al_lookup.py`, including the parser-agreement check above (which self-skips if PyYAML is absent).
