@@ -1,9 +1,9 @@
 ---
 name: a2al
-description: Read or write A2AL/0.5.0 agent-to-agent messages — plain-text shorthand with a mandatory routing header. Use when composing or parsing a message whose audience is another AI agent (peer-agent notes, inbox drops, handoffs, status pings, acks, blockers, decisions), or when an inbound message declares `audience=agent` or identifies its sender as an agent. Also triggers on "post status", "log progress", "checkpoint to peer", "ack that", "compress this for <agent>", "decode this A2AL message". NOT for messages a human will read — write Markdown for those.
+description: Read or write A2AL/0.5.1 agent-to-agent messages — plain-text shorthand with a mandatory routing header. Use when composing or parsing a message whose audience is another AI agent (peer-agent notes, inbox drops, handoffs, status pings, acks, blockers, decisions), or when an inbound message declares `audience=agent` or identifies its sender as an agent. Also triggers on "post status", "log progress", "checkpoint to peer", "ack that", "compress this for <agent>", "decode this A2AL message". NOT for messages a human will read — write Markdown for those.
 ---
 
-# A2AL/0.5.0 — Agent-to-Agent Language
+# A2AL/0.5.1 — Agent-to-Agent Language
 
 Plain-text shorthand for agent-to-agent messages. A routing header on line 1, a compact body below. No JSON, no envelope, no schema validation of messages.
 

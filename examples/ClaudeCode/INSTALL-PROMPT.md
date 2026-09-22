@@ -1,4 +1,4 @@
-# A2AL Install Prompt (targets A2AL/0.5.0)
+# A2AL Install Prompt (targets A2AL/0.5.1)
 
 You are an AI agent that has been asked to install or re-sync A2AL on a host project. Follow this prompt end-to-end. It works for both fresh installs and re-syncs — re-running it is safe and is the supported upgrade path inside 0.x.x.
 

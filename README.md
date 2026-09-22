@@ -4,7 +4,7 @@ A2AL is the **body-language layer** for agent-to-agent messages — an open, con
 
 **A2AL is industry-neutral.** State, intent, blockers, decisions and acknowledgments are how *any* two coordinating agents talk — on a construction programme, a clinical rollout, a legal matter, a marketing campaign, or a software sprint. The shipped vocabulary leans toward software because technology teams adopted it first and generated the first real traffic; software is **one worked domain, not the reference domain**. Adding an industry means adding a vocabulary file, not changing the spec.
 
-**Status:** A2AL/0.5.0. Pre-1.0; subject to refinement before /1.0.
+**Status:** A2AL/0.5.1 — the industry-neutral release. Pre-1.0; subject to refinement before /1.0.
 
 **License:** Apache-2.0 — see [LICENSE](./LICENSE).
 
@@ -84,7 +84,7 @@ Channels can also be declared agent-only by convention (e.g., paths under `agent
 
 ## How to install
 
-A2AL/0.5.0 is plain text — no runtime, no compiler. Install means making the vocabulary library and the agent helper skill available to your AI agent.
+A2AL/0.5.1 is plain text — no runtime, no compiler. Install means making the vocabulary library and the agent helper skill available to your AI agent.
 
 ### For Claude Code agents
 
@@ -154,7 +154,7 @@ The skill loads `library/core.yaml` automatically. To add domain vocabulary (e.g
 
 | Path | Purpose |
 |---|---|
-| [`specs/A2A-Core.md`](./specs/A2A-Core.md) | Normative A2AL/0.5.0 spec (audience rule, routing header, style guide) |
+| [`specs/A2A-Core.md`](./specs/A2A-Core.md) | Normative A2AL/0.5.1 spec (audience rule, routing header, style guide) |
 | [`library/`](./library) | Vocabulary library — `core.yaml` + 6 domain extensions |
 | [`examples/`](./examples) | Worked shorthand examples |
 | [`examples/ClaudeCode/`](./examples/ClaudeCode) | Claude Code install guide — skill, slash command, sample CLAUDE.md |
@@ -188,8 +188,8 @@ A2AL follows semantic versioning. Adding library entries is a minor bump. Renami
 | 0.4.0 | Hard pivot — shorthand library is A2AL | superseded by 0.4.1 |
 | 0.4.1 | Audience rule + routing header (normative) | superseded by 0.5.0 |
 | 0.4.2 | Install prompt (idempotent — same flow handles installs and re-syncs) | shipped |
-| **0.5.0** | **Optional header fields (`thread`, `status`, `cc`, `priority`) + vocabulary expansion (core +10, new `azure` domain)** | **current** |
-| 0.5.1 | Positioning (body-language layer) + require-the-header demo (attestation handshake, `evidence=`) + cross-LLM proof | in progress |
-| 0.5.2 | Auto-harvested PR candidates from agent traffic | future |
+| 0.5.0 | Optional header fields (`thread`, `status`, `cc`, `priority`) + vocabulary expansion (core +10, new `azure` domain) | superseded by 0.5.1 |
+| **0.5.1** | **Industry-neutral — `project-mgmt` re-scoped cross-industry, `a2al=` + fail-soft decode, `evidence=`, embedded-block rule, preview + lookup tooling** | **current** |
+| 0.5.2 | Cross-LLM proof demo, conservation-as-non-goal doc, auto-harvested PR candidates, first industry domain (gated on non-software feedback) | future |
 | 0.6.0 | Cross-LLM validation — tokenizer parity shown; next is a non-Claude agent emitting/consuming A2AL | future |
 | 1.0.0 | Production agents using A2AL successfully + Moltbook beta proven | gated on real-world adoption |

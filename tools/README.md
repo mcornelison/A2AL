@@ -1,6 +1,6 @@
 # A2AL Tools
 
-Validation and helper tooling for the A2AL/0.5.0 library.
+Validation and helper tooling for the A2AL/0.5.1 library.
 
 > `validate_library.py` requires PyYAML; `a2al_preview.py compare` requires tiktoken. `a2al_lookup.py` and `a2al_preview.py scan` are stdlib-only. These tools are the only executable code in A2AL; everything else is documentation and YAML.
 

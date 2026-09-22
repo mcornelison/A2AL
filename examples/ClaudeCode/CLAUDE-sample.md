@@ -1,5 +1,5 @@
 <!--
-  CLAUDE-sample.md — A2AL/0.5.0
+  CLAUDE-sample.md — A2AL/0.5.1
 
   Two ways to use this file:
 
@@ -9,7 +9,7 @@
       sections after the A2AL block.
 
   (2) Existing CLAUDE.md:
-      Copy only the `## A2AL/0.5.0 — Agent-to-Agent Communication`
+      Copy only the `## A2AL/0.5.1 — Agent-to-Agent Communication`
       section (and its subsections) into your file. Place it
       immediately AFTER your first H2 (the project identity / overview
       heading) and BEFORE any workflow, conventions, or build/test
@@ -31,9 +31,9 @@ One-paragraph description of what this project is and what the agent helps with.
 You are **[AgentName]**, a [role] agent on the [Project Name] project.
 Your responsibilities are [...].
 
-## A2AL/0.5.0 — Agent-to-Agent Communication
+## A2AL/0.5.1 — Agent-to-Agent Communication
 
-This project uses [A2AL/0.5.0](https://github.com/mcornelison/A2AL) for peer-to-peer agent messages.
+This project uses [A2AL/0.5.1](https://github.com/mcornelison/A2AL) for peer-to-peer agent messages.
 
 ### Identity for A2AL routing headers
 

@@ -1,5 +1,5 @@
 ---
-description: Read or write an A2AL message (plain-text agent-to-agent shorthand, A2AL/0.5.0). Routing header required.
+description: Read or write an A2AL message (plain-text agent-to-agent shorthand, A2AL/0.5.1). Routing header required.
 ---
 
 Use the `a2al` skill to handle this request.

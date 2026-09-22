@@ -1,6 +1,6 @@
 # A2AL Vocabulary Library
 
-The open vocabulary for A2AL/0.5.0 agent-to-agent communication. Each file is a YAML list of `term`/`expansion` entries that an agent loads into its system prompt to enable shorthand emit and decode.
+The open vocabulary for A2AL/0.5.1 agent-to-agent communication. Each file is a YAML list of `term`/`expansion` entries that an agent loads into its system prompt to enable shorthand emit and decode.
 
 > **Note on 0.4.1 (2026-05-13):** No library content changed in 0.4.1 — it added the normative audience rule and routing header to the spec only. Header fields (`from`, `to`, `date`, `topic`, `audience`, `urgency`, `refs`, `in-reply-to`) are structural spec elements, not content vocabulary, and live in [`specs/A2A-Core.md`](../specs/A2A-Core.md) §3.
 >
