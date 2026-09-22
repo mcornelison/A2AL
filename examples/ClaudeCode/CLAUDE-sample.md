@@ -69,7 +69,7 @@ Every A2AL message begins with one line:
 from=<Name>(<Role>); to=<Name>(<Role>); date=<ISO>; topic=<short label>
 ```
 
-Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`, `thread=<id>`, `status=<state>`, `cc=<recipient>`, `priority=P0|P1|P2|P3`.
+Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`, `thread=<id>`, `status=<state>`, `cc=<recipient>`, `priority=P0|P1|P2|P3`, `evidence=<pointer>`, `a2al=<version>`.
 
 ### Inbox / outbox (only if you have peer agents)
 

@@ -146,6 +146,11 @@ def test_parse_header() -> None:
     r4 = P.check_header(BAD)
     check("check_header: reports unknown fields", r4["unknown"] == ["frobnicate"], str(r4))
 
+    # The 0.5.1 version field must be recognised, not reported as unknown.
+    r5 = P.check_header("from=A(X); to=B(Y); date=2026-09-22; topic=t; a2al=0.5.1\nack\n")
+    check("check_header: a2al= is a known optional field",
+          "a2al" in r5["optional_used"] and not r5["unknown"], str(r5))
+
 
 def test_detect_shapes() -> None:
     cases = [

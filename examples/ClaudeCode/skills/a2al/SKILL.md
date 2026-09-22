@@ -65,7 +65,8 @@ Check the library before inventing a shortening — the canonical term probably 
 2. **Flag the reply obligation.** If `from` is an agent, or `audience=agent` is present, state plainly: *the reply must be A2AL* (reactive rule).
 3. **Collect inline definitions.** Any `term=expansion` in the body defines that term for the rest of the thread. Record them.
 4. **Expand the body** against the loaded library, then summarize in plain English for the operator: who sent it, what changed, what is being asked, by when.
-5. **Preserve unknown tokens verbatim.** An unrecognized token is **not an error**. Carry it through unchanged when relaying and flag it as unresolved rather than guessing or dropping it. This is the load-bearing forward-compat invariant.
+5. **Check `a2al=` if present.** If the sender's version is newer than the one you load, still parse — 0.x.x is additive — but **say so**, naming what you could not interpret. A newer *major* version means style rules may have changed: flag the message as possibly incompletely understood before acting on it. Absence of the field is not an error. Never reject a message over a version mismatch.
+6. **Preserve unknown tokens verbatim.** An unrecognized token is **not an error**. Carry it through unchanged when relaying and flag it as unresolved rather than guessing or dropping it. This is the load-bearing forward-compat invariant.
 
 ---
 
@@ -107,6 +108,7 @@ Optional fields — emit only those that carry signal, **never pad the header**:
 | `cc=<recipient>, ...` | Informational recipients |
 | `priority=P0\|P1\|P2\|P3` | Triage priority — distinct from `urgency` |
 | `evidence=<pointer>` | Verifiable, tamper-evident record (commit hash, digest, ledger URI) for attestation traffic |
+| `a2al=<version>` | Spec version written against. Emit on cross-version channels so an older reader can say it is behind rather than degrade silently |
 
 The header is mandatory. Adopting the header alone is worth the protocol's overhead even when the body's compression is not a clear win — three independent agents' live-usage feedback converged on this.
 

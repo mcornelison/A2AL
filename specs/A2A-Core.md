@@ -93,6 +93,7 @@ Fields are separated by `; ` (semicolon + space). The header is one line and end
 | `cc=<recipient>, ...` | Informational (copy) recipients, same shape as `to`. Comma-separated. |
 | `priority=P0\|P1\|P2\|P3` | Triage priority — distinct from `urgency` (how fast) and from severity tokens (`crit`/`high`/`med`/`low`). |
 | `evidence=<verifiable-pointer>` | *(since 0.5.1)* Pointer to an append-only / content-addressed record that attests the message's claim — a commit hash, content digest, or ledger URI neither party solely controls. Distinct from `refs=` (general citations): `evidence=` asserts a *tamper-evident, verifiable* record, for attestation/commitment traffic. See §7.10. |
+| `a2al=<version>` | *(since 0.5.1)* The spec version the sender wrote against, e.g. `a2al=0.5.1`. Lets a reader detect that it is older than the sender and say so, instead of degrading silently. See §3.5. |
 
 All §3.2 fields are genuinely optional and channel-dependent — a richly-routed office inbox may use several; a public channel like Moltbook may use none. Emit only the optional fields that carry signal in your context; never pad the header.
 
@@ -118,6 +119,38 @@ ack?
 ### 3.4 Why the header is mandatory
 
 Live-usage feedback from three independent agents converged on the same finding: the routing header carries more value than the body shorthand. Without it, receiving agents triangulate sender/topic from the body's first paragraph; with it, the same information arrives in one parseable line. The header pays back its tokens on the first read and again on every re-read or archive scan. Tooling (inbox routers, archive scanners, future validators) gets a stable parse target. Adopting the header alone is worth the protocol's overhead even when the body's compression isn't a clear win.
+
+### 3.5 Version signalling and fail-soft decode *(since 0.5.1)*
+
+Forward compatibility (§6, and the library's central invariant) says a reader that meets an unknown token preserves it verbatim rather than erroring. That keeps the *message* intact, but it leaves the *reader* unable to tell the difference between two very different situations:
+
+- a token it does not recognise because the sender coined it inline, and
+- a token it does not recognise because the sender is writing a **newer version of the spec than the reader knows**.
+
+The first is routine. The second is a silent degradation: the reader parses what it can, drops meaning it never knew to look for, and reports success. A real-agent field report named this directly — *"if sender writes 0.5 and receiver only knows 0.4, parsing degrades silently. Markdown does not have that failure mode."*
+
+The optional `a2al=<version>` field closes it.
+
+**Writer (SHOULD).** Emit `a2al=<version>` when writing to a channel whose readers may be on other versions — a public channel, a cross-org inbox, a newly-onboarded peer. Omit it on a settled intra-workspace channel where every agent is known to load the same library; there it is pure overhead.
+
+**Reader (MUST, when the field is present).** Compare the sender's version to your own:
+
+| Comparison | Obligation |
+|---|---|
+| Sender **equal or older** | Proceed normally. Nothing to report. |
+| Sender **newer in patch or minor** | Parse normally — 0.x.x releases are additive — but **surface the mismatch**. Unrecognised header fields and tokens are still preserved verbatim; say which ones you could not interpret. |
+| Sender **newer in major** | Parse what you can and **flag the message as possibly incompletely understood** before acting on it. A major bump may have changed style rules, not just added vocabulary. |
+| No `a2al=` field | Assume compatible and proceed. Absence is not an error; the field is optional. |
+
+Surfacing means telling the next agent or human in the chain, in whatever form that channel uses — not raising an error and not discarding the message. A reader that cannot fully interpret a message still relays it intact.
+
+```text
+from=shell-prompt(field-test); to=Lex(A2AL-maintainer); date=2026-09-22; topic=wave-7 parse results; a2al=0.5.1
+```
+
+A 0.4.x reader meeting that header does not recognise `a2al=`, preserves it verbatim per §6, and proceeds — which is the correct degradation, and exactly why the field is optional rather than required. The field pays off from the first reader that *does* know it.
+
+**This is a reader obligation, not a validation gate.** A2AL never validates message shape (§2.4, §5). There is no version linter, and a version mismatch is never grounds for rejecting a message.
 
 ## 4. Style Rules
 

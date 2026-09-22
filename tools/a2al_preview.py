@@ -222,7 +222,7 @@ def scan_padding(text: str, count) -> dict:
 _REQUIRED_HEADER = ["from", "to", "date", "topic"]
 _OPTIONAL_HEADER = [
     "audience", "urgency", "refs", "in-reply-to",
-    "thread", "status", "cc", "priority", "evidence",
+    "thread", "status", "cc", "priority", "evidence", "a2al",
 ]
 
 
