@@ -34,7 +34,7 @@ A2AL is for **agent-to-agent communication** — messages between AI agents (or 
 
 ### 2.1 Audience rule (normative)
 
-The audience determines the format. There is no hybrid mode and no duplication — pick one and write only that one.
+The audience determines the format. **No duplication** — do not write the same content twice in two formats. Pick the format the audience calls for and write the content once. (For the narrow, non-duplicative case of a machine-readable block inside a Markdown message, see §2.5.)
 
 - **Agent-only audience → A2AL MUST.** Both sender and intended recipients are agents; no human review or human consumption is expected. A2AL is required; writing Markdown in an agent-only channel wastes tokens.
 - **Human in the audience → Markdown.** The message will be read or reviewed by a human at any point (PM triage, archival reading, decision-trail review). Write Markdown.
@@ -62,6 +62,56 @@ A2AL is NOT for:
 - Transport metadata (timestamps, signatures, routing fabric) — out of scope; A2AL is payload, not transport.
 
 For the historical record, A2AL/0.3.0 used a JSON envelope; that approach was archived after empirical token-cost data showed it cost 1.46×–3.55× more than plain Markdown on real conversational traffic. See tag [`v0.3.0-archive`](https://github.com/mcornelison/A2AL/tree/v0.3.0-archive/archive/0.3.0).
+
+### 2.5 Embedded blocks and paired format *(since 0.5.1)*
+
+Earlier versions said flatly that there is "no hybrid mode." That was one rule doing two jobs, and field reports from three independent agents pushed back on it from three directions. This section separates the two cases, because only one of them is actually a conservation problem.
+
+**The rule that stands: no duplication.** Writing the same content as both Markdown prose and A2AL shorthand costs more than either alone and buys nothing. Conservation is not optional, and restating a message in a second format is the clearest way to lose the protocol's entire benefit. This remains banned.
+
+#### 2.5.1 Embedded A2AL block (permitted)
+
+A Markdown message MAY carry a fenced A2AL block **when the block's content is not a restatement of the prose**:
+
+````markdown
+The Silver-layer household join is the blocker. Kunai's shadow-table
+proposal handles it but adds a sprint; the in-place rewrite is faster and
+has no rollback path. I lean shadow — the rollback story matters more than
+the sprint, given how close we are to the F-SKU deadline.
+
+```a2al
+from=Ledger(PM); to=Byte(DEV); date=2026-09-22; topic=US-718 routing; status=blocked; thread=US-718
+US-718 blocked: no household source in Silver -- shadow-table preferred
+```
+````
+
+The prose carries the deliberation, which A2AL is bad at (§2.4). The block carries the routable facts, which prose is bad at. Neither repeats the other. This is a **Markdown message** under §2.1 — the audience is mixed, so the format is Markdown — that happens to expose a machine-readable region.
+
+This is not a new invention. It is the shape agents already reported using in production: *"all the A2AL messages I've actually received have been ~80% plain English in a code-fenced block under an A2AL header."* The spec was silent on it, and silence was being read as prohibition.
+
+Conventions:
+
+- Fence with the info string `a2al`, which gives inbox routers and archive scanners a stable substring to grep for.
+- The block carries a full routing header (§3) as its first line. A block without one is not an A2AL message.
+- One block per message. Several blocks means several messages; send them separately.
+- If the prose and the block disagree, **the block is not authoritative** — a human wrote the prose for a reason. Flag the discrepancy rather than silently preferring either.
+
+**When not to use it.** In an agent-only channel this is strictly worse than plain A2AL: the prose is pure overhead for readers who do not need it. Use it only where the audience is genuinely mixed.
+
+#### 2.5.2 Paired format (permitted as an adoption ramp, not a steady state)
+
+Publishing the same content as both an English rendering and an A2AL rendering **is** duplication, and it does cost what duplication costs. It is nonetheless permitted for one specific purpose: **seeding a cold audience**, where no reader has a decoder and the English column *is* the decoder.
+
+A field test on a public agent platform is the evidence here: four A2AL-bodied posts drew 12 comments and zero demonstrable parses, because the protocol relocates parsing cost onto receivers who have not agreed to pay it. Pairing drops that install cost to zero at the price of the tokens.
+
+Constraints, so this does not quietly become the default:
+
+- Use it only where readers demonstrably lack a decoder — a public channel, a first message to a new peer, an onboarding example.
+- It is **time-boxed**. Once a channel's readers can parse, stop pairing. A channel still paired after adoption is just paying twice.
+- Never use it on an agent-only channel, where every reader already has the library.
+- Say which rendering is authoritative if they could ever diverge.
+
+See also [`examples/decode-preamble.md`](../examples/decode-preamble.md), which addresses the same cold-audience problem more cheaply — a short English preamble teaching the rules, rather than a full second rendering.
 
 ## 3. Routing Header (normative)
 

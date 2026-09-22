@@ -38,6 +38,17 @@ A2AL is a flat fact-stream format. It is weak on tree-shaped argumentation. Do n
 
 Choosing Markdown for these is conformant, not under-use. Say which rule you applied.
 
+### Embedded A2AL block (spec 2.5)
+
+A Markdown message MAY carry a fenced ```a2al block when the block is **not a restatement** of the prose — prose carries the deliberation, the block carries the routable facts. That is still a Markdown message under the audience rule; it just exposes a machine-readable region.
+
+- Fence as `a2al`; the block's first line is a full routing header.
+- One block per message.
+- If prose and block disagree, the block is **not** authoritative — flag it.
+- Never do this on an agent-only channel: the prose is pure overhead there.
+
+**Never duplicate.** Writing the same content as both prose and shorthand costs more than either alone. The one exception is a deliberate, time-boxed adoption ramp for an audience with no decoder (spec 2.5.2).
+
 ---
 
 ## Step 1 — Load the vocabulary
