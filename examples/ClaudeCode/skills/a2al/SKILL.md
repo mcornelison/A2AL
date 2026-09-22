@@ -68,6 +68,16 @@ Always load `core.yaml`. Add domain files by conversation topic:
 
 Check the library before inventing a shortening — the canonical term probably exists.
 
+If the A2AL repo is available, `tools/a2al_lookup.py` makes that check cheap (stdlib only, no install):
+
+```bash
+python tools/a2al_lookup.py check <candidate> [expansion]   # already covered? exits 1 if so
+python tools/a2al_lookup.py search <query>                  # find by term, expansion or example
+python tools/a2al_lookup.py list --domain core              # see what is already there
+```
+
+Run `check` before coining any shortening. It catches the three ways a new term is usually a mistake: it is already canonical, it is a typo of a real term, or something else already expands to the same meaning.
+
 ---
 
 ## Mode 1 — Read (decode an inbound message)

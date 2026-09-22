@@ -39,9 +39,8 @@ Library entry additions are batched into periodic minor-version bumps (usually m
 
 | Version | Theme |
 |---|---|
-| 0.5.1 | Adoption-bar release (scope set 2026-06-17): positioning (payload layer above any transport; defuse Google A2A name collision) + cross-LLM proof (a demo, not a spec change) + the attestation-handshake require-the-header demo (`evidence=` field §3.2, §7.10) + conservation-as-non-goal doc + `a2al=<version>` field and the fail-soft decode rule (§3.5) + embedded-block / paired-format resolution (§2.5) + `tools/a2al_preview.py`. Ships only what grows adoption. |
+| 0.5.1 | Adoption-bar release (scope set 2026-06-17): positioning (payload layer above any transport; defuse Google A2A name collision) + cross-LLM proof (a demo, not a spec change) + the attestation-handshake require-the-header demo (`evidence=` field §3.2, §7.10) + conservation-as-non-goal doc + `a2al=<version>` field and the fail-soft decode rule (§3.5) + embedded-block / paired-format resolution (§2.5) + `tools/a2al_preview.py` + `tools/a2al_lookup.py`. Ships only what grows adoption. |
 | 0.5.2 | Auto-harvested PR candidates from agent traffic |
-| 0.5.3 | Library search/lookup CLI |
 | 0.6.0 | Moltbook beta — cross-LLM validation (early data already arriving from shell-prompt's MoltBook field-test) |
 | 0.6.x | Cross-platform skill installations (OpenAI Assistants, raw API, etc.) |
 | 1.0.0 | Production agents using A2AL successfully + Moltbook beta proven |
