@@ -10,14 +10,22 @@ The open vocabulary for A2AL/0.5.0 agent-to-agent communication. Each file is a 
 
 | File | Purpose | Entries |
 |---|---|---:|
-| [`core.yaml`](./core.yaml) | Universal terms — always load | 87 |
-| [`programming.yaml`](./programming.yaml) | Code review and dev process | 7 |
-| [`infrastructure.yaml`](./infrastructure.yaml) | Cloud, orchestration, data pipelines | 10 |
-| [`project-mgmt.yaml`](./project-mgmt.yaml) | Specialized roles, SRE/ops | 8 |
+| [`core.yaml`](./core.yaml) | Universal coordination terms — always load | 87 |
+| [`programming.yaml`](./programming.yaml) | Software development, code review, engineering roles | 9 |
+| [`infrastructure.yaml`](./infrastructure.yaml) | Cloud, orchestration, data pipelines, service operations | 15 |
+| [`project-mgmt.yaml`](./project-mgmt.yaml) | **Cross-industry** project and program management | 16 |
 | [`security.yaml`](./security.yaml) | Security threats and controls | 10 |
 | [`ai-agents.yaml`](./ai-agents.yaml) | AI/LLM/agent terms | 5 |
 | [`azure.yaml`](./azure.yaml) | Azure identity, compliance, Fabric data-platform | 22 |
-| **Total** | | **149** |
+| **Total** | | **164** |
+
+## Industry scope
+
+A2AL is a coordination protocol, not a software protocol. `core.yaml` and `project-mgmt.yaml` are written to be industry-neutral: state, blockers, decisions, milestones, deliverables and change control mean the same thing on a construction programme, a clinical rollout, a legal matter, or a software sprint.
+
+The other domains are industry-specific by design, and the shipped set leans toward software because that is where A2AL was first exercised — technology teams adopt new tooling quickly and generated the first real traffic. **Software is one worked domain, not the reference domain.** A domain file for field services, clinical operations, underwriting, or logistics is exactly as legitimate; adding one requires no spec change. Propose a new industry domain in an issue first.
+
+> **Changed in 0.5.1.** `project-mgmt.yaml` previously held SRE and service-operations vocabulary (`SRE`, `SLA`, `SLO`, `SLI`, `MTTR`) despite its name, so a non-software project manager opening the file named for their role found nothing they used. Those moved to `infrastructure.yaml`; the software roles `EM` and `TPM` moved to `programming.yaml`; `project-mgmt.yaml` now holds cross-industry project vocabulary. No term was removed or renamed, so no message needs rewriting — but an agent that loads `project-mgmt.yaml` for SRE terms should now also load `infrastructure.yaml`.
 
 ## Loading model
 
@@ -26,8 +34,8 @@ Agents always load `core.yaml`. Domain extensions are opt-in by conversation con
 | Conversation theme | Load |
 |---|---|
 | General agent coordination | `core.yaml` only |
-| Code review / dev process | + `programming.yaml` |
-| Cloud / infrastructure / data pipelines | + `infrastructure.yaml` |
+| Software development / code review | + `programming.yaml` |
+| Cloud / infrastructure / data / service ops | + `infrastructure.yaml` |
 | Sprint, project, or program management | + `project-mgmt.yaml` |
 | Security review / threat modeling | + `security.yaml` |
 | LLM / agent / RAG topics | + `ai-agents.yaml` |

@@ -48,6 +48,14 @@ NEW_IN_RELEASE: dict[str, list[str]] = {
         "gate", "spike", "hotfix", "PARTIAL", "WITHDRAWN",
         "domain:azure",
     ],
+    # 0.5.1 re-scoped project-mgmt from SRE/ops to cross-industry project
+    # management. These carry the theme, so they must be demonstrated by
+    # examples that are not software -- that is the whole point of the release.
+    "0.5.1": [
+        "milestone", "critical-path", "baseline", "variance", "kickoff",
+        "go-live", "deliverable", "scope-change", "change-order", "SOW",
+        "WBS", "stakeholder", "RAID", "RFI", "lessons-learned",
+    ],
 }
 
 # Directories under examples/ that are not message corpora.

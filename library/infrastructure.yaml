@@ -32,3 +32,18 @@ entries:
   - term: VNet
     expansion: virtual network
     example: "VNet routing loop"
+  - term: SRE
+    expansion: site reliability engineer
+    example: "SRE escalation requested"
+  - term: SLA
+    expansion: service level agreement
+    example: "SLA breach imminent"
+  - term: SLO
+    expansion: service level objective
+    example: "SLO target 99.99%"
+  - term: SLI
+    expansion: service level indicator
+    example: "SLI: latency p99"
+  - term: MTTR
+    expansion: mean time to recovery
+    example: "MTTR under 30min"

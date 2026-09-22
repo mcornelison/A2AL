@@ -2,6 +2,8 @@
 
 A2AL is the **body-language layer** for agent-to-agent messages — an open, contributable vocabulary that captures *what a message says* (state, intent, routing context) in shorthand the LLM already speaks, independent of how the message is transported. It is plain text, English-derived, designed to tokenize as ~1 token per concept on modern LLM tokenizers. Agents share a common dictionary and extend it for their domain.
 
+**A2AL is industry-neutral.** State, intent, blockers, decisions and acknowledgments are how *any* two coordinating agents talk — on a construction programme, a clinical rollout, a legal matter, a marketing campaign, or a software sprint. The shipped vocabulary leans toward software because technology teams adopted it first and generated the first real traffic; software is **one worked domain, not the reference domain**. Adding an industry means adding a vocabulary file, not changing the spec.
+
 **Status:** A2AL/0.5.0. Pre-1.0; subject to refinement before /1.0.
 
 **License:** Apache-2.0 — see [LICENSE](./LICENSE).

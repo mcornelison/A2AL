@@ -1,6 +1,6 @@
 # A2AL — `A2AL/0.5.0` Core Specification
 
-**Status:** Normative. A2AL/0.5.0 adds four optional routing-header fields (`thread`, `status`, `cc`, `priority`) and a substantial vocabulary expansion (core additions + the new `azure` identity/compliance/Fabric domain), all backward-compatible with 0.4.x. Supersedes A2AL/0.4.1 (audience rule + routing header). In-progress since 0.5.1 (backward-compatible): the optional `evidence=` field (§3.2) and the attestation-handshake pattern (§7.10). The deprecated A2AL/0.3.0 JSON envelope spec is archived.
+**Status:** Normative. A2AL/0.5.0 adds four optional routing-header fields (`thread`, `status`, `cc`, `priority`) and a substantial vocabulary expansion (core additions + the new `azure` identity/compliance/Fabric domain), all backward-compatible with 0.4.x. Supersedes A2AL/0.4.1 (audience rule + routing header). In-progress since 0.5.1 (backward-compatible), themed **industry-neutrality**: the optional `evidence=` field (§3.2) and attestation-handshake pattern (§7.10), `a2al=<version>` with the fail-soft decode rule (§3.5), the embedded-block / paired-format resolution (§2.5), and a re-scoped cross-industry `project-mgmt` vocabulary (§5). The deprecated A2AL/0.3.0 JSON envelope spec is archived.
 **See also:** [`README.md`](../README.md), [`library/`](../library), [`examples/`](../examples), [`examples/ClaudeCode/skills/a2al/`](../examples/ClaudeCode/skills/a2al)
 
 A2AL is an open vocabulary library and shorthand style guide for token-efficient agent-to-agent communication. It is plain text — no JSON envelope, no parser dependency. Agents share a common dictionary (`library/core.yaml`) and load domain extensions (`library/<domain>.yaml`) as needed.
@@ -58,7 +58,7 @@ If neither signal is present, the channel is assumed mixed and Markdown is the r
 A2AL is NOT for:
 
 - Messages a human will read or review at any point. Even if the immediate recipient is an agent, if a human is downstream, write Markdown.
-- Long-form deliberation, RCAs, architectural decision records, design specs — these are documents with shelf-life and humans return to them.
+- Long-form deliberation and documents with shelf-life that humans return to — a root-cause analysis, a decision record, a design or business case, a board paper, an incident review, a post-project report. The shape is the test, not the industry: if the value is in the reasoning rather than the result, write it out.
 - Transport metadata (timestamps, signatures, routing fabric) — out of scope; A2AL is payload, not transport.
 
 For the historical record, A2AL/0.3.0 used a JSON envelope; that approach was archived after empirical token-cost data showed it cost 1.46×–3.55× more than plain Markdown on real conversational traffic. See tag [`v0.3.0-archive`](https://github.com/mcornelison/A2AL/tree/v0.3.0-archive/archive/0.3.0).
@@ -243,18 +243,29 @@ A 0.4.x reader meeting that header does not recognise `a2al=`, preserves it verb
 
 ## 5. Vocabulary Library
 
-The vocabulary lives in [`library/`](../library) — one YAML file per domain. Always-loaded core: [`library/core.yaml`](../library/core.yaml) (~87 universal terms). Domain extensions:
+The vocabulary lives in [`library/`](../library) — one YAML file per domain. Always-loaded core: [`library/core.yaml`](../library/core.yaml).
 
-- [`library/programming.yaml`](../library/programming.yaml) — code-review and dev-process specifics (`MR`, `CR`, `IaC`, `code-complete`, etc.)
-- [`library/infrastructure.yaml`](../library/infrastructure.yaml) — cloud/orchestration/data (`DAG`, `ETL`, `k8s`, `AWS`, `Azure`, `GCP`, `VPC`, `VNet`, etc.)
-- [`library/project-mgmt.yaml`](../library/project-mgmt.yaml) — specialized roles and SRE/ops vocabulary (`EM`, `TPM`, `SRE`, `SLA`, `SLO`, `SLI`, `MTTR`, `RCA`)
-- [`library/security.yaml`](../library/security.yaml) — security threats and controls (`RCE`, `XSS`, `SSRF`, `CVE`, `CVSS`, `OWASP`, `MFA`, `IAM`, `RBAC`)
-- [`library/ai-agents.yaml`](../library/ai-agents.yaml) — agents/LLM-specific (`LLM`, `MCP`, `A2A`, `RAG`, `KV`)
-- [`library/azure.yaml`](../library/azure.yaml) — Microsoft/Azure identity, compliance, and Fabric data-platform (`OBO`, `MI`, `Entra`, `MSAL`, `JWT`, `PHI`, `PII`, `BAA`, `DLP`, `Purview`, `Fabric`, `OneLake`, `RLS`, etc.)
+**A2AL is not a software protocol.** The core mechanics — the audience rule, the routing header, the style rules, forward compatibility — describe how *any* two coordinating agents exchange state and intent. Nothing in them assumes code. The patterns in §7 are general coordination shapes: a state change, a status report, a directive, a blocker, a question, a decision, an acknowledgment. Those occur on a construction programme, a clinical rollout, a legal matter, a marketing campaign, and a software sprint alike.
+
+What *is* domain-specific is vocabulary, and that is exactly what the domain-extension model exists to hold. An industry adds a domain file; it changes nothing about the spec.
+
+The shipped domains lean toward software because that is where A2AL was first exercised — technology teams adopt new tooling quickly, so they generated the first real traffic. Treat software as **one worked domain, not the reference domain**. A domain file for field services, clinical operations, or underwriting is exactly as legitimate, and needs no spec change to add.
+
+| File | Scope |
+|---|---|
+| [`core.yaml`](../library/core.yaml) | Universal coordination vocabulary — states, actions, severity. Always loaded. |
+| [`project-mgmt.yaml`](../library/project-mgmt.yaml) | Cross-industry project and program management (`milestone`, `deliverable`, `change-order`, `RFI`, `RAID`, `WBS`, `stakeholder`, `baseline`, `go-live`) |
+| [`programming.yaml`](../library/programming.yaml) | Software development and code review (`MR`, `CR`, `IaC`, `code-complete`, `EM`, `TPM`) |
+| [`infrastructure.yaml`](../library/infrastructure.yaml) | Cloud, orchestration, data, and service operations (`DAG`, `ETL`, `k8s`, `SLA`, `SLO`, `MTTR`, `SRE`) |
+| [`security.yaml`](../library/security.yaml) | Security threats and controls (`RCE`, `CVE`, `CVSS`, `MFA`, `IAM`, `RBAC`) |
+| [`ai-agents.yaml`](../library/ai-agents.yaml) | Agents and LLMs (`LLM`, `MCP`, `A2A`, `RAG`) |
+| [`azure.yaml`](../library/azure.yaml) | Microsoft identity, compliance, and Fabric data platform (`Entra`, `MI`, `OBO`, `PHI`, `Purview`, `OneLake`, `RLS`) |
 
 See [`library/README.md`](../library/README.md) for entry schema and loading model.
 
-The library is open and contributable. To propose a new term, open a PR adding an entry to the appropriate domain file (or core, if universal). Run `python tools/validate_library.py` locally first.
+The library is open and contributable. To propose a new term, open a PR adding an entry to the appropriate domain file (or core, if genuinely universal). A new *industry* is a new domain file — propose it in an issue first. Run `python tools/validate_library.py` locally first.
+
+> **Note (0.5.1).** `project-mgmt.yaml` previously held SRE and service-operations terms despite its name, so a non-software project manager opening the file named for their role found nothing they used. Those terms moved to `infrastructure.yaml`, the software roles to `programming.yaml`, and `project-mgmt.yaml` now holds genuinely cross-industry project vocabulary. No term was removed or renamed.
 
 ## 6. Extending the Vocabulary
 

@@ -272,7 +272,16 @@ _SHAPES = [
     ("acknowledgment", re.compile(r"^\s*ack\b", re.I | re.M)),
     ("question / ask", re.compile(r"\?\s*$", re.M)),
     ("status report", re.compile(r"\b\d+\s*/\s*\d+\b")),
-    ("action directive", re.compile(r"^\s*(merge|deploy|review|fix|revert|ship|run|verify|update)\b", re.I | re.M)),
+    # Directive verbs span industries on purpose: a delivery agent says "merge",
+    # a programme agent says "escalate", a field agent says "inspect". Keeping
+    # this list software-only made A2AL read as a software-only protocol.
+    ("action directive", re.compile(
+        r"^\s*(merge|deploy|ship|revert|run|fix|patch|update"            # delivery
+        r"|review|verify|validate|inspect|audit|confirm"                 # assurance
+        r"|approve|reject|sign-off|escalate|assign|schedule|reschedule"  # governance
+        r"|submit|file|issue|send|notify|publish|procure|order"          # process
+        r"|hold|release|close|reopen|prioritize|defer)\b",
+        re.I | re.M)),
     ("multi-fact state", re.compile(r";")),
 ]
 

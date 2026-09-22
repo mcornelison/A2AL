@@ -59,12 +59,14 @@ Always load `core.yaml`. Add domain files by conversation topic:
 
 | Topic | Load |
 |---|---|
-| Code review / dev process | + `programming.yaml` |
-| Cloud / orchestration / data | + `infrastructure.yaml` |
-| Sprint, project, program management | + `project-mgmt.yaml` |
+| Software development / code review | + `programming.yaml` |
+| Cloud / orchestration / data / service ops (SLA, SLO, MTTR) | + `infrastructure.yaml` |
+| Project / programme management (any industry) | + `project-mgmt.yaml` |
 | Security review / threat modeling | + `security.yaml` |
 | LLM / agent / RAG topics | + `ai-agents.yaml` |
 | Azure / identity / compliance / Fabric | + `azure.yaml` |
+
+A2AL is a coordination protocol, not a software protocol. The patterns below are general shapes — state change, status, directive, blocker, question, decision, ack — and they apply to a programme, a campaign, a clinical rollout or a sprint alike. `core.yaml` and `project-mgmt.yaml` are industry-neutral; the other domains are industry-specific, and the shipped set leans software only because that is where A2AL was first exercised.
 
 Check the library before inventing a shortening — the canonical term probably exists.
 

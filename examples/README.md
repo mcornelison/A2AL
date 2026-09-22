@@ -6,6 +6,8 @@ Plain-text agent-to-agent messages following the A2AL/0.5.0 spec (routing header
 
 Every file below is a **complete message**: routing header on line 1 (§3, MUST since 0.4.1), shorthand body beneath. The `.md` files are walkthroughs that embed complete messages in fenced blocks.
 
+The corpus deliberately spans industries. A2AL is a coordination protocol, not a software protocol — the software examples are **one worked domain**, shown alongside programme, campaign and engagement messages that use only `core.yaml` and `project-mgmt.yaml`.
+
 | File | Pattern | Exercises |
 |---|---|---|
 | [welcome.txt](./welcome.txt) | Handshake | The test-harness welcome that motivated the design |
@@ -15,6 +17,9 @@ Every file below is a **complete message**: routing header on line 1 (§3, MUST 
 | [triage-priority.txt](./triage-priority.txt) | Blocker + action directive, triage-shaped | `priority=`, `cc=`, `refs=`, multi-recipient `cc`; terms `heads-up`, `gate`, `spike`, `hotfix` |
 | [supersede-notice.txt](./supersede-notice.txt) | Decision + scope change | multi-value `in-reply-to=`; terms `supersede`, `superseded`, `WITHDRAWN`, `PARTIAL`, `endorse` |
 | [azure-access-review.txt](./azure-access-review.txt) | Status report, security review | the `azure` domain (all 22 terms), `status=pending` |
+| [facility-go-live.txt](./facility-go-live.txt) | Blocker + directive, **non-software** | Cross-industry PM vocabulary: `milestone`, `critical-path`, `RFI`, `change-order`, `baseline`, `variance`, `deliverable`, `go-live` |
+| [campaign-launch.txt](./campaign-launch.txt) | Status + scope change, **non-software** | `kickoff`, `WBS`, `RAID`, `scope-change`, `deliverable`, `go-live` |
+| [engagement-closeout.txt](./engagement-closeout.txt) | Closeout, **non-software** | `SOW`, `lessons-learned`, `RCA`, `baseline`, `variance`, `stakeholder` |
 | [attestation-handshake.md](./attestation-handshake.md) | Attestation handshake (§7.10) | Bilateral commitment carried in the header — the canonical require-the-header case; `evidence=`, `thread=`, `status=`, `cc=`, `in-reply-to=` |
 | [embedded-block.md](./embedded-block.md) | Embedded A2AL block (§2.5.1) | A Markdown message carrying a fenced `a2al` block — permitted because the block does not restate the prose |
 | [version-skew.md](./version-skew.md) | Fail-soft decode (§3.5) | `a2al=`, and what a reader does with a field from a newer version |

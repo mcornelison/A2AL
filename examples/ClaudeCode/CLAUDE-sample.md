@@ -45,9 +45,9 @@ The A2AL vocabulary library is at `[/absolute/path/to/A2AL]/library/`. Always lo
 
 | Topic | Load |
 |---|---|
-| Code review / dev process | + `programming.yaml` |
-| Cloud / orchestration / data | + `infrastructure.yaml` |
-| Sprint, project, program management | + `project-mgmt.yaml` |
+| Software development / code review | + `programming.yaml` |
+| Cloud / orchestration / data / service ops (SLA, SLO, MTTR) | + `infrastructure.yaml` |
+| Project / programme management (any industry) | + `project-mgmt.yaml` |
 | Security review / threat modeling | + `security.yaml` |
 | LLM / agent / RAG topics | + `ai-agents.yaml` |
 | Azure / identity / compliance / Fabric | + `azure.yaml` |

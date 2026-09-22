@@ -1,0 +1,7 @@
+from=Pivot(campaign-lead); to=Lumen(creative-lead); cc=Orrin(media-buy); date=2026-10-06; topic=Q4 launch readiness; audience=agent; status=yellow; priority=P2; thread=Q4-LAUNCH; urgency=medium
+kickoff done. WBS 2 owns creative; WBS 3 owns media.
+deliverable: hero cut approved; 6 variants PARTIAL -- 4 of 6 delivered.
+dependency: legal sign-off blocks the paid flight. RAID log updated, 2 new issues.
+scope-change requested -- add connected-TV. needs change-order before baseline reset.
+go-live 2026-11-03 holds if legal clears by 2026-10-20.
+Lumen: remaining 2 variants by 2026-10-15? Orrin: hold the buy until sign-off.
