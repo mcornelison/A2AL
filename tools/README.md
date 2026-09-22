@@ -70,15 +70,28 @@ python tools/a2al_preview.py count examples/*.txt
 
 ### Token backends
 
-`compare` **requires** tiktoken, because its verdict turns on a threshold and a threshold needs exact counts:
+Everything runs with no dependencies. Install tiktoken for a sharper answer:
 
 ```bash
 pip install tiktoken
+python tools/a2al_preview.py --encoder o200k_base compare draft.md msg.txt
 ```
 
-`scan` works without it, falling back to a stdlib heuristic. That fallback is sound for `scan` because it reports a share *within one document* — both numbers measured the same way, so the error cancels.
+**No tokenizer here is "exact" for Claude.** Anthropic's vocabulary is not published, so `cl100k_base` is the long-standing proxy — see [`testing/tools/CROSS-LLM-RESULTS.md`](../testing/tools/CROSS-LLM-RESULTS.md). What makes the conclusion safe is not precision on one tokenizer but stability across four: the A2AL/Markdown ratio held at **0.73–0.84** on cl100k, o200k, Llama 3 and Mistral. `--encoder` counts with another.
 
-It is deliberately **not** trusted for `compare`. Measured against `cl100k_base` over this repo's own corpus, the heuristic under-counts A2AL by ~9% and over-counts Markdown prose by ~2%, inflating an A2AL/Markdown ratio by ~11% — enough to report a real 26% saving as 34% and cross a 30% threshold in the wrong direction.
+**`scan` is sound on the heuristic.** It reports a share *within one document* — padding tokens over total tokens, both counted the same way — so the bias cancels. That is measured, not assumed: across this repo's corpus the reported share moves by at most **0.6 percentage points** versus cl100k_base, and `test_a2al_preview.py` asserts it stays within 1 point.
+
+**`compare` is different**, because it divides one rendering by another and the error does *not* cancel across formats. Measured on this corpus the heuristic under-counts A2AL by ~9% and over-counts Markdown prose by ~2%, inflating the ratio by ~11% — enough to report a real 26% saving as 34% and cross a 30% threshold the wrong way.
+
+So without a tokenizer, `compare` reports a **±12 point band** instead of a point estimate and refuses to guess:
+
+| Situation | Verdict | Exit |
+|---|---|---|
+| Threshold clears even at the pessimistic end | `WORTH IT` | 0 |
+| Threshold missed even at the optimistic end | `MARGINAL` | 1 |
+| Threshold falls **inside** the band | `INCONCLUSIVE` — install tiktoken | 3 |
+
+With a tokenizer the band is zero and the verdict is a straight comparison.
 
 > This tool validates nothing about message shape. A2AL never validates messages, by design — only the library is validated. Every conformance note above is advisory.
 

@@ -91,33 +91,68 @@ def test_estimate_tokens() -> None:
           P.estimate_tokens(long_word) > 1)
 
 
-def test_heuristic_fallback() -> None:
-    """get_counter must fall back cleanly when tiktoken is missing."""
-    saved = sys.modules.get("tiktoken", "<absent>")
-    sys.modules["tiktoken"] = None  # makes `import tiktoken` raise ImportError
-    try:
-        fn, backend = P.get_counter()
-        check("get_counter: falls back to heuristic", fn is P.estimate_tokens, backend)
-        check("get_counter: fallback label says estimate", "heuristic" in backend, backend)
+def without_tiktoken():
+    """Context manager making `import tiktoken` fail, to exercise the fallback."""
+    import contextlib
 
-        # exact_required must exit rather than silently degrade.
-        err = io.StringIO()
-        real_stderr, sys.stderr = sys.stderr, err
+    @contextlib.contextmanager
+    def _cm():
+        saved = sys.modules.get("tiktoken", "<absent>")
+        sys.modules["tiktoken"] = None  # makes `import tiktoken` raise ImportError
         try:
-            P.get_counter(exact_required=True)
-            exited = False
-        except SystemExit as e:
-            exited = e.code == 2
+            yield
         finally:
-            sys.stderr = real_stderr
-        check("get_counter: exact_required exits 2 without tiktoken", exited)
-        check("get_counter: exit message names the install command",
-              "pip install tiktoken" in err.getvalue())
-    finally:
-        if saved == "<absent>":
-            sys.modules.pop("tiktoken", None)
-        else:
-            sys.modules["tiktoken"] = saved
+            if saved == "<absent>":
+                sys.modules.pop("tiktoken", None)
+            else:
+                sys.modules["tiktoken"] = saved
+    return _cm()
+
+
+def test_heuristic_fallback() -> None:
+    """get_counter degrades to the heuristic and says so -- it never exits."""
+    with without_tiktoken():
+        fn, backend, measured = P.get_counter()
+        check("get_counter: falls back to heuristic", fn is P.estimate_tokens, backend)
+        check("get_counter: reports measured=False on the fallback", measured is False)
+        check("get_counter: fallback label says heuristic", "heuristic" in backend, backend)
+
+    if has_tiktoken():
+        fn, backend, measured = P.get_counter()
+        check("get_counter: reports measured=True with a real tokenizer", measured is True)
+        check("get_counter: labels the encoding", "cl100k_base" in backend, backend)
+        _, backend, measured = P.get_counter("not-a-real-encoding")
+        check("get_counter: unknown encoding degrades instead of raising",
+              measured is False and "heuristic" in backend, backend)
+    else:
+        skip("get_counter measured path", "needs tiktoken")
+
+
+def test_scan_share_is_stable_without_tiktoken() -> None:
+    """The claim that justifies letting `scan` use the heuristic.
+
+    `scan` reports a share within ONE document, so the heuristic's bias should
+    largely cancel. Measured over the real corpus the reported share must stay
+    within one percentage point of the tokenizer's.
+    """
+    if not has_tiktoken():
+        skip("scan share stability", "needs tiktoken for the reference")
+        return
+    exact, _, _ = P.get_counter()
+    worst, worst_file = 0.0, None
+    for f in sorted((REPO / "examples").glob("*.txt")) + [
+        REPO / "specs" / "feedback" / "2026-05-13-ledger-pm-datawarehouse.md",
+        REPO / "CONTRIBUTING.md",
+    ]:
+        if not f.exists():
+            continue
+        text = f.read_text(encoding="utf-8")
+        a = P.scan_padding(text, exact)["padding_share"]
+        b = P.scan_padding(text, P.estimate_tokens)["padding_share"]
+        if abs(b - a) > worst:
+            worst, worst_file = abs(b - a), f.name
+    check("scan: heuristic share stays within 1 point of the tokenizer's",
+          worst <= 0.01, f"worst {worst:.1%} on {worst_file}")
 
 
 def test_parse_header() -> None:
@@ -160,6 +195,12 @@ def test_detect_shapes() -> None:
         ("merge?", "question / ask"),
         ("tests 21/21; preflight 878/878", "status report"),
         ("merge ralph/auth-fix", "action directive"),
+        # Directives are not software-only -- 0.5.1's industry-neutral theme.
+        ("escalate RFI-18 to the authority having jurisdiction", "action directive"),
+        ("approve change-order 4", "action directive"),
+        ("schedule the site inspection", "action directive"),
+        ("notify stakeholder group before go-live", "action directive"),
+        ("submit the permit package", "action directive"),
     ]
     for body, expected in cases:
         check(f"detect_shapes: {expected}", expected in P.detect_shapes(body),
@@ -198,7 +239,7 @@ def test_antipatterns() -> None:
     if not has_tiktoken():
         skip("antipatterns", "needs tiktoken for the token-cost oracle")
         return
-    count, _ = P.get_counter(exact_required=True)
+    count, _, _ = P.get_counter()
     lib = REPO / "library"
 
     anti = P.check_antipatterns(BAD.split("\n", 1)[1], count, lib)
@@ -246,6 +287,21 @@ def test_cli() -> None:
         rc = run_cli(["compare", draft, good, "--threshold", "0.99"])
         check("cli: compare exits 1 when it does not", rc == 1, f"rc={rc}")
 
+        # Without a tokenizer the verdict is decided on a band, and a threshold
+        # inside that band must come back inconclusive rather than guessed.
+        with without_tiktoken():
+            rc = run_cli(["compare", draft, good, "--threshold", "0.01"])
+            check("cli: heuristic still decides a clear-cut case", rc == 0, f"rc={rc}")
+
+            rc = run_cli(["compare", draft, good, "--threshold", "0.99"])
+            check("cli: heuristic still rejects a hopeless case", rc == 1, f"rc={rc}")
+
+            # The measured saving on this pair sits near 23%, so a threshold
+            # right on it falls inside the +/-12 band.
+            rc = run_cli(["compare", draft, good, "--threshold", "0.23"])
+            check("cli: heuristic returns inconclusive (exit 3) inside the band",
+                  rc == 3, f"rc={rc}")
+
         rc = run_cli(["count", draft, good])
         check("cli: count exits 0", rc == 0, f"rc={rc}")
 
@@ -259,6 +315,7 @@ def main() -> int:
     for fn in (
         test_estimate_tokens,
         test_heuristic_fallback,
+        test_scan_share_is_stable_without_tiktoken,
         test_parse_header,
         test_detect_shapes,
         test_library_terms,

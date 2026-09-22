@@ -14,19 +14,28 @@ Three subcommands:
 
 Token counting
 --------------
-`compare` requires tiktoken (`pip install tiktoken`) because its verdict turns
-on a threshold, and a threshold needs exact counts.
+Everything runs without dependencies. Install tiktoken for a sharper answer:
 
-`scan` falls back to a stdlib heuristic when tiktoken is absent. That is safe
-because `scan` reports a *share within one document* -- padding tokens over
-total tokens, both measured the same way -- so the heuristic's error largely
-cancels.
+    pip install tiktoken
 
-The heuristic is not accurate enough to compare two different renderings.
-Measured against cl100k_base over this repo's own corpus, it under-counts A2AL
-by ~9% and over-counts Markdown prose by ~2%, which inflates an A2AL/Markdown
-ratio by ~11% -- enough to turn a real 26% saving into a reported 34% and cross
-a 30% threshold in the wrong direction. Hence the hard requirement in `compare`.
+No tokenizer is "exact" for Claude -- Anthropic's vocabulary is not published,
+so cl100k_base is the long-standing proxy (testing/tools/CROSS-LLM-RESULTS.md).
+What makes the conclusion safe is that the A2AL/Markdown ratio held at 0.73-0.84
+across four tokenizers, so it does not hinge on which one you pick. Use
+--encoder to count with another (o200k_base, etc.).
+
+`scan` is sound on the stdlib heuristic. It reports a *share within one
+document* -- padding tokens over total tokens, both counted the same way -- so
+the error cancels. Verified across this repo's corpus: the reported share moves
+by at most 0.6 percentage points versus cl100k_base.
+
+`compare` is different, because it divides one rendering by another and the
+heuristic's error does NOT cancel across formats: measured on this corpus it
+under-counts A2AL by ~9% and over-counts Markdown prose by ~2%, inflating the
+ratio by ~11%. That is enough to report a real 26% saving as 34% and cross a 30%
+threshold the wrong way. So without a tokenizer `compare` reports a +/-12 point
+band instead of a point estimate, and returns "inconclusive" (exit 3) when the
+threshold falls inside it, rather than guessing.
 
 This tool validates nothing about message shape. A2AL never validates messages
 by design -- only the library is validated (tools/validate_library.py). The
@@ -49,6 +58,13 @@ import unicodedata
 # --------------------------------------------------------------------------
 
 _TIKTOKEN_ENCODING = "cl100k_base"
+
+# How far a heuristic-derived A2AL/Markdown ratio can be off, as a fraction.
+# Measured against cl100k_base over this repo's corpus: the heuristic
+# under-counts A2AL ~9% and over-counts Markdown prose ~2%, inflating the ratio
+# ~11%. Rounded up. `compare` reports a band this wide rather than a crisp
+# verdict when running without a real tokenizer.
+_HEURISTIC_BAND = 0.12
 
 # Splits text into BPE-ish chunks: a run of word characters (with any leading
 # whitespace attached, which is how byte-pair encoders merge it), or a single
@@ -89,35 +105,30 @@ def estimate_tokens(text: str) -> int:
     return total
 
 
-def get_counter(exact_required: bool = False) -> tuple[callable, str]:
-    """Return (count_fn, backend_label).
+def get_counter(encoding: str = _TIKTOKEN_ENCODING) -> tuple[callable, str, bool]:
+    """Return (count_fn, backend_label, measured).
 
-    With exact_required, exits with an install instruction rather than silently
-    falling back to the heuristic.
+    `measured` is True when a real tokenizer is doing the counting and False
+    when the stdlib heuristic is. Callers whose output depends on the
+    difference must branch on it -- this never exits on its own.
+
+    No tokenizer here is "exact" for Claude: Anthropic's vocabulary is not
+    published, so `cl100k_base` is the long-standing proxy (see
+    testing/tools/CROSS-LLM-RESULTS.md). The reassurance is that the
+    A2AL/Markdown ratio held at 0.73-0.84 across four tokenizers, so the
+    conclusion does not hinge on which one you pick.
     """
-    reason = None
     try:
         import tiktoken
-        try:
-            enc = tiktoken.get_encoding(_TIKTOKEN_ENCODING)
-            return (lambda s: len(enc.encode(s))), f"tiktoken/{_TIKTOKEN_ENCODING}"
-        except Exception as e:  # vocab fetch needs network on first use
-            reason = f"tiktoken is installed but could not load {_TIKTOKEN_ENCODING}: {e}"
     except ImportError:
-        reason = "tiktoken is not installed"
+        return estimate_tokens, "stdlib heuristic (no tokenizer installed)", False
 
-    if exact_required:
-        print(f"ERROR: {reason}.", file=sys.stderr)
-        print("", file=sys.stderr)
-        print("`compare` needs exact token counts -- its verdict turns on a threshold,", file=sys.stderr)
-        print("and the stdlib heuristic inflates an A2AL/Markdown ratio by ~11%.", file=sys.stderr)
-        print("", file=sys.stderr)
-        print("    pip install tiktoken", file=sys.stderr)
-        print("", file=sys.stderr)
-        print("`scan` works without it.", file=sys.stderr)
-        sys.exit(2)
+    try:
+        enc = tiktoken.get_encoding(encoding)
+    except Exception as e:  # unknown name, or vocab fetch needs network
+        return estimate_tokens, f"stdlib heuristic ({encoding} unavailable: {e})", False
 
-    return estimate_tokens, "stdlib heuristic (estimate; pip install tiktoken for exact counts)"
+    return (lambda s: len(enc.encode(s))), f"tiktoken/{encoding}", True
 
 
 # --------------------------------------------------------------------------
@@ -377,7 +388,7 @@ def _bar(fraction: float, width: int = 28) -> str:
 
 
 def cmd_scan(args) -> int:
-    count, backend = get_counter()
+    count, backend, _ = get_counter(args.encoder)
     text = _read(args.file)
     report = scan_padding(text, count)
 
@@ -419,7 +430,7 @@ def cmd_scan(args) -> int:
 
 
 def cmd_compare(args) -> int:
-    count, backend = get_counter(exact_required=True)
+    count, backend, measured = get_counter(args.encoder)
     md_text = _read(args.markdown)
     a2al_text = _read(args.a2al)
 
@@ -431,7 +442,21 @@ def cmd_compare(args) -> int:
 
     ratio = a2al_tokens / md_tokens
     saving = 1.0 - ratio
-    meets = saving >= args.threshold
+
+    # Without a real tokenizer the saving carries a known bias, so the verdict
+    # is decided on the band rather than the point estimate. A result inside
+    # the band is reported as inconclusive rather than guessed at.
+    band = 0.0 if measured else _HEURISTIC_BAND
+    low, high = saving - band, saving + band
+    if measured:
+        verdict = "meets" if saving >= args.threshold else "misses"
+    elif low >= args.threshold:
+        verdict = "meets"
+    elif high < args.threshold:
+        verdict = "misses"
+    else:
+        verdict = "inconclusive"
+    meets = verdict == "meets"
 
     header = check_header(a2al_text)
     lines = a2al_text.lstrip("\n").split("\n")
@@ -447,12 +472,16 @@ def cmd_compare(args) -> int:
             "saving": round(saving, 4),
             "threshold": args.threshold,
             "meets_threshold": meets,
+            "verdict": verdict,
+            "measured": measured,
+            "uncertainty_band": band,
+            "saving_range": [round(low, 4), round(high, 4)],
             "header": header,
             "shapes": shapes,
             "antipatterns": anti,
             "backend": backend,
         }, indent=2))
-        return 0 if meets else 1
+        return {"meets": 0, "misses": 1, "inconclusive": 3}[verdict]
 
     md_name, a2al_name = pathlib.Path(args.markdown).name, pathlib.Path(args.a2al).name
     width = max(len(md_name), len(a2al_name))
@@ -466,10 +495,25 @@ def cmd_compare(args) -> int:
     print()
 
     print("-" * 72)
-    if meets:
-        print(f"WORTH IT: {saving:.0%} saving clears the {args.threshold:.0%} threshold.")
+    if verdict == "inconclusive":
+        print(f"INCONCLUSIVE: saving is {low:.0%}-{high:.0%}, and the {args.threshold:.0%}")
+        print("threshold falls inside that range. The stdlib heuristic is not precise")
+        print("enough to call this one -- it under-counts A2AL and over-counts Markdown")
+        print("prose, which inflates the ratio by roughly 12 points.")
+        print()
+        print("    pip install tiktoken      # then re-run for a decisive answer")
+    elif meets:
+        if measured:
+            print(f"WORTH IT: {saving:.0%} saving clears the {args.threshold:.0%} threshold.")
+        else:
+            print(f"WORTH IT: saving is {low:.0%}-{high:.0%}, clearing the "
+                  f"{args.threshold:.0%} threshold even at the pessimistic end.")
     elif saving > 0:
-        print(f"MARGINAL: {saving:.0%} saving is below the {args.threshold:.0%} threshold.")
+        if measured:
+            print(f"MARGINAL: {saving:.0%} saving is below the {args.threshold:.0%} threshold.")
+        else:
+            print(f"MARGINAL: saving is {low:.0%}-{high:.0%}, short of the "
+                  f"{args.threshold:.0%} threshold even at the optimistic end.")
         print("The body shorthand is not paying for its composition cost here.")
         print("The routing header may still be worth it on its own (spec section 3.4).")
     else:
@@ -477,6 +521,10 @@ def cmd_compare(args) -> int:
         print("Check for creative abbreviations or rare Unicode (spec section 4.4) --")
         print("both tokenize worse than the plain word.")
     print()
+    if not measured:
+        print("Counting with the stdlib heuristic. Ranges above are the measured")
+        print("uncertainty, not a confidence interval.")
+        print()
 
     # Advisory conformance notes.
     if not header["present"]:
@@ -503,11 +551,11 @@ def cmd_compare(args) -> int:
                   f"the full word is usually 1")
         if not anti["library_terms_loaded"]:
             print(f"      (no library found at {args.library_dir}; abbreviation check ran without it)")
-    return 0 if meets else 1
+    return {"meets": 0, "misses": 1, "inconclusive": 3}[verdict]
 
 
 def cmd_count(args) -> int:
-    count, backend = get_counter(exact_required=args.exact)
+    count, backend, _ = get_counter(args.encoder)
     rows = [(f, count(_read(f))) for f in args.files]
     if args.json:
         print(json.dumps({
@@ -531,6 +579,9 @@ def main(argv=None) -> int:
         prog="a2al_preview.py",
         description="Show what A2AL buys on a specific message, before composing it.",
     )
+    p.add_argument("--encoder", default=_TIKTOKEN_ENCODING,
+                   help=f"tiktoken encoding to count with (default: {_TIKTOKEN_ENCODING}); "
+                        "falls back to the stdlib heuristic if unavailable")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     p_scan = sub.add_parser("scan", help="audit a Markdown draft for droppable padding")
@@ -550,8 +601,6 @@ def main(argv=None) -> int:
 
     p_cnt = sub.add_parser("count", help="count tokens in one or more files")
     p_cnt.add_argument("files", nargs="+")
-    p_cnt.add_argument("--exact", action="store_true",
-                       help="require tiktoken rather than falling back to the heuristic")
     p_cnt.add_argument("--json", action="store_true")
     p_cnt.set_defaults(func=cmd_count)
 
