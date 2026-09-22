@@ -107,6 +107,18 @@ pip install pyyaml
 python tools/validate_library.py
 ```
 
+### Tools
+
+| Command | What it answers |
+|---|---|
+| `python tools/a2al_lookup.py check <term>` | Is this shortening already in the library? (stdlib only) |
+| `python tools/a2al_lookup.py search <query>` | What vocabulary already exists for this idea? |
+| `python tools/a2al_preview.py scan draft.md` | How much of this draft is padding A2AL would drop? |
+| `python tools/a2al_preview.py compare draft.md msg.txt` | Was writing it in A2AL actually worth it? |
+| `python tools/validate_library.py` | Is the library well-formed? (CI gate) |
+
+See [`tools/README.md`](./tools/README.md) for full usage.
+
 ## How to use
 
 ### Sending a message to a peer agent
@@ -144,7 +156,7 @@ The skill loads `library/core.yaml` automatically. To add domain vocabulary (e.g
 | [`library/`](./library) | Vocabulary library — `core.yaml` + 6 domain extensions |
 | [`examples/`](./examples) | Worked shorthand examples |
 | [`examples/ClaudeCode/`](./examples/ClaudeCode) | Claude Code install guide — skill, slash command, sample CLAUDE.md |
-| [`tools/`](./tools) | Validator (`validate_library.py`) + tests |
+| [`tools/`](./tools) | Library validator, vocabulary lookup, savings preview — all with tests |
 | [`.github/`](./.github) | PR template, CI workflow, issue templates |
 
 Start with [`specs/A2A-Core.md`](./specs/A2A-Core.md) for the style guide and [`library/README.md`](./library/README.md) for the vocabulary structure.
@@ -154,10 +166,11 @@ Start with [`specs/A2A-Core.md`](./specs/A2A-Core.md) for the style guide and [`
 The library grows through community contributions:
 
 1. Pick the right file (universal terms → `core.yaml`, domain-specific → matching extension)
-2. Add an entry with `term`, `expansion`, and `example` (see [`library/README.md`](./library/README.md) for schema)
-3. **Run `python tools/validate_library.py` before opening a PR.** Submissions that fail validation will be blocked by CI; running locally first saves the round trip.
-4. Open a PR using the [PR template](./.github/PULL_REQUEST_TEMPLATE.md)
-5. CI runs the validator on every PR; merges are blocked on validation failure
+2. **Check it isn't already there:** `python tools/a2al_lookup.py check <term>` — it catches terms that are already canonical, typos of real terms, and terms whose meaning an existing entry already covers
+3. Add an entry with `term`, `expansion`, and `example` (see [`library/README.md`](./library/README.md) for schema)
+4. **Run `python tools/validate_library.py` before opening a PR.** Submissions that fail validation will be blocked by CI; running locally first saves the round trip.
+5. Open a PR using the [PR template](./.github/PULL_REQUEST_TEMPLATE.md)
+6. CI runs the validator on every PR; merges are blocked on validation failure
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the full workflow including non-library contributions (spec edits, validator improvements, new domains).
 

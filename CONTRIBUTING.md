@@ -10,6 +10,7 @@ Thanks for your interest in A2AL/0.5.0. Here's how to contribute.
 | **Spec clarifications** | Edits to `specs/A2A-Core.md` |
 | **Skill / command improvements** | `examples/ClaudeCode/skills/a2al/SKILL.md` or `examples/ClaudeCode/commands/a2al.md` |
 | **Validator features or fixes** | `tools/validate_library.py` (with tests in `tools/test_validate_library.py`) |
+| **Tooling** | `tools/a2al_lookup.py` (vocabulary lookup) or `tools/a2al_preview.py` (savings preview) — each with a matching `test_*.py` |
 | **Examples** | Add a `.txt` to `examples/` demonstrating a pattern not yet covered |
 | **Documentation** | README, library/README, examples/README, etc. |
 
@@ -31,6 +32,14 @@ This is the most common contribution. Walkthrough:
    ```
 
    See [`library/README.md`](./library/README.md) for the full schema.
+
+   Before writing the entry, check nothing already covers it:
+
+   ```bash
+   python tools/a2al_lookup.py check <term> [expansion]
+   ```
+
+   It exits 1 if the term is already canonical, is a near-miss of an existing term, or duplicates an existing expansion's meaning.
 
 3. **Validate locally:**
 
