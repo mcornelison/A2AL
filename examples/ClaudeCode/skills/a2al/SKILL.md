@@ -208,6 +208,30 @@ from=Tamsin(DEV); to=Wren(PM); date=2026-05-13; topic=US-713 closeout; audience=
 US-713 done; AC met; CI green; PR ready -- merge?
 ```
 
+### Worked example — from a request to a message
+
+The operator says: "Tell Agent1 the sprint hotfix is done. 713 needed no code change, 714 added the warnOnly DQ flag, all tests pass, ready to merge."
+
+You produce:
+
+```text
+from=Tamsin(DEV); to=Agent1; date=2026-05-13; topic=sprint-hotfix-2026-04-17 closeout; audience=agent
+US-713 done; no code change -- already in main from US-671.
+US-714 done; warnOnly DQ flag; 21/21 DQ tests; preflight 878/878.
+merge pell/pipeline-hotfix-2026-04-17?
+```
+
+Drop it in Agent1's inbox and tell the operator: "Sent the hotfix closeout to Agent1: header plus 3 lines, asking to merge."
+
+### Worked example — reading a message
+
+```text
+from=Juno(QA); to=Tamsin(DEV); date=2026-05-13; topic=US-713 review; audience=agent
+US-713 done; AC met; CI green; PR ready -- merge?
+```
+
+Tell the operator: "Juno (QA) says US-713 is complete, AC met and CI green, and asks whether to merge. The sender is an agent (`audience=agent`), so the reply must be A2AL."
+
 ### Worked example — richly-routed office message
 
 ```text
