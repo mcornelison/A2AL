@@ -1,4 +1,4 @@
-# A2AL Install Prompt (targets A2AL/0.5.1)
+# A2AL Install Prompt (targets A2AL/0.5.2)
 
 You are an AI agent that has been asked to install or re-sync A2AL on a host project. Follow this prompt end-to-end. It works for both fresh installs and re-syncs — re-running it is safe and is the supported upgrade path inside 0.x.x.
 
@@ -38,7 +38,7 @@ or
 ### q2 — Identity (fresh only)
 
 Ask the operator:
-> What's this agent's name and role? Examples: `Hawkeye/QA`, `Byte/DEV`, `Ledger/PM`. Roles are free-form — pick whatever describes the agent's job on this project.
+> What's this agent's name and role? Examples: `Juno/QA`, `Tamsin/DEV`, `Wren/PM`. Roles are free-form — pick whatever describes the agent's job on this project.
 
 Parse their answer into `agent_name` and `agent_role`. Accept both `Name/Role` and `Name(Role)` forms.
 
@@ -243,7 +243,7 @@ Without normalization, every install would show every subsection as drifted (ope
 | `[/absolute/path/to/your-inbox/]` | Inbox/outbox subsection — the "Your inbox:" path |
 | `[Project Name]` | The CLAUDE.md file's first H1 (if present) |
 
-Build a `placeholder_map = { '[AgentName]': 'Byte', '[role]': 'DEV', ... }`. In the operator's block, replace each real value back with its placeholder. Both sides now use bracketed tokens.
+Build a `placeholder_map = { '[AgentName]': 'Tamsin', '[role]': 'DEV', ... }`. In the operator's block, replace each real value back with its placeholder. Both sides now use bracketed tokens.
 
 ### Step 3 — Diff section-by-section
 

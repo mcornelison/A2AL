@@ -9,17 +9,17 @@ A2AL is my attempt to fix that. It's two things:
 
 It's plain text. There's no runtime, no parser and no JSON. If your agents can read a text file, they can use it.
 
-**Status:** A2AL/0.5.1. It's pre-1.0, so expect changes.
+**Status:** A2AL/0.5.2. It's pre-1.0, so expect changes.
 **License:** Apache-2.0, see [LICENSE](./LICENSE).
 
 ## What a message looks like
 
 ```text
-from=Byte(DEV); to=Ledger(PM); date=2026-05-13; topic=US-713 closeout; audience=agent
+from=Tamsin(DEV); to=Wren(PM); date=2026-05-13; topic=US-713 closeout; audience=agent
 US-713 done; AC met; CI green; PR ready -- merge?
 ```
 
-The first line is the header, and it's required. Everything after it is the body, written in short phrases drawn from the vocabulary. The receiving agent loads the vocabulary, reads the message and acts on it.
+The first line is the header, and it's required. Everything after it is the body. For status updates, acks, handoffs and blockers, write the body in short phrases from the vocabulary, like the one above. When the message carries reasoning, exact wording or a table, write the body in plain prose under the same header; shorthand drops exactly the words that matter there. Either way, put the verdict on the first body line.
 
 It isn't only for software. Here's part of a building handover (the full message is in [`examples/facility-go-live.txt`](./examples/facility-go-live.txt)):
 
@@ -33,7 +33,7 @@ escalate RFI-18 to the authority having jurisdiction today.
 And a security alert:
 
 ```text
-from=Audrey(SEC); to=Byte(DEV); date=2026-05-13; topic=CVE-2026-30856; audience=agent; urgency=urgent
+from=Sable(SEC); to=Tamsin(DEV); date=2026-05-13; topic=CVE-2026-30856; audience=agent; urgency=urgent
 crit: RCE in MCP stdio config -- patch ASAP. CVE-2026-30856.
 ```
 
@@ -87,7 +87,9 @@ The rule is simple: if a person will read it, write Markdown.
 | Not sure who'll read it | Markdown |
 | RCAs, design docs, decisions people will come back to | Markdown |
 
-A common pattern that works well is a short A2AL note pointing at a Markdown document that holds the detail.
+A common pattern that works well is a short A2AL note pointing at a Markdown document that holds the detail. If a person also reads an agent message, mark it `audience=mixed` and write the body for them.
+
+One rule matters more than it looks: when an agent passes on something a person said, it's a proposal until that person confirms it. Agents mark it `relay(<person>): "..."`, and questions only a person can answer go on their own line as `ASK(<person>): ...`. That came straight from a real mix-up in the field.
 
 ## Installing it
 
@@ -134,6 +136,7 @@ Adding an industry means adding a file. The spec doesn't change.
 | `python tools/a2al_lookup.py search <query>` | What terms already exist for this idea? |
 | `python tools/a2al_preview.py scan draft.md` | How much of this draft is padding? |
 | `python tools/a2al_preview.py compare draft.md msg.txt` | Was writing it in A2AL worth it? |
+| `python tools/a2al_lint.py msg.a2al` | Is the header line well-formed? (checks line 1 only, never the body) |
 | `python tools/validate_library.py` | Is the library well-formed? (CI runs this) |
 
 Details are in [`tools/README.md`](./tools/README.md).
@@ -175,9 +178,9 @@ Adding vocabulary is a minor version bump. Renaming or removing a term, or chang
 | 0.4.1 | Audience rule and required routing header | replaced by 0.5.0 |
 | 0.4.2 | Install prompt (the same flow installs and re-syncs) | shipped |
 | 0.5.0 | Optional header fields (`thread`, `status`, `cc`, `priority`), more vocabulary, `azure` domain | replaced by 0.5.1 |
-| **0.5.1** | **Industry-neutral: project management re-scoped for any industry, `a2al=` version field, `evidence=`, embedded-block rule, lookup and preview tools** | **current** |
-| 0.5.2 | Cross-LLM demo, conservation-as-non-goal doc, auto-harvested term candidates, first non-software domain | next |
-| 0.6.0 | A non-Claude agent writing and reading A2AL end to end | future |
+| 0.5.1 | Industry-neutral: project management re-scoped for any industry, `a2al=` version field, `evidence=`, embedded-block rule, lookup and preview tools | replaced by 0.5.2 |
+| **0.5.2** | **Field feedback: header required, body free (shorthand or prose), `audience=mixed` defined, relayed-human-words rule, `supersedes=`, header lint, body conventions** | **current** |
+| 0.6.0 | A non-Claude agent writing and reading A2AL end to end; decide the remaining proposed header fields on field data | next |
 | 1.0.0 | Agents using it in production | when the field data says so |
 
 The full history is in [`VersionHistory.md`](./VersionHistory.md).

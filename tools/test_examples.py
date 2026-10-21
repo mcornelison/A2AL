@@ -5,7 +5,7 @@ they accept. This suite doesn't change that. It validates *this repository's
 own examples*. The examples are documentation, and documentation that
 contradicts the spec is a bug.
 
-Three assertions:
+Four assertions:
 
   1. Every A2AL message in examples/ carries a conformant routing header
      (spec section 3): required fields present, no unrecognised field names.
@@ -18,6 +18,9 @@ Three assertions:
   3. Every term introduced by a release appears in at least one example.
      I added this after finding that 8 of the 10 terms added in 0.5.0 existed
      only inside the changelog that announced them.
+
+  4. Every message passes tools/a2al_lint.py with no ERROR (warnings are
+     allowed, since an unknown field is a warning by design).
 
 Assertions 2 and 3 are the ones that fail on the *next* release, and I want
 that. They turn "I shipped a feature" into something CI can check.
@@ -32,6 +35,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
+import a2al_lint as LINT  # noqa: E402
 import a2al_lookup as L  # noqa: E402
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
@@ -56,6 +60,9 @@ NEW_IN_RELEASE: dict[str, list[str]] = {
         "go-live", "deliverable", "scope-change", "change-order", "SOW",
         "WBS", "stakeholder", "RAID", "RFI", "lessons-learned",
     ],
+    # 0.5.2 named the body conventions agents were already using in the field
+    # (spec 2.6 and 7.11).
+    "0.5.2": ["ASK", "relay", "void-if", "blocks", "default"],
 }
 
 # Directories under examples/ that are not message corpora.
@@ -267,6 +274,22 @@ def test_every_new_term_is_exercised(messages: list[dict]) -> None:
               f"{len(unused)}/{len(terms)} demonstrated nowhere: {unused}")
 
 
+def test_every_message_is_lint_error_free(messages: list[dict]) -> None:
+    """The linter and the examples must agree. Warnings are allowed."""
+    bad = []
+    for m in messages:
+        body = m["body"].splitlines()
+        for level, msg in LINT.lint_header(m["header"], body[0] if body else None):
+            if level == LINT.ERROR:
+                bad.append(f"{m['file']}:{m['line']} {msg}")
+    # Whole-file view too: a .txt message is linted from its literal line 1.
+    for p in sorted(EXAMPLES.glob("*.txt")):
+        for level, msg in LINT.lint_path(str(p)):
+            if level == LINT.ERROR:
+                bad.append(f"{p.relative_to(REPO).as_posix()} {msg}")
+    check("lint: every example is free of a2al_lint.py errors", not bad, "; ".join(bad[:4]))
+
+
 def test_bodies_avoid_spec_anti_patterns(messages: list[dict]) -> None:
     """Spec 4.4 bans rare Unicode outright; the corpus must model that."""
     allowed = set("—–…")
@@ -294,6 +317,7 @@ def main() -> int:
     test_header_field_names_are_well_formed(messages)
     test_every_documented_field_is_exercised(messages, required, optional)
     test_every_new_term_is_exercised(messages)
+    test_every_message_is_lint_error_free(messages)
     test_bodies_avoid_spec_anti_patterns(messages)
 
     print()

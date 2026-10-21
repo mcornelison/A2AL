@@ -123,7 +123,7 @@ Copy [`CLAUDE-sample.md`](./CLAUDE-sample.md) to your project root as `CLAUDE.md
 
 ### Existing CLAUDE.md
 
-Open [`CLAUDE-sample.md`](./CLAUDE-sample.md) and copy just the `## A2AL/0.5.1 — Agent-to-Agent Communication` section with all its subsections (Identity, Library location, Audience rule, Routing header, Inbox / outbox, Reference).
+Open [`CLAUDE-sample.md`](./CLAUDE-sample.md) and copy just the `## A2AL/0.5.2 — Agent-to-Agent Communication` section with all its subsections (Identity, Library location, Audience rule, Routing header, Inbox / outbox, Reference).
 
 Paste it right after your first H2 (the project identity or overview heading) and before any workflow, conventions or build/test sections.
 
@@ -137,7 +137,7 @@ Example structure:
 ## Project Identity
 You are [AgentName], ...
 
-## A2AL/0.5.1 — Agent-to-Agent Communication        ← INSERT HERE
+## A2AL/0.5.2 — Agent-to-Agent Communication        ← INSERT HERE
 ... (entire A2AL block from the sample) ...
 
 ## Workflow / Conventions / Build / Test
@@ -146,7 +146,7 @@ You are [AgentName], ...
 
 ### Fill in the placeholders
 
-- `[AgentName]` and `[role]`: your agent's name and what it does (for example `Hawkeye` and `QA`)
+- `[AgentName]` and `[role]`: your agent's name and what it does (for example `Juno` and `QA`)
 - `[/absolute/path/to/A2AL]/library/`: the library path you chose in Step 1
   - Option A: `/path/to/cloned/A2AL/library/`
   - Option B: `<project-root>/.claude/a2al-library/` or `~/.claude/a2al-library/`
@@ -182,7 +182,7 @@ If a step fails:
 
 Only CLAUDE.md has the library path. The skill and command files don't. If you move the library:
 
-1. Edit your CLAUDE.md. Find the `### Library location` subsection inside the `## A2AL/0.5.1` block and update the path on its first line. Update the path in the `### Reference` subsection too, if it's there.
+1. Edit your CLAUDE.md. Find the `### Library location` subsection inside the `## A2AL/0.5.2` block and update the path on its first line. Update the path in the `### Reference` subsection too, if it's there.
 2. Leave `skills/a2al/SKILL.md` and `commands/a2al.md` alone.
 3. Restart Claude Code so it reloads CLAUDE.md.
 

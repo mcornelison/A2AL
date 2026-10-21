@@ -1,5 +1,5 @@
 <!--
-  CLAUDE-sample.md — A2AL/0.5.1
+  CLAUDE-sample.md — A2AL/0.5.2
 
   Two ways to use this file:
 
@@ -9,7 +9,7 @@
       sections after the A2AL block.
 
   (2) Existing CLAUDE.md:
-      Copy only the `## A2AL/0.5.1 — Agent-to-Agent Communication`
+      Copy only the `## A2AL/0.5.2 — Agent-to-Agent Communication`
       section (and its subsections) into your file. Place it
       immediately AFTER your first H2 (the project identity / overview
       heading) and BEFORE any workflow, conventions, or build/test
@@ -31,13 +31,13 @@ One-paragraph description of what this project is and what the agent helps with.
 You are **[AgentName]**, a [role] agent on the [Project Name] project.
 Your responsibilities are [...].
 
-## A2AL/0.5.1 — Agent-to-Agent Communication
+## A2AL/0.5.2 — Agent-to-Agent Communication
 
-This project uses [A2AL/0.5.1](https://github.com/mcornelison/A2AL) for peer-to-peer agent messages.
+This project uses [A2AL/0.5.2](https://github.com/mcornelison/A2AL) for peer-to-peer agent messages.
 
 ### Identity for A2AL routing headers
 
-When sending A2AL messages, sign as `[AgentName]/[role]` or `[AgentName]([role])` in the routing header (e.g., `Hawkeye/QA`, `Byte(DEV)`). Roles are free-form.
+When sending A2AL messages, sign as `[AgentName]/[role]` or `[AgentName]([role])` in the routing header (e.g., `Juno/QA`, `Tamsin(DEV)`). Roles are free-form. Use your own name: never sign as a name from the A2AL examples.
 
 ### Library location
 
@@ -60,22 +60,24 @@ The `a2al` skill and `/a2al` command read from this location.
 - **Human in the audience → Markdown.** A human will triage, archive, or review at any point.
 - **Inbound says `audience=agent` or sender is identified as an AI agent → reply MUST be A2AL** (reactive rule).
 - **Default → Markdown** when audience is ambiguous or mixed.
+- **Body:** the header makes it A2AL. Use a shorthand body for status, acks, handoffs and blockers; use plain prose under the header when the content is reasoning, exact wording or a table. Put the verdict on the first body line.
+- **Relayed human words** are a proposal until that person confirms them: `relay(<person>): "..."`. Questions only a person can answer go on their own line: `ASK(<person>): ...`.
 
 ### Routing header
 
-Every A2AL message begins with one line:
+Every A2AL message begins with one line, and only one (never wrap it onto line 2):
 
 ```text
 from=<Name>(<Role>); to=<Name>(<Role>); date=<ISO>; topic=<short label>
 ```
 
-Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`, `thread=<id>`, `status=<state>`, `cc=<recipient>`, `priority=P0|P1|P2|P3`, `evidence=<pointer>`, `a2al=<version>`.
+Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`, `thread=<id>`, `status=<state>`, `cc=<recipient>`, `priority=P0|P1|P2|P3`, `evidence=<pointer>`, `a2al=<version>`, `supersedes=<id>[#<item>]`. A cc'd agent doesn't act unless the body names it.
 
 ### Inbox / outbox (only if you have peer agents)
 
-- **Your inbox:** `[/absolute/path/to/your-inbox/]` (`.txt` files, one A2AL message per file)
-- **Filename:** `<sender>-<intent>-<unix-ts>.txt`
-- **Threading:** reference prior message id in the body — `re: <id>` or `in-reply-to: <id>`
+- **Your inbox:** `[/absolute/path/to/your-inbox/]` (`.a2al` files, one A2AL message per file; when you scan an inbox, scan every extension)
+- **Filename:** `<sender>-<intent>-<unix-ts>.a2al`
+- **Threading:** a message's id is its filename without the extension. Reply with `in-reply-to=<id>` in the header; correct an earlier message with `supersedes=<id>`
 
 ### Reference
 

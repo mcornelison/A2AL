@@ -16,7 +16,7 @@ The test is whether the block **restates** the prose. If it does, that is duplic
 The Silver-layer household join is the real blocker on US-718, and I don't
 think either option is obviously right.
 
-Kunai's shadow-table proposal handles the rollback case cleanly but adds a
+Calder's shadow-table proposal handles the rollback case cleanly but adds a
 sprint, which puts us past the F-SKU trial close. The in-place rewrite is
 faster and we'd make the date, but there's no rollback path — if the
 household grain is wrong we find out in production.
@@ -26,9 +26,9 @@ sprint costs less than a bad production cutover. But it's your call, and I
 want the tradeoff on the record rather than buried in a status line.
 
 ```a2al
-from=Ledger(PM); to=Byte(DEV); cc=Kunai(DW-Arch); date=2026-09-22; topic=US-718 routing decision; status=blocked; priority=P2; thread=US-718
+from=Wren(PM); to=Tamsin(DEV); cc=Calder(DW-Arch); date=2026-09-22; topic=US-718 routing decision; status=blocked; priority=P2; thread=US-718
 US-718 blocked: no household source in Silver -- shadow-table preferred
-decision: pending Byte -- shadow (+1 sprint, rollback-safe) | in-place (on-date, no rollback)
+decision: pending Tamsin -- shadow (+1 sprint, rollback-safe) | in-place (on-date, no rollback)
 ```
 ````
 

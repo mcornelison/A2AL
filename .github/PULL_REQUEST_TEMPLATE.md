@@ -15,7 +15,7 @@
 
 ## Tokenization claim (optional but encouraged)
 
-If you've verified `<term>` is 1 token on Claude/GPT/etc., note it here. Future tooling (v0.5.1+) will auto-validate.
+If you've verified `<term>` is 1 token on Claude/GPT/etc., note it here. There's no automatic token check yet.
 
 ## Other contributions (skill, spec, validator)
 

@@ -1,8 +1,8 @@
 # A2AL Tools
 
-Validation and helper tools for the A2AL/0.5.1 library.
+Validation and helper tools for the A2AL/0.5.2 library.
 
-> `validate_library.py` needs PyYAML. `a2al_lookup.py` and `a2al_preview.py` run on the standard library alone; installing tiktoken makes `a2al_preview.py compare` more precise (see [Token backends](#token-backends)). These tools are the only executable code in A2AL. Everything else is documentation and YAML.
+> `validate_library.py` needs PyYAML. `a2al_lookup.py`, `a2al_preview.py` and `a2al_lint.py` run on the standard library alone; installing tiktoken makes `a2al_preview.py compare` more precise (see [Token backends](#token-backends)). These tools are the only executable code in A2AL. Everything else is documentation and YAML.
 
 ## `validate_library.py`
 
@@ -125,6 +125,36 @@ It only uses the standard library. Having to `pip install` something before you 
 
 That only works if the two parsers agree, so `test_a2al_lookup.py` compares them entry by entry against the real library and fails if they drift apart.
 
+## `a2al_lint.py`
+
+Lints the routing header of a message, and nothing else. It checks line 1 only. Bodies are free-form and never get checked. The one look past line 1 is at line 2, to catch a header that spilled over: a strict reader ends the header at the first newline, so a `cc=` on line 2 just gets dropped.
+
+```bash
+python tools/a2al_lint.py examples/*.txt
+python tools/a2al_lint.py --strict message.txt
+cat message.txt | python tools/a2al_lint.py -
+```
+
+For a `.md` file whose line 1 isn't a header, it lints the first line of the first fenced `a2al` block instead (§2.5.1). A Markdown file with a header on line 1 gets linted like any other message.
+
+| Level | Check |
+|---|---|
+| ERROR | No header on line 1 (or in the `a2al` block) |
+| ERROR | Missing or empty required field (`from`, `to`, `date`, `topic`) |
+| ERROR | A `; `-separated segment with no `=`, which usually means a `; ` inside the topic |
+| ERROR | Duplicate key |
+| ERROR | Line 2 continues the header (starts with a known `key=`, or has `; key=` with a known key) |
+| ERROR | `date` isn't an ISO 8601 date or datetime |
+| WARN | Unknown field. Readers preserve it, so it never fails the lint (forward compat) |
+| WARN | `audience` not `agent\|mixed`, `urgency` not `low\|medium\|high\|urgent`, `priority` not `P0`-`P3` |
+| WARN | `topic` over 60 chars: put the verdict on body line 1 and keep the topic a label |
+| WARN | `refs=` with more than 3 items: keep the ones this message cites, list the rest on a body `refs:` line |
+| WARN | `from`/`to`/`cc` party not in `Name(Role)` or `Name/Role` shape |
+
+Output is one `path: LEVEL: message` line per finding, then a summary. It exits 1 on any ERROR and 0 otherwise. `--strict` makes warnings exit 1 too, and `--quiet` prints errors only.
+
+The known field list comes from `a2al_preview.py` (`_REQUIRED_HEADER` / `_OPTIONAL_HEADER`), so the two tools can't disagree about what a header field is.
+
 ## `test_examples.py`
 
 Conformance tests for the [`examples/`](../examples) corpus. Standard library only.
@@ -140,7 +170,8 @@ It checks that:
 1. Every message has a conformant routing header (§3): required fields present, no unrecognised field names.
 2. Every header field the spec documents appears in at least one example. The field list is read straight from `specs/A2A-Core.md` §3.1 and §3.2, so the test can't drift from the spec. If you add a field to the spec table and no example uses it, this fails.
 3. Every term a release adds appears in at least one example, following the `NEW_IN_RELEASE` list at the top of the file (a whole new domain is listed as `domain:<name>`). Add a row when a release adds vocabulary.
-4. There's no rare Unicode anywhere in the corpus (§4.4).
+4. Every message is free of `a2al_lint.py` errors. Warnings are allowed, since an unknown field is a warning by design.
+5. There's no rare Unicode anywhere in the corpus (§4.4).
 
 Checks 2 and 3 fail on the *next* release, and that's intended. They turn "this release added X" into something CI can confirm. I wrote them after a sweep found that 8 of the 10 terms added in 0.5.0 existed only inside the changelog announcing them, and that no example used any of 0.5.0's four new header fields.
 
@@ -152,6 +183,14 @@ Tests `a2al_lookup.py`, including the parser-agreement check above (which skips 
 
 ```bash
 python tools/test_a2al_lookup.py
+```
+
+## `test_a2al_lint.py`
+
+Tests `a2al_lint.py`: every check at its level, the `.md` block fallback, the CLI flags and exit codes, and that every `examples/*.txt` is error-free. Standard library only.
+
+```bash
+python tools/test_a2al_lint.py
 ```
 
 ## `test_a2al_preview.py`

@@ -1,10 +1,10 @@
 # A2AL Examples
 
-These are plain-text agent-to-agent messages that follow the A2AL/0.5.1 spec (routing header plus the style guide). The spec is [`specs/A2A-Core.md`](../specs/A2A-Core.md).
+These are plain-text agent-to-agent messages that follow the A2AL/0.5.2 spec (routing header, then a shorthand or prose body). The spec is [`specs/A2A-Core.md`](../specs/A2A-Core.md).
 
 ## Files
 
-Each `.txt` file below is one complete message: the routing header on line 1 (§3, required since 0.4.1) and the shorthand body under it. The `.md` files are walkthroughs that include complete messages in fenced blocks.
+Each `.txt` file below is one complete message: the routing header on line 1 (§3, required since 0.4.1) and the body under it. Most are shorthand bodies; `prose-ruling.txt` shows a prose body under the header, which 0.5.2 allows. The `.md` files are walkthroughs that include complete messages in fenced blocks.
 
 I picked examples from several industries on purpose. A2AL is for coordinating work in general, and software is just one of the domains I've worked through. The software examples sit next to programme, campaign and engagement messages that use only `core.yaml` and `project-mgmt.yaml`.
 
@@ -22,6 +22,9 @@ I picked examples from several industries on purpose. A2AL is for coordinating w
 | [engagement-closeout.txt](./engagement-closeout.txt) | Closeout, non-software | `SOW`, `lessons-learned`, `RCA`, `baseline`, `variance`, `stakeholder` |
 | [attestation-handshake.md](./attestation-handshake.md) | Attestation handshake (§7.10) | A two-way commitment carried in the header, the main case where you really need the header; `evidence=`, `thread=`, `status=`, `cc=`, `in-reply-to=` |
 | [embedded-block.md](./embedded-block.md) | Embedded A2AL block (§2.5.1) | A Markdown message carrying a fenced `a2al` block, which is allowed because the block doesn't repeat the prose |
+| [item-correction.txt](./item-correction.txt) | Correction of one item (§3.2, §7.11) | `supersedes=<id>#<item>`, `# n.` section markers, `void-if` |
+| [prose-ruling.txt](./prose-ruling.txt) | Ruling with a prose body (§2.1) | header over plain prose, verdict on line 1, `void-if`, `blocks` |
+| [relay-and-ask.txt](./relay-and-ask.txt) | Relayed human words (§2.6) | `relay(<person>)`, `ASK(<person>)`, `default`, `cc=` that doesn't act |
 | [version-skew.md](./version-skew.md) | Fail-soft decode (§3.5) | `a2al=`, and what a reader does with a field from a newer version |
 
 ## Conformance

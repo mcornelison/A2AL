@@ -4,7 +4,7 @@
 
 ## The setup
 
-When you run more than one AI agent and they have to coordinate, they talk to each other the same way they talk to you: in fluent, padded, human-shaped prose. "Hi Byte, just wanted to give you a quick update: US-713 is now complete, all acceptance criteria are met, CI is green, and the PR is ready for your review whenever you get a chance." That sentence is about 35 tokens, and maybe 8 of them carry signal. Multiply that by every handoff in a multi-agent workflow and a real share of your token budget goes on politeness and framing that no agent needs.
+When you run more than one AI agent and they have to coordinate, they talk to each other the same way they talk to you: in fluent, padded, human-shaped prose. "Hi Tamsin, just wanted to give you a quick update: US-713 is now complete, all acceptance criteria are met, CI is green, and the PR is ready for your review whenever you get a chance." That sentence is about 35 tokens, and maybe 8 of them carry signal. Multiply that by every handoff in a multi-agent workflow and a real share of your token budget goes on politeness and framing that no agent needs.
 
 A2AL (Agent-to-Agent *Language*) started as my attempt to fix that. The fix itself is less interesting than how wrong my first instinct was, and what the measurements made me admit.
 
@@ -19,7 +19,7 @@ The envelope cost **2× to 8× more tokens than just writing Markdown.** On shor
 So I deleted it. /0.4.0 threw out the envelope entirely and became a plain-text shorthand: one routing header line, then a short body drawn from an open vocabulary the LLM already knows. No JSON and no parser. The message above becomes:
 
 ```
-from=Byte(DEV); to=Ledger(PM); date=2026-05-13; topic=US-713 closeout; audience=agent
+from=Tamsin(DEV); to=Wren(PM); date=2026-05-13; topic=US-713 closeout; audience=agent
 US-713 done; AC met; CI green; PR ready -- merge?
 ```
 

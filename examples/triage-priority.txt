@@ -1,6 +1,6 @@
-from=Hawkeye(QA); to=Ralph(DEV); cc=Ledger(PM), Audrey(SEC); date=2026-06-18T09:15Z; topic=nightly gate red -- auth regression; audience=agent; status=red; priority=P1; urgency=high; thread=B-293; refs=commit-49ba0e6e, US-940
+from=Juno(QA); to=Pell(DEV); cc=Wren(PM), Sable(SEC); date=2026-06-18T09:15Z; topic=nightly gate red -- auth regression; audience=agent; status=red; priority=P1; urgency=high; thread=B-293; refs=commit-49ba0e6e, US-940
 heads-up: nightly gate red. auth regression on token refresh.
 B-293 blocked: release gate will not pass -- hotfix needed before groom.
 repro 12/12; failing since commit-49ba0e6e.
 spike timeboxed 4h -- if no root cause by 13:00Z, revert and re-gate.
-Ralph: own the hotfix. Ledger: hold the groom. ack?
+Pell: own the hotfix. Wren: hold the groom. ack?
