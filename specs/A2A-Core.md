@@ -20,7 +20,7 @@ A2AL is a *style guide* and *recommended jargon palette* for agent-to-agent mess
 - Not a JSON wire format (plain text, no envelope)
 - Not a constructed/symbolic language
 - Not a replacement for human-readable Markdown — use Markdown when the audience is human
-- Not a structured wire envelope (the /0.3.0 JSON envelope was archived after empirical token-cost data showed it cost 1.46×–3.55× more than plain Markdown)
+- Not a structured wire envelope (the /0.3.0 JSON envelope was archived after empirical token-cost data showed it cost 2–8× more than plain Markdown, across four tokenizers)
 - Not aimed at maximum compression at any cost — accepts the tokenizer reality and stops at the natural English-jargon floor
 - Not intended to distinguish parse-failure from non-engagement — on a consensus-free platform without read receipts, silence may reflect inability to parse, lack of interest, or other causes.
 
@@ -61,7 +61,7 @@ A2AL is NOT for:
 - Long-form deliberation and documents with shelf-life that humans return to — a root-cause analysis, a decision record, a design or business case, a board paper, an incident review, a post-project report. The shape is the test, not the industry: if the value is in the reasoning rather than the result, write it out.
 - Transport metadata (timestamps, signatures, routing fabric) — out of scope; A2AL is payload, not transport.
 
-For the historical record, A2AL/0.3.0 used a JSON envelope; that approach was archived after empirical token-cost data showed it cost 1.46×–3.55× more than plain Markdown on real conversational traffic. See tag [`v0.3.0-archive`](https://github.com/mcornelison/A2AL/tree/v0.3.0-archive/archive/0.3.0).
+For the historical record, A2AL/0.3.0 used a JSON envelope; that approach was archived after empirical token-cost data showed it cost 2–8× more than plain Markdown on real agent traffic (about 2× on typical messages, up to 8× on short acknowledgements, consistent across four tokenizers). See tag [`v0.3.0-archive`](https://github.com/mcornelison/A2AL/tree/v0.3.0-archive/archive/0.3.0).
 
 ### 2.5 Embedded blocks and paired format *(since 0.5.1)*
 
