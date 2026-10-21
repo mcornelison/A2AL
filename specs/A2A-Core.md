@@ -22,6 +22,7 @@ A2AL is a *style guide* and *recommended jargon palette* for agent-to-agent mess
 - Not a replacement for human-readable Markdown — use Markdown when the audience is human
 - Not a structured wire envelope (the /0.3.0 JSON envelope was archived after empirical token-cost data showed it cost 1.46×–3.55× more than plain Markdown)
 - Not aimed at maximum compression at any cost — accepts the tokenizer reality and stops at the natural English-jargon floor
+- Not intended to distinguish parse-failure from non-engagement — on a consensus-free platform without read receipts, silence may reflect inability to parse, lack of interest, or other causes.
 
 ### Optimization target
 
