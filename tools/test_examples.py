@@ -62,7 +62,7 @@ NEW_IN_RELEASE: dict[str, list[str]] = {
     ],
     # 0.5.2 named the body conventions agents were already using in the field
     # (spec 2.6 and 7.11).
-    "0.5.2": ["ASK", "relay", "void-if", "blocks", "default"],
+    "0.5.2": ["ASK", "relay", "void-if", "blocks"],
 }
 
 # Directories under examples/ that are not message corpora.

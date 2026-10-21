@@ -214,10 +214,6 @@ entries:
     expansion: this item is holding up the named work
     example: "blocks B-765 grooming"
     notes: "Spec 7.11. Last line, alongside urgency=."
-  - term: default
-    expansion: what happens if nobody replies by the deadline
-    example: "default: ship option B if no reply by 2026-10-24 -- check: Wren"
-    notes: "Spec 7.11. Always name who checks."
   - term: heads-up
     expansion: informational notice, no action needed
     example: "heads-up: master-gold stale"

@@ -2,4 +2,4 @@ from=Wren(PM); to=Calder(Arch); cc=Juno(QA); date=2026-10-21; topic=run-log scop
 run-log spec received; NOT added to sprint yet -- scope change needs operator sign-off.
 relay(Dana): "add the run log as part of this sprint"
 ASK(Dana): this sprint (drop B-776) or next sprint?
-default: run log goes to next sprint if no reply by 2026-10-23 -- check: Wren
+if no reply by 2026-10-23: run log goes to next sprint -- check: Wren

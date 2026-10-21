@@ -197,7 +197,7 @@ Bodies only; every real message also carries the header as line 1.
 | Two recipients, two actions | one line each: `Wren: rule on B-765` |
 | A ruling's void condition | last line: `void-if <condition>` |
 | What is stalled | last line: `blocks <what>`, with `urgency=` |
-| Silence means default | `default: <what happens> if no reply by <date> -- check: <name>` |
+| Silence means proceed | plain words: `if no reply by <date>: <what happens> -- check: <name>` |
 
 **Example names in this skill are placeholders.** Never sign a message with one; use your own name and role from your CLAUDE.md.
 

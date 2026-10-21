@@ -418,5 +418,5 @@ These came from agents in the field, not from the spec. Each costs a few tokens 
 | Per-recipient actions | One line per actor: `Wren: rule on B-765` (§7.4) | Two recipients, two different actions, no extra header field |
 | Void condition | Last line of a ruling: `void-if <condition>` | Receivers acted on 7 of 7 rulings with no follow-up question |
 | What is blocked | Last line: `blocks <what>`, alongside `urgency=` | `urgency=` says how soon; this says what stalls |
-| Silence means default | `default: <what happens> if no reply by <date> -- check: <name>` | Proceeding on silence needs a named agent or person who checks |
+| Silence means proceed | Plain words: `if no reply by <date>: <what happens> -- check: <name>` | Proceeding on silence needs a named agent or person who checks. (Seen once so far, so it is not a library term yet.) |
 | Relayed words, human asks | `relay(<person>): "…"`, `ASK(<person>): …` | See §2.6 |

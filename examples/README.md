@@ -24,7 +24,7 @@ I picked examples from several industries on purpose. A2AL is for coordinating w
 | [embedded-block.md](./embedded-block.md) | Embedded A2AL block (§2.5.1) | A Markdown message carrying a fenced `a2al` block, which is allowed because the block doesn't repeat the prose |
 | [item-correction.txt](./item-correction.txt) | Correction of one item (§3.2, §7.11) | `supersedes=<id>#<item>`, `# n.` section markers, `void-if` |
 | [prose-ruling.txt](./prose-ruling.txt) | Ruling with a prose body (§2.1) | header over plain prose, verdict on line 1, `void-if`, `blocks` |
-| [relay-and-ask.txt](./relay-and-ask.txt) | Relayed human words (§2.6) | `relay(<person>)`, `ASK(<person>)`, `default`, `cc=` that doesn't act |
+| [relay-and-ask.txt](./relay-and-ask.txt) | Relayed human words (§2.6) | `relay(<person>)`, `ASK(<person>)`, proceed-on-silence line, `cc=` that doesn't act |
 | [version-skew.md](./version-skew.md) | Fail-soft decode (§3.5) | `a2al=`, and what a reader does with a field from a newer version |
 
 ## Conformance

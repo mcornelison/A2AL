@@ -11,7 +11,7 @@ A2AL releases inside 0.x.x are **additive and backward-compatible**. Upgrading m
 2. Re-sync library:  copy the updated core.yaml + any NEW domain files into the library your agent ACTUALLY LOADS
 3. Bump skill:       re-copy examples/ClaudeCode/skills/a2al/SKILL.md + commands/a2al.md
 4. Bump heading:     CLAUDE.md "## A2AL/<old>" → "## A2AL/<new>"
-5. Verify:           python tools/validate_library.py   → expect "OK: 169 entries across 7 files" at 0.5.2
+5. Verify:           python tools/validate_library.py   → expect "OK: 168 entries across 7 files" at 0.5.2
 ```
 
 Or run [`INSTALL-PROMPT.md`](./INSTALL-PROMPT.md) in re-sync mode, which automates steps 2–4 **for the clone-and-point and copy-locally modes** (see the library-mode caveat below).
@@ -58,10 +58,10 @@ A new domain file is opt-in. Load it per-topic like the others — **unless** th
 - **Relayed human words are a proposal until confirmed** (§2.6, normative). New body markers: `relay(<person>): "..."` and `ASK(<person>): ...`.
 - **One new optional field:** `supersedes=<id>[#<item>]` for corrections (§3.2). In file inboxes, a message id is its filename without the extension.
 - **Header hygiene:** one line only, no `; ` inside values, `topic=` under about 60 characters (§3.1). New advisory checker: `python tools/a2al_lint.py <file>` (header only).
-- **Body conventions documented** (§7.11): numbered items, `void-if`, `blocks`, `default`, per-recipient lines.
+- **Body conventions documented** (§7.11): numbered items, `void-if`, `blocks`, per-recipient lines, proceed-on-silence with a named checker.
 - **Skill version stamp.** `SKILL.md` now carries `<!-- a2al-skill: <version>+<date> -->`; compare it with the repo's copy to see whether your vendored skill is stale.
 - **Example names changed** to placeholders that aren't real agents. If any of your agents copied an example identity (`Byte`, `Ledger`, `Kunai`, `Hawkeye`), give it its own name.
-- **Library 164 → 169** (+5 core: `ASK`, `relay`, `void-if`, `blocks`, `default`). Expected post-upgrade count: **169 entries across 7 files**.
+- **Library 164 → 168** (+4 core: `ASK`, `relay`, `void-if`, `blocks`). Expected post-upgrade count: **168 entries across 7 files**.
 
 ## What changed in 0.5.1
 
