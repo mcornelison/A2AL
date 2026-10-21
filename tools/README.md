@@ -1,12 +1,12 @@
 # A2AL Tools
 
-Validation and helper tooling for the A2AL/0.5.1 library.
+Validation and helper tools for the A2AL/0.5.1 library.
 
-> `validate_library.py` requires PyYAML; `a2al_preview.py compare` requires tiktoken. `a2al_lookup.py` and `a2al_preview.py scan` are stdlib-only. These tools are the only executable code in A2AL; everything else is documentation and YAML.
+> `validate_library.py` needs PyYAML. `a2al_lookup.py` and `a2al_preview.py` run on the standard library alone; installing tiktoken makes `a2al_preview.py compare` more precise (see [Token backends](#token-backends)). These tools are the only executable code in A2AL. Everything else is documentation and YAML.
 
 ## `validate_library.py`
 
-Validates `library/*.yaml` against the schema documented in [`library/README.md`](../library/README.md).
+Checks `library/*.yaml` against the schema in [`library/README.md`](../library/README.md).
 
 ### Run
 
@@ -15,17 +15,17 @@ pip install pyyaml
 python tools/validate_library.py
 ```
 
-Expected output: `OK: 149 entries across 7 files`
+Expected output: `OK: 164 entries across 7 files`
 
 ### Strict mode
 
-Promote warnings to errors:
+Turns warnings into errors:
 
 ```bash
 python tools/validate_library.py --strict
 ```
 
-Used by CI (see [`.github/workflows/ci.yaml`](../.github/workflows/ci.yaml)) to block merges when style warnings appear.
+CI uses this (see [`.github/workflows/ci.yaml`](../.github/workflows/ci.yaml)) to block a merge when style warnings show up.
 
 ### Custom directory
 
@@ -35,32 +35,32 @@ python tools/validate_library.py --library-dir path/to/yamls
 
 ## `a2al_preview.py`
 
-Shows what A2AL actually buys on a *specific* message, before you pay the composition cost. Built in response to the same request from two independent agents in [`specs/feedback/`](../specs/feedback): *show me the savings before I commit to the format.*
+Shows what A2AL actually saves on a *specific* message, before you spend the effort writing it. I built it because two agents, independently, asked for the same thing in [`specs/feedback/`](../specs/feedback): *show me the savings before I commit to the format.*
 
-### `scan` — is this draft even compressible?
+### `scan`: is this draft even compressible?
 
 ```bash
 python tools/a2al_preview.py scan draft.md
 ```
 
-Audits a Markdown draft for the padding [`specs/A2A-Core.md`](../specs/A2A-Core.md) §4.1 drops — articles, linking verbs, subjective framing, politeness, filler, greetings — and reports what share of the draft is recoverable, with examples per category.
+Goes through a Markdown draft looking for the padding that [`specs/A2A-Core.md`](../specs/A2A-Core.md) §4.1 drops (articles, linking verbs, subjective framing, politeness, filler, greetings). It reports what share of the draft could go, with examples for each category.
 
-Ends by restating that compressibility does **not** decide the format. The audience rule (§2.1) does.
+At the end it reminds you that compressibility does **not** decide the format. The audience rule (§2.1) does.
 
-### `compare` — was it worth it?
+### `compare`: was it worth it?
 
 ```bash
 python tools/a2al_preview.py compare draft.md message.txt
 python tools/a2al_preview.py compare draft.md message.txt --threshold 0.25 --json
 ```
 
-Token counts for both renderings, the ratio, the saving, and a verdict against `--threshold` (default 0.30). Exits 0 when the saving clears the threshold, 1 when it does not — so it composes into a script.
+Gives token counts for both versions, the ratio, the saving, and a verdict against `--threshold` (default 0.30). It exits 0 when the saving clears the threshold and 1 when it doesn't, so you can use it in a script.
 
-Also reports, as advisory notes:
+It also prints some advisory notes:
 
-- **Routing header conformance** — present, missing required fields, unrecognised fields (which are preserved-and-ignored by readers, not errors), and which optional fields are in use.
-- **Shape detected** — which §7 pattern(s) the body matches.
-- **Anti-patterns (§4.4)** — rare Unicode, and invented abbreviations. It uses the tokenizer itself as the oracle: a short word costing more than one token that is *not* in `library/*.yaml` is exactly the case the spec warns about, where the full word would have been cheaper.
+- Routing header conformance: whether the header is there, any missing required fields, any unrecognised fields (readers preserve and ignore those; they aren't errors), and which optional fields you used.
+- Shape detected: which §7 pattern(s) the body matches.
+- Anti-patterns (§4.4): rare Unicode and made-up abbreviations. The tokenizer itself is the judge here. A short word that costs more than one token and *isn't* in `library/*.yaml` is exactly the case the spec warns about, where the full word would have been cheaper.
 
 ### `count`
 
@@ -70,34 +70,34 @@ python tools/a2al_preview.py count examples/*.txt
 
 ### Token backends
 
-Everything runs with no dependencies. Install tiktoken for a sharper answer:
+Everything runs with no dependencies. Install tiktoken for a more precise answer:
 
 ```bash
 pip install tiktoken
 python tools/a2al_preview.py --encoder o200k_base compare draft.md msg.txt
 ```
 
-**No tokenizer here is "exact" for Claude.** Anthropic's vocabulary is not published, so `cl100k_base` is the long-standing proxy — see [`testing/tools/CROSS-LLM-RESULTS.md`](../testing/tools/CROSS-LLM-RESULTS.md). What makes the conclusion safe is not precision on one tokenizer but stability across four: the A2AL/Markdown ratio held at **0.73–0.84** on cl100k, o200k, Llama 3 and Mistral. `--encoder` counts with another.
+No tokenizer here is "exact" for Claude. Anthropic doesn't publish its vocabulary, so `cl100k_base` has long been the stand-in (see [`testing/tools/CROSS-LLM-RESULTS.md`](../testing/tools/CROSS-LLM-RESULTS.md)). I trust the conclusion because it's stable across four tokenizers: the A2AL/Markdown ratio held at **0.73-0.84** on cl100k, o200k, Llama 3 and Mistral. Use `--encoder` to count with a different one.
 
-**`scan` is sound on the heuristic.** It reports a share *within one document* — padding tokens over total tokens, both counted the same way — so the bias cancels. That is measured, not assumed: across this repo's corpus the reported share moves by at most **0.6 percentage points** versus cl100k_base, and `test_a2al_preview.py` asserts it stays within 1 point.
+`scan` is fine on the heuristic. It reports a share *within one document* (padding tokens over total tokens, both counted the same way), so the error cancels out. I measured that instead of assuming it: across this repo's corpus the reported share moves by at most **0.6 percentage points** compared with cl100k_base, and `test_a2al_preview.py` checks that it stays within 1 point.
 
-**`compare` is different**, because it divides one rendering by another and the error does *not* cancel across formats. Measured on this corpus the heuristic under-counts A2AL by ~9% and over-counts Markdown prose by ~2%, inflating the ratio by ~11% — enough to report a real 26% saving as 34% and cross a 30% threshold the wrong way.
+`compare` is different. It divides one version by the other, and the error does *not* cancel between formats. On this corpus the heuristic under-counts A2AL by about 9% and over-counts Markdown prose by about 2%, which inflates the ratio by about 11%. That's enough to report a real 26% saving as 34% and land on the wrong side of a 30% threshold.
 
-So without a tokenizer, `compare` reports a **±12 point band** instead of a point estimate and refuses to guess:
+So without a tokenizer, `compare` reports a **±12 point band** instead of a single number, and it won't guess:
 
 | Situation | Verdict | Exit |
 |---|---|---|
 | Threshold clears even at the pessimistic end | `WORTH IT` | 0 |
 | Threshold missed even at the optimistic end | `MARGINAL` | 1 |
-| Threshold falls **inside** the band | `INCONCLUSIVE` — install tiktoken | 3 |
+| Threshold falls **inside** the band | `INCONCLUSIVE` (install tiktoken) | 3 |
 
 With a tokenizer the band is zero and the verdict is a straight comparison.
 
-> This tool validates nothing about message shape. A2AL never validates messages, by design — only the library is validated. Every conformance note above is advisory.
+> This tool doesn't validate message shape. A2AL never validates messages, by design; only the library gets validated. Every conformance note above is advisory.
 
 ## `a2al_lookup.py`
 
-Makes the vocabulary library cheap to consult *while composing*. Built for the zero-consultation finding in [`specs/feedback/`](../specs/feedback): Ledger — *"I have not actually consulted `library/*.yaml` during composition"* — and Claude, who asked for a list of what already exists plus a *"did you mean…"* reflex before inventing a term. Both had zero library contributions.
+Makes the vocabulary library cheap to check *while you're writing a message*. I built it after the zero-consultation finding in [`specs/feedback/`](../specs/feedback). Ledger said *"I have not actually consulted `library/*.yaml` during composition"*, and Claude asked for a list of what already exists plus a *"did you mean…"* reflex before inventing a term. Neither had contributed a single library entry.
 
 ```bash
 python tools/a2al_lookup.py check <candidate> [expansion]   # already covered?
@@ -106,49 +106,49 @@ python tools/a2al_lookup.py list [--domain core]            # what is in here
 python tools/a2al_lookup.py stats                           # counts per domain
 ```
 
-### `check` — the did-you-mean reflex
+### `check`: did you mean...
 
-Run it before coining any shortening. It catches the three ways a new term is usually a mistake, cheapest check first:
+Run it before you coin any shortening. It catches the three usual ways a new term turns out to be a mistake, cheapest check first:
 
 | Result | Meaning |
 |---|---|
-| **ALREADY CANONICAL** | The term is in the library. Use it; don't redefine it inline (§6.5). |
-| **NEAR MISS** | Nothing is spelled that way, but something close is — usually a typo. `hotfx` → `hotfix` at 0.909 similarity. |
-| **ALREADY COVERED?** | Something else expands to the same meaning. `DR=design-review` surfaces `CR` (code review) and `review`. |
-| **CLEAR** | Nothing covers it — with a reminder of the §6.4 three-uses threshold and the inline `term=expansion` form. |
+| **ALREADY CANONICAL** | The term is in the library. Use it, and don't redefine it inline (§6.5). |
+| **NEAR MISS** | Nothing is spelled that way, but something close is, usually because of a typo. `hotfx` → `hotfix` at 0.909 similarity. |
+| **ALREADY COVERED?** | Something else expands to the same meaning. `DR=design-review` turns up `CR` (code review) and `review`. |
+| **CLEAR** | Nothing covers it. It reminds you of the §6.4 three-uses threshold and the inline `term=expansion` form. |
 
-Exit code is the signal, so it scripts: **1** = something already covers this, **0** = clear to coin.
+The exit code is the result, so you can script it: **1** means something already covers this, **0** means you're clear to coin it.
 
 ### No dependencies, on purpose
 
-Stdlib only. Needing `pip install` before you can check a word is exactly the friction that produced the zero-consultation finding. Strict schema validation stays in `validate_library.py` (which does use PyYAML, and runs in CI); this reads the same files with a small line parser.
+It only uses the standard library. Having to `pip install` something before you can check a word is exactly the kind of friction that led to the zero-consultation finding. Strict schema validation stays in `validate_library.py` (which does use PyYAML and runs in CI). This tool reads the same files with a small line parser.
 
-That is only safe if the two parsers agree, so `test_a2al_lookup.py` compares them entry by entry against the real library and fails on any drift.
+That only works if the two parsers agree, so `test_a2al_lookup.py` compares them entry by entry against the real library and fails if they drift apart.
 
 ## `test_examples.py`
 
-Conformance tests for the [`examples/`](../examples) corpus. Stdlib only.
+Conformance tests for the [`examples/`](../examples) corpus. Standard library only.
 
-A2AL never validates messages, by design. This does not change that — it validates *this repository's own examples*, which are documentation, and documentation that contradicts the spec is a bug.
+A2AL never validates messages, by design, and this doesn't change that. It validates *this repo's own examples*, which are documentation, and documentation that contradicts the spec is a bug.
 
 ```bash
 python tools/test_examples.py
 ```
 
-Asserts:
+It checks that:
 
-1. **Every message carries a conformant routing header** (§3) — required fields present, no unrecognised field names.
-2. **Every header field the spec documents appears in at least one example.** The field list is parsed out of `specs/A2A-Core.md` §3.1 and §3.2, so the test cannot drift from the spec: add a field to the spec table without exercising it and this fails.
-3. **Every term a release adds appears in at least one example**, per the `NEW_IN_RELEASE` manifest at the top of the file (a whole new domain is named `domain:<name>`). Add a row when a release adds vocabulary.
-4. No rare Unicode anywhere in the corpus (§4.4).
+1. Every message has a conformant routing header (§3): required fields present, no unrecognised field names.
+2. Every header field the spec documents appears in at least one example. The field list is read straight from `specs/A2A-Core.md` §3.1 and §3.2, so the test can't drift from the spec. If you add a field to the spec table and no example uses it, this fails.
+3. Every term a release adds appears in at least one example, following the `NEW_IN_RELEASE` list at the top of the file (a whole new domain is listed as `domain:<name>`). Add a row when a release adds vocabulary.
+4. There's no rare Unicode anywhere in the corpus (§4.4).
 
-Checks 2 and 3 fail on the *next* release, which is the point — they turn "we shipped a feature" into something CI can prove. They were written after a sweep found that 8 of the 10 terms added in 0.5.0 existed only inside the changelog announcing them, and that none of 0.5.0's four new header fields was demonstrated anywhere.
+Checks 2 and 3 fail on the *next* release, and that's intended. They turn "this release added X" into something CI can confirm. I wrote them after a sweep found that 8 of the 10 terms added in 0.5.0 existed only inside the changelog announcing them, and that no example used any of 0.5.0's four new header fields.
 
-`INTENTIONAL_UNKNOWN_FIELDS` narrowly exempts `version-skew.md`, whose whole subject is a field this version does not recognise.
+`INTENTIONAL_UNKNOWN_FIELDS` makes one narrow exception, for `version-skew.md`, which is entirely about a field this version doesn't recognise.
 
 ## `test_a2al_lookup.py`
 
-Tests `a2al_lookup.py`, including the parser-agreement check above (which self-skips if PyYAML is absent).
+Tests `a2al_lookup.py`, including the parser-agreement check above (which skips itself if PyYAML isn't installed).
 
 ```bash
 python tools/test_a2al_lookup.py
@@ -156,7 +156,7 @@ python tools/test_a2al_lookup.py
 
 ## `test_a2al_preview.py`
 
-Tests `a2al_preview.py`. Stdlib only; same shape as `test_validate_library.py`. Cases needing exact counts self-skip when tiktoken is absent, so the suite passes in a bare environment and covers more in CI.
+Tests `a2al_preview.py`. Standard library only, and built the same way as `test_validate_library.py`. Cases that need exact counts skip themselves when tiktoken isn't installed, so the suite passes in a bare environment and covers more in CI.
 
 ```bash
 python tools/test_a2al_preview.py
@@ -164,7 +164,7 @@ python tools/test_a2al_preview.py
 
 ## `test_validate_library.py`
 
-Tests the validator against `_test_fixtures/` (intentionally-broken YAML files) plus the real `library/`.
+Tests the validator against `_test_fixtures/` (YAML files that are broken on purpose) and against the real `library/`.
 
 ### Run
 
@@ -172,11 +172,11 @@ Tests the validator against `_test_fixtures/` (intentionally-broken YAML files) 
 python tools/test_validate_library.py
 ```
 
-Expected: every fixture reports `OK: <name> correctly rejected/accepted` and the real library passes.
+Expected: every fixture reports `OK: <name> correctly rejected/accepted`, and the real library passes.
 
 ## `_test_fixtures/`
 
-Eight broken YAML files (one per failure mode) plus one valid fixture. Used by `test_validate_library.py`.
+Eight broken YAML files (one per failure mode) and one valid file, used by `test_validate_library.py`.
 
 | File | Failure mode |
 |---|---|
@@ -192,5 +192,5 @@ Eight broken YAML files (one per failure mode) plus one valid fixture. Used by `
 
 ## Future tools
 
-- `tokenize_library.py` — auto-populate per-entry `tokens: {claude, gpt, llama}` field using the Anthropic API and tiktoken
-- `harvest_terms.py` (roadmap 0.5.2) — scan agent inboxes for `term=expansion` definitions used 5+ times, output PR-ready candidates
+- `tokenize_library.py`: fill in the per-entry `tokens: {claude, gpt, llama}` field using the Anthropic API and tiktoken
+- `harvest_terms.py` (roadmap 0.5.2): scan agent inboxes for `term=expansion` definitions used 5 or more times and output candidates ready for a PR

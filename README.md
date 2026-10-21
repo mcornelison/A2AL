@@ -1,195 +1,183 @@
-# A2AL — Open Vocabulary for Agent Communication
+# A2AL: a shared language for agents talking to agents
 
-A2AL is the **body-language layer** for agent-to-agent messages — an open, contributable vocabulary that captures *what a message says* (state, intent, routing context) in shorthand the LLM already speaks, independent of how the message is transported. It is plain text, English-derived, designed to tokenize as ~1 token per concept on modern LLM tokenizers. Agents share a common dictionary and extend it for their domain.
+When I started running several AI agents on the same projects, I noticed they wrote to each other the way they write to me: long, polite, padded prose. Every handoff opened with a greeting and a recap before it got to the point. It was hard to scan, hard to route, and it burned tokens on words no agent needed.
 
-**A2AL is industry-neutral.** State, intent, blockers, decisions and acknowledgments are how *any* two coordinating agents talk — on a construction programme, a clinical rollout, a legal matter, a marketing campaign, or a software sprint. The shipped vocabulary leans toward software because technology teams adopted it first and generated the first real traffic; software is **one worked domain, not the reference domain**. Adding an industry means adding a vocabulary file, not changing the spec.
+A2AL is my attempt to fix that. It's two things:
 
-**Status:** A2AL/0.5.1 — the industry-neutral release. Pre-1.0; subject to refinement before /1.0.
+1. **A one-line routing header** at the top of every agent message: who it's from, who it's to, the date, and what it's about.
+2. **A shared vocabulary** of short, plain-English terms for state and intent (`done`, `blocked`, `ack`, `RISK`, `ACTION`), kept in YAML files anyone can extend.
 
-**License:** Apache-2.0 — see [LICENSE](./LICENSE).
+It's plain text. There's no runtime, no parser and no JSON. If your agents can read a text file, they can use it.
 
-## Where A2AL fits — the body-language layer
+**Status:** A2AL/0.5.1. It's pre-1.0, so expect changes.
+**License:** Apache-2.0, see [LICENSE](./LICENSE).
 
-Agent communication has two layers, and they're easy to conflate:
-
-- **Transport / lifecycle** — *how* a message gets from agent A to agent B: the connection, the envelope, addressing, streaming, task lifecycle. This is what MCP (tool-call routing) and Google's Agent2Agent / A2A (agent-as-API over HTTP + JSON-RPC) handle.
-- **Payload / body-language** — *what the message says* once it's been routed: the compact vocabulary of state and intent the receiving agent actually reads and acts on.
-
-A2AL is the **payload layer**. It says nothing about transport. It's the body language — the shared dictionary of state, intent, and routing context — that rides *inside* whatever envelope your agents already use: an MCP `data` part, a Google A2A `Message.Part`, a webhook body, or a `.txt` dropped in an inbox.
-
-That's why "why another protocol?" has a one-word answer: **layer.** A2AL doesn't compete with MCP or A2A any more than a shared vocabulary competes with the postal service — they compose.
-
-| Layer | Owns | Examples |
-|---|---|---|
-| Transport / lifecycle | connection, envelope, addressing, streaming, task state | MCP, Google A2A, ACP, plain HTTP |
-| **Payload / body-language** | **message contents — state, intent, routing context** | **A2AL** |
-
-**On the name.** Google's protocol is **A2A** (Agent2Agent); this is **A2AL** (Agent-to-Agent *Language*). Similar acronyms, different layers — A2A *moves* the message, A2AL is *what the message says*. A2AL fits inside an A2A `Message.Part` of type `data`; see [`specs/A2A-Core.md`](./specs/A2A-Core.md) §9 for the explicit mapping.
-
-## Why
-
-In real multi-agent execution, much of the inter-agent token budget is mechanical waste — narrative prose, framing, justification, JSON-envelope overhead. A2AL carries only the signal: state and intent, in shorthand the LLM already speaks. On real agent traffic it costs **~0.76× the tokens of plain Markdown (≈24% fewer), routing header included** — while the JSON-envelope approach we tried in /0.3.0 (now archived) cost *2–8× more* than Markdown. But the real payoff is a clean, parseable record of what each agent meant, not the byte count.
-
-### The efficiency is tokenizer-agnostic
-
-A2AL was long measured on a single tokenizer (`cl100k_base` — OpenAI's GPT-3.5/4 BPE, historically a stand-in for Claude's unpublished tokenizer). Re-running the same agent-traffic corpus through four *independent* tokenizers shows the saving is a property of the format, not of one model:
-
-| A2AL vs Markdown (lower = fewer tokens) | GPT-3.5/4 | GPT-4o | Llama 3 | Mistral |
-|---|---|---|---|---|
-| Real office traffic (routing header included) | 0.77× | 0.77× | 0.77× | 0.76× |
-| The abandoned /0.3.0 JSON envelope | 1.96× | 1.99× | 1.97× | 2.02× |
-
-The routing header adds a fixed cost that dominates only on very short messages, where A2AL earns its place by parseability rather than compression (see [`specs/A2A-Core.md`](./specs/A2A-Core.md) §3.4). Claude's own tokenizer is proprietary and remains unmeasured; the claim rests on the four real tokenizers above.
-
-## How A2AL looks
-
-A complete agent-to-agent message — one routing header line, then the body:
+## What a message looks like
 
 ```text
 from=Byte(DEV); to=Ledger(PM); date=2026-05-13; topic=US-713 closeout; audience=agent
 US-713 done; AC met; CI green; PR ready -- merge?
 ```
 
-That's the whole format. No envelope. No JSON. Plain text. The receiving agent has the vocabulary library loaded into its context, expands the shorthand internally, and acts. The header is mandatory (see `specs/A2A-Core.md` §3); the body uses the style guide and library.
+The first line is the header, and it's required. Everything after it is the body, written in short phrases drawn from the vocabulary. The receiving agent loads the vocabulary, reads the message and acts on it.
 
-For a domain example (security):
+It isn't only for software. Here's part of a building handover (the full message is in [`examples/facility-go-live.txt`](./examples/facility-go-live.txt)):
+
+```text
+from=Meridian(programme-lead); to=Castell(site-lead); cc=Nadia(compliance); date=2026-10-02; topic=Bldg-C go-live readiness; audience=agent; status=blocked; priority=P1
+go-live 2026-10-19 at risk. milestone 3 done; milestone 4 blocked.
+RFI-18 open 9d -- fire-suppression sign-off sits on critical-path.
+escalate RFI-18 to the authority having jurisdiction today.
+```
+
+And a security alert:
 
 ```text
 from=Audrey(SEC); to=Byte(DEV); date=2026-05-13; topic=CVE-2026-30856; audience=agent; urgency=urgent
 crit: RCE in MCP stdio config -- patch ASAP. CVE-2026-30856.
 ```
 
-For a status report:
+There are more in [`examples/`](./examples).
 
-```text
-from=Byte(DEV); to=Ledger(PM); date=2026-05-13; topic=preflight status; audience=agent
-tests 21/21; preflight 878/878; ruff pass; build green.
-```
+## What it's actually good for
 
-See [`examples/`](./examples) for full worked examples.
+I'll be straight about this, because I got it wrong the first time.
 
-## When to write A2AL vs Markdown
+**The header is the part that matters most.** One stable line on every message means you can grep an inbox, route messages with a script, rebuild a thread from `refs=` and `in-reply-to=`, and see who said what without reading the body. Agents keep using the header even when they write the body as plain prose:
 
-A2AL is **mandatory** when the audience is agent-only and **wrong** when a human is in the audience. No hybrid mode; no duplication.
+- A five-agent team on one of my projects put the header on all 632 of its messages over four months. It was required there, but it never slipped, even as the bodies drifted back into prose.
+- A six-agent fleet, which nobody asked to do this, used it on about 99% of its notes.
+
+**The token saving is real but modest.** On real agent traffic an A2AL message costs about **0.76× the tokens of the same message in Markdown**, roughly 24% fewer, header included. That held across four different tokenizers:
+
+| A2AL vs Markdown (lower = fewer tokens) | GPT-3.5/4 | GPT-4o | Llama 3 | Mistral |
+|---|---|---|---|---|
+| Real office traffic (header included) | 0.77× | 0.77× | 0.77× | 0.76× |
+| My original 0.3.0 JSON format (since deleted) | 1.96× | 1.99× | 1.97× | 2.02× |
+
+That second row is why there's no JSON. My first version wrapped messages in a JSON envelope, and when I measured it, it cost 2 to 8 times more than plain Markdown. So I threw it out.
+
+Some caveats you should know about:
+
+- On very short messages, like a bare `ack`, the header can make A2AL cost more than Markdown. You're paying for the structure there, not saving tokens.
+- The measured corpus is small (about 15 paired messages). The direction has been consistent; the exact numbers are indicative.
+- Claude's tokenizer isn't public, so it hasn't been measured directly.
+- So far only Claude-based agents have written and read A2AL end to end. Getting a non-Claude agent doing it is the next milestone.
+
+## Where it fits
+
+A2AL is about *what a message says*, not *how it gets there*. It doesn't replace MCP, Google's A2A or anything else that moves messages around. You put an A2AL message inside whatever your agents already use: an MCP data part, an A2A `Message.Part`, a webhook body, or a text file dropped in an inbox.
+
+| Layer | Handles | Examples |
+|---|---|---|
+| Transport | connections, addressing, delivery, task state | MCP, Google A2A, ACP, plain HTTP |
+| **Message content** | **state, intent, who and what** | **A2AL** |
+
+About the name: Google's protocol is **A2A** (Agent2Agent). Mine is **A2AL** (Agent-to-Agent *Language*). The names are close, but they do different jobs: A2A moves the message, A2AL is the message. [`specs/A2A-Core.md`](./specs/A2A-Core.md) §9 shows how they fit together.
+
+## When to use A2AL and when to use Markdown
+
+The rule is simple: if a person will read it, write Markdown.
 
 | Situation | Format |
 |---|---|
-| Agent → agent, no human review expected | A2AL MUST |
-| Sender identified itself as an AI agent in an inbound message | A2AL MUST (reactive rule) |
-| Human will read or review the message at any point | Markdown |
-| Audience ambiguous or mixed | Markdown (default) |
-| RCAs, ADRs, design specs, long-form deliberation | Markdown (humans return to these) |
+| Agent to agent, no person reading | A2AL (required) |
+| Replying to a message from another agent | A2AL (required) |
+| A person will read or review it | Markdown |
+| Not sure who'll read it | Markdown |
+| RCAs, design docs, decisions people will come back to | Markdown |
 
-Channels can also be declared agent-only by convention (e.g., paths under `agent-channel/`, `.a2a/`, `*/inbox-internal/`).
+A common pattern that works well is a short A2AL note pointing at a Markdown document that holds the detail.
 
-## How to install
+## Installing it
 
-A2AL/0.5.1 is plain text — no runtime, no compiler. Install means making the vocabulary library and the agent helper skill available to your AI agent.
+There's nothing to compile. Installing means giving your agent the vocabulary files and, for Claude Code, a skill that knows the rules.
 
-### For Claude Code agents
-
-Three pieces to install: the skill files, the vocabulary library, and a CLAUDE.md block. Start by cloning the repo:
+### Claude Code
 
 ```bash
 git clone https://github.com/mcornelison/A2AL.git /path/to/A2AL
 ```
 
-Then follow the step-by-step install guide at **[examples/ClaudeCode/README.md](./examples/ClaudeCode/README.md)** — it covers project-scoped vs user-global install, the two library-location strategies (clone-and-point vs copy-locally), the CLAUDE.md block (sample at [`examples/ClaudeCode/CLAUDE-sample.md`](./examples/ClaudeCode/CLAUDE-sample.md), placed right after the first H2 of your CLAUDE.md), verification, and multi-agent setup.
+Then follow [examples/ClaudeCode/README.md](./examples/ClaudeCode/README.md). It walks through installing for one project or for your whole user profile, where to keep the library, the block to add to your CLAUDE.md (there's a sample in [`CLAUDE-sample.md`](./examples/ClaudeCode/CLAUDE-sample.md)), how to check it worked, and setting up several agents.
 
-### For other LLM platforms
+Once it's installed, you just describe the message:
 
-The vocabulary library at `library/*.yaml` is plain YAML — load any subset into your agent's system prompt. The `specs/A2A-Core.md` style guide is normative and platform-agnostic.
+> "Send Agent2 a quick update: US-713 is done, all tests pass, PR is ready to merge."
 
-### For library contributors
+and the `a2al` skill writes the header and body for you. To read an incoming message, hand the file to the skill. You can also call it directly with `/a2al`.
 
-```bash
-git clone https://github.com/mcornelison/A2AL.git
-cd A2AL
-pip install pyyaml
-python tools/validate_library.py
-```
+### Any other platform
 
-### Tools
+The vocabulary in `library/*.yaml` is plain YAML. Load `core.yaml` and whichever domain files you need into your agent's system prompt. The rules in [`specs/A2A-Core.md`](./specs/A2A-Core.md) don't depend on any particular model or tool.
 
-| Command | What it answers |
+### Domain vocabularies
+
+`core.yaml` is always loaded. The domain files are optional:
+
+| File | Covers |
 |---|---|
-| `python tools/a2al_lookup.py check <term>` | Is this shortening already in the library? (stdlib only) |
-| `python tools/a2al_lookup.py search <query>` | What vocabulary already exists for this idea? |
-| `python tools/a2al_preview.py scan draft.md` | How much of this draft is padding A2AL would drop? |
-| `python tools/a2al_preview.py compare draft.md msg.txt` | Was writing it in A2AL actually worth it? |
-| `python tools/validate_library.py` | Is the library well-formed? (CI gate) |
+| `project-mgmt.yaml` | project and program management in any industry |
+| `programming.yaml` | code review and development |
+| `infrastructure.yaml` | cloud, ops, data |
+| `security.yaml` | security review, threat modeling |
+| `ai-agents.yaml` | LLM, agent and RAG topics |
+| `azure.yaml` | Azure, identity, compliance |
 
-See [`tools/README.md`](./tools/README.md) for full usage.
+Adding an industry means adding a file. The spec doesn't change.
 
-## How to use
+## Tools
 
-### Sending a message to a peer agent
-
-In Claude Code, just describe the message:
-
-> "Send Agent2 a quick update — US-713 is done, all tests pass, PR ready to merge."
-
-The `a2al` skill kicks in and produces a header + body:
-
-```text
-from=Byte(DEV); to=Agent2; date=2026-05-13; topic=US-713 closeout; audience=agent
-US-713 done; AC met; CI green; PR ready -- merge?
-```
-
-Drop that text into the peer's inbox (or send via whatever transport the agents share).
-
-### Reading a peer agent message
-
-Hand the `.txt` file to the skill (or paste the content). The agent expands shorthand to plain English internally and acts on the meaning.
-
-### Slash command
-
-Explicit invocation: `/a2al` — useful when you want to specifically request shorthand output, or to read a file by path.
-
-### Loading domain extensions
-
-The skill loads `library/core.yaml` automatically. To add domain vocabulary (e.g., when working on infrastructure or security), instruct the agent: "Load `library/security.yaml` for this thread." The agent merges that vocabulary into its dictionary for the session.
-
-## Repository Layout
-
-| Path | Purpose |
+| Command | What it tells you |
 |---|---|
-| [`specs/A2A-Core.md`](./specs/A2A-Core.md) | Normative A2AL/0.5.1 spec (audience rule, routing header, style guide) |
-| [`library/`](./library) | Vocabulary library — `core.yaml` + 6 domain extensions |
-| [`examples/`](./examples) | Worked shorthand examples |
-| [`examples/ClaudeCode/`](./examples/ClaudeCode) | Claude Code install guide — skill, slash command, sample CLAUDE.md |
-| [`tools/`](./tools) | Library validator, vocabulary lookup, savings preview — all with tests |
-| [`.github/`](./.github) | PR template, CI workflow, issue templates |
+| `python tools/a2al_lookup.py check <term>` | Is this term already in the library? (no dependencies) |
+| `python tools/a2al_lookup.py search <query>` | What terms already exist for this idea? |
+| `python tools/a2al_preview.py scan draft.md` | How much of this draft is padding? |
+| `python tools/a2al_preview.py compare draft.md msg.txt` | Was writing it in A2AL worth it? |
+| `python tools/validate_library.py` | Is the library well-formed? (CI runs this) |
 
-Start with [`specs/A2A-Core.md`](./specs/A2A-Core.md) for the style guide and [`library/README.md`](./library/README.md) for the vocabulary structure.
+Details are in [`tools/README.md`](./tools/README.md).
 
-## Contributing to the Library
+## What's in the repo
 
-The library grows through community contributions:
+| Path | What it is |
+|---|---|
+| [`specs/A2A-Core.md`](./specs/A2A-Core.md) | The spec: audience rule, routing header, style rules |
+| [`library/`](./library) | The vocabulary: `core.yaml` plus 6 domain files |
+| [`examples/`](./examples) | Worked examples |
+| [`examples/ClaudeCode/`](./examples/ClaudeCode) | Claude Code skill, slash command and install guide |
+| [`tools/`](./tools) | Library validator, term lookup, savings preview, all tested |
+| [`docs/why-a2al.md`](./docs/why-a2al.md) | The story of how A2AL got here, including what I got wrong |
+| [`.github/`](./.github) | PR template, CI, issue templates |
 
-1. Pick the right file (universal terms → `core.yaml`, domain-specific → matching extension)
-2. **Check it isn't already there:** `python tools/a2al_lookup.py check <term>` — it catches terms that are already canonical, typos of real terms, and terms whose meaning an existing entry already covers
-3. Add an entry with `term`, `expansion`, and `example` (see [`library/README.md`](./library/README.md) for schema)
-4. **Run `python tools/validate_library.py` before opening a PR.** Submissions that fail validation will be blocked by CI; running locally first saves the round trip.
-5. Open a PR using the [PR template](./.github/PULL_REQUEST_TEMPLATE.md)
-6. CI runs the validator on every PR; merges are blocked on validation failure
+If you're new, read [`specs/A2A-Core.md`](./specs/A2A-Core.md) first, then [`library/README.md`](./library/README.md).
 
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the full workflow including non-library contributions (spec edits, validator improvements, new domains).
+## Contributing
 
-## Versioning
+The vocabulary grows from real use, and I'd love your help.
 
-A2AL follows semantic versioning. Adding library entries is a minor bump. Renaming or removing a term, or changing the spec's style rules, is a major bump. Pre-1.0 means breaking changes are expected; /1.0 is reached when at least one production agent emits and consumes A2AL successfully and cross-LLM compatibility has been demonstrated. Tokenizer-level cross-LLM parity is already shown (see above); the remaining gap is a non-Claude agent emitting and consuming A2AL end-to-end.
+1. Pick the file: universal terms go in `core.yaml`, everything else in the matching domain file.
+2. Check it isn't there already: `python tools/a2al_lookup.py check <term>`. It catches existing terms, typos and near-duplicates.
+3. Add an entry with `term`, `expansion` and `example` (the schema is in [`library/README.md`](./library/README.md)).
+4. Run `python tools/validate_library.py`. CI runs it too and blocks the merge if it fails, so running it first saves you a round trip.
+5. Open a PR using the [template](./.github/PULL_REQUEST_TEMPLATE.md).
 
-## Status & Roadmap
+The most useful thing you can send me is field data: how your agents actually used A2AL, what worked and what didn't. Open an issue. Many of the open ones came from exactly that. [`CONTRIBUTING.md`](./CONTRIBUTING.md) covers spec changes, tools and new domains.
 
-| Version | Theme | Status |
+## Versions and roadmap
+
+Adding vocabulary is a minor version bump. Renaming or removing a term, or changing the spec's rules, is a major one. Until 1.0, breaking changes can happen. I'll call it 1.0 once agents are using it in production and a non-Claude agent has written and read it end to end.
+
+| Version | What it was | Status |
 |---|---|---|
-| 0.3.0 | JSON envelope (deprecated) | archived at tag [`v0.3.0-archive`](https://github.com/mcornelison/A2AL/tree/v0.3.0-archive/archive/0.3.0) |
-| 0.4.0 | Hard pivot — shorthand library is A2AL | superseded by 0.4.1 |
-| 0.4.1 | Audience rule + routing header (normative) | superseded by 0.5.0 |
-| 0.4.2 | Install prompt (idempotent — same flow handles installs and re-syncs) | shipped |
-| 0.5.0 | Optional header fields (`thread`, `status`, `cc`, `priority`) + vocabulary expansion (core +10, new `azure` domain) | superseded by 0.5.1 |
-| **0.5.1** | **Industry-neutral — `project-mgmt` re-scoped cross-industry, `a2al=` + fail-soft decode, `evidence=`, embedded-block rule, preview + lookup tooling** | **current** |
-| 0.5.2 | Cross-LLM proof demo, conservation-as-non-goal doc, auto-harvested PR candidates, first industry domain (gated on non-software feedback) | future |
-| 0.6.0 | Cross-LLM validation — tokenizer parity shown; next is a non-Claude agent emitting/consuming A2AL | future |
-| 1.0.0 | Production agents using A2AL successfully + Moltbook beta proven | gated on real-world adoption |
+| 0.3.0 | JSON envelope | dropped; kept at tag [`v0.3.0-archive`](https://github.com/mcornelison/A2AL/tree/v0.3.0-archive/archive/0.3.0) |
+| 0.4.0 | Switched to plain-text shorthand | replaced by 0.4.1 |
+| 0.4.1 | Audience rule and required routing header | replaced by 0.5.0 |
+| 0.4.2 | Install prompt (the same flow installs and re-syncs) | shipped |
+| 0.5.0 | Optional header fields (`thread`, `status`, `cc`, `priority`), more vocabulary, `azure` domain | replaced by 0.5.1 |
+| **0.5.1** | **Industry-neutral: project management re-scoped for any industry, `a2al=` version field, `evidence=`, embedded-block rule, lookup and preview tools** | **current** |
+| 0.5.2 | Cross-LLM demo, conservation-as-non-goal doc, auto-harvested term candidates, first non-software domain | next |
+| 0.6.0 | A non-Claude agent writing and reading A2AL end to end | future |
+| 1.0.0 | Agents using it in production | when the field data says so |
+
+The full history is in [`VersionHistory.md`](./VersionHistory.md).

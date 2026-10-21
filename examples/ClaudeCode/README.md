@@ -1,71 +1,71 @@
-# A2AL — Claude Code Integration
+# A2AL for Claude Code
 
-Reference skill, slash command, and sample CLAUDE.md for Claude Code. After install, an agent in Claude Code can read and write A2AL/0.5.1 messages (routing header + body shorthand).
+This folder has a skill, a slash command and a sample CLAUDE.md for Claude Code. Once they're installed, an agent in Claude Code can read and write A2AL/0.5.1 messages (routing header plus body shorthand).
 
-> **Already installed on an older version?** See [`UPGRADING.md`](./UPGRADING.md) for the version-to-version upgrade path (library re-sync, the three library modes, and the false-GREEN verify trap).
+> Already installed on an older version? See [`UPGRADING.md`](./UPGRADING.md) for how to upgrade from one version to the next: re-syncing the library, the three library modes, and the verify step that can pass when it shouldn't (the false-GREEN trap).
 
-## For AI agents — automated install (v0.4.2+)
+## Letting an agent install it (v0.4.2+)
 
-Two entry points for an AI agent to install A2AL on a host project end-to-end without the operator running each step manually. Both load the same prompt file ([`INSTALL-PROMPT.md`](./INSTALL-PROMPT.md)); pick the one that matches your environment.
+You can have an AI agent install A2AL on a project from start to finish, so you don't have to run each step yourself. There are two ways to start it. Both load the same prompt file, [`INSTALL-PROMPT.md`](./INSTALL-PROMPT.md), so pick whichever fits your setup.
 
-### Primary — WebFetch
+### First choice: WebFetch
 
-Operator pastes this into a fresh Claude Code session in the target project:
+Paste this into a fresh Claude Code session in the target project:
 
 ```
 Fetch and follow this install prompt:
 https://raw.githubusercontent.com/mcornelison/A2AL/main/examples/ClaudeCode/INSTALL-PROMPT.md
 ```
 
-The agent fetches the file and follows it. Pulls whatever is currently on `main`.
+The agent fetches the file and follows it. You get whatever is on `main` right now.
 
-### Fallback — inline paste
+### Fallback: paste it in
 
-If WebFetch isn't available, the operator copies the full contents of [`INSTALL-PROMPT.md`](./INSTALL-PROMPT.md) from the GitHub UI and pastes the whole file as their first message in the chat. The agent reads it from the message and follows it. Self-contained; no network calls beyond the eventual `git clone`.
+If WebFetch isn't available, copy the full contents of [`INSTALL-PROMPT.md`](./INSTALL-PROMPT.md) from the GitHub UI and paste the whole file as your first message in the chat. The agent reads it from the message and follows it. It's self-contained, and nothing goes over the network until the `git clone`.
 
-### Idempotent re-sync
+### Re-running it is safe
 
-Re-running the prompt against an already-installed project re-syncs the skill, command, and library files from upstream, then runs a section-by-section diff of the existing CLAUDE.md A2AL block against the current sample. Any drift is surfaced for operator review one subsection at a time; their legitimate placeholder fill-ins (agent identity, paths) are normalized out before diffing. This is the supported upgrade path for all 0.x.x versions.
+If you run the prompt again on a project that already has A2AL, it re-syncs the skill, command and library files from upstream. Then it compares the A2AL block in your CLAUDE.md with the current sample, section by section, and shows you any drift one subsection at a time for you to review. Your own placeholder values (agent identity, paths) are normalized out before the diff, so they don't show up as drift. This is how I support upgrades across all 0.x.x versions.
 
-The manual step-by-step instructions below are still the canonical reference for humans who prefer to do it themselves.
+The manual steps below are still the reference if you'd rather do it yourself.
 
 ## Files in this folder
 
 | Path | Purpose |
 |---|---|
-| [`skills/a2al/SKILL.md`](./skills/a2al/SKILL.md) | A2AL skill — auto-invoked when the agent reads or writes a peer-agent message |
-| [`commands/a2al.md`](./commands/a2al.md) | Slash command `/a2al` — explicit invocation |
-| [`CLAUDE-sample.md`](./CLAUDE-sample.md) | Sample CLAUDE.md with the A2AL block in placement context |
+| [`skills/a2al/SKILL.md`](./skills/a2al/SKILL.md) | The A2AL skill. Claude Code invokes it automatically when the agent reads or writes a message to or from a peer agent |
+| [`commands/a2al.md`](./commands/a2al.md) | The `/a2al` slash command, for calling it directly |
+| [`CLAUDE-sample.md`](./CLAUDE-sample.md) | A sample CLAUDE.md showing where the A2AL block goes |
 
 ## What you install
 
-Three independent pieces. Each can be project-scoped or user-global; the install paths just differ.
+There are three separate pieces. Each one can be installed for one project or for your whole user profile; only the paths differ.
 
-1. **Skill + slash command** — copied into `.claude/skills/a2al/` and `.claude/commands/a2al.md`.
-2. **Vocabulary library** — either left inside a cloned A2AL repo and referenced by absolute path, or copied next to your skill files. Choose one (§ Library location).
-3. **CLAUDE.md A2AL block** — tells the agent its identity, the library path, the audience rule, and (if peers exist) the inbox convention. Copied from [`CLAUDE-sample.md`](./CLAUDE-sample.md).
+1. The skill and slash command, copied into `.claude/skills/a2al/` and `.claude/commands/a2al.md`.
+2. The vocabulary library. Either leave it inside a cloned A2AL repo and point at it by absolute path, or copy it next to your skill files. Pick one (see Step 1).
+3. The A2AL block in CLAUDE.md. It tells the agent its identity, the library path, the audience rule and, if it has peers, the inbox convention. You copy it from [`CLAUDE-sample.md`](./CLAUDE-sample.md).
 
-After all three are in place, restart Claude Code. The skill auto-discovers; no enable step.
+Once all three are in place, restart Claude Code. The skill is picked up automatically; there's nothing to enable.
 
-## Step 1 — Pick a library location (clone-and-point vs copy-locally)
+## Step 1: Pick a library location (clone-and-point or copy-locally)
 
-The library is plain YAML (`library/*.yaml` in this repo, 164 entries across 7 files). The agent needs to be able to read these files at runtime. Two options:
+The library is plain YAML (`library/*.yaml` in this repo, 164 entries across 7 files). The agent has to be able to read these files while it runs. You have two options.
 
-### Option A — Clone-and-point (simpler, easier to update)
+### Option A: Clone-and-point (simpler, easier to update)
 
-Clone this repo once at a stable path; CLAUDE.md references its `library/` folder by absolute path. To update vocabulary later, `git pull` the clone.
+Clone this repo once at a path that won't move, and have CLAUDE.md point at its `library/` folder by absolute path. To pick up new vocabulary later, `git pull` the clone.
 
 ```bash
 git clone https://github.com/mcornelison/A2AL.git /path/to/A2AL
 ```
 
-CLAUDE.md library path becomes: `/path/to/A2AL/library/` (use forward slashes on Windows too — Claude Code handles them).
+The library path in CLAUDE.md is then `/path/to/A2AL/library/`. Use forward slashes on Windows too; Claude Code handles them.
 
-**Trade-offs:** single source of truth; library updates are one `git pull`; the spec, validator, and examples are also right there. Cost: requires the clone to stay at the path you point at.
+Trade-offs: there's one source of truth, updating the library is one `git pull`, and the spec, validator and examples are right there too. The cost is that the clone has to stay at the path you pointed at.
 
-### Option B — Copy-locally (self-contained, no external dependency)
+### Option B: Copy-locally (self-contained, no external dependency)
 
-Copy `library/` into your project's `.claude/` (or `~/.claude/`) directory. CLAUDE.md references the local copy.
+Copy `library/` into your project's `.claude/` (or `~/.claude/`) directory and point CLAUDE.md at the copy.
 
 ```bash
 # Project-scoped:
@@ -77,13 +77,13 @@ mkdir -p ~/.claude/a2al-library
 cp -r /path/to/cloned/A2AL/library/*.yaml ~/.claude/a2al-library/
 ```
 
-CLAUDE.md library path becomes: `<project-root>/.claude/a2al-library/` or `~/.claude/a2al-library/`.
+The library path in CLAUDE.md is then `<project-root>/.claude/a2al-library/` or `~/.claude/a2al-library/`.
 
-**Trade-offs:** self-contained; works offline; doesn't depend on the clone surviving. Cost: stale unless you re-copy when the upstream library updates. No local access to `specs/`, `tools/`, or `examples/` unless you also clone the repo.
+Trade-offs: it's self-contained, works offline and doesn't depend on a clone staying put. The cost is that it goes stale unless you copy it again when the upstream library changes. You also won't have `specs/`, `tools/` or `examples/` locally unless you clone the repo as well.
 
-## Step 2 — Copy skill + slash command
+## Step 2: Copy the skill and slash command
 
-Pick project-scoped or user-global. Skill and command paths are fixed by Claude Code (`.claude/skills/` and `.claude/commands/`). Library path is independent.
+Choose project-scoped or user-global. Claude Code fixes where skills and commands live (`.claude/skills/` and `.claude/commands/`). The library path is separate from that.
 
 ### Project-scoped (only this project's Claude Code sessions)
 
@@ -93,7 +93,7 @@ cp -r /path/to/cloned/A2AL/examples/ClaudeCode/skills/a2al .claude/skills/
 cp /path/to/cloned/A2AL/examples/ClaudeCode/commands/a2al.md .claude/commands/
 ```
 
-End state:
+You should end up with:
 ```
 <project-root>/.claude/skills/a2al/SKILL.md
 <project-root>/.claude/commands/a2al.md
@@ -107,27 +107,27 @@ cp -r /path/to/cloned/A2AL/examples/ClaudeCode/skills/a2al ~/.claude/skills/
 cp /path/to/cloned/A2AL/examples/ClaudeCode/commands/a2al.md ~/.claude/commands/
 ```
 
-End state:
+You should end up with:
 ```
 ~/.claude/skills/a2al/SKILL.md
 ~/.claude/commands/a2al.md
 ```
 
-The skill and command files do **not** have hardcoded library paths. They rely on CLAUDE.md to tell the agent where the library lives, so you don't need to edit them after copying.
+The skill and command files don't have library paths hardcoded in them. They rely on CLAUDE.md to tell the agent where the library is, so you don't need to edit them after copying.
 
-## Step 3 — Create or update CLAUDE.md
+## Step 3: Create or update CLAUDE.md
 
 ### New project (no CLAUDE.md yet)
 
-Copy [`CLAUDE-sample.md`](./CLAUDE-sample.md) to your project root as `CLAUDE.md`, then fill in every `[bracketed placeholder]`. Add any project-specific sections after the `## A2AL/0.5.1` block.
+Copy [`CLAUDE-sample.md`](./CLAUDE-sample.md) to your project root as `CLAUDE.md`, then fill in every `[bracketed placeholder]`. Put any project-specific sections after the `## A2AL/0.5.1` block.
 
 ### Existing CLAUDE.md
 
-Open [`CLAUDE-sample.md`](./CLAUDE-sample.md) and copy only the `## A2AL/0.5.1 — Agent-to-Agent Communication` section and all its subsections (Identity, Library location, Audience rule, Routing header, Inbox / outbox, Reference).
+Open [`CLAUDE-sample.md`](./CLAUDE-sample.md) and copy just the `## A2AL/0.5.1 — Agent-to-Agent Communication` section with all its subsections (Identity, Library location, Audience rule, Routing header, Inbox / outbox, Reference).
 
-**Where to paste:** immediately AFTER your first H2 (the project identity / overview heading) and BEFORE any workflow, conventions, or build/test sections.
+Paste it right after your first H2 (the project identity or overview heading) and before any workflow, conventions or build/test sections.
 
-Why that placement: the audience rule and routing-header conventions need to be loaded early so the agent decides format before composing. Putting them at the bottom risks the agent producing Markdown to a peer agent because it hasn't reached the A2AL section yet.
+The placement matters because the agent needs the audience rule and the routing-header conventions early, so it picks the format before it starts writing. If the block is at the bottom, the agent may write Markdown to a peer agent because it hasn't got to the A2AL section yet.
 
 Example structure:
 
@@ -146,20 +146,20 @@ You are [AgentName], ...
 
 ### Fill in the placeholders
 
-- `[AgentName]` and `[role]` — your agent's name and what it does (e.g., `Hawkeye` and `QA`)
-- `[/absolute/path/to/A2AL]/library/` — the library path you chose in Step 1:
+- `[AgentName]` and `[role]`: your agent's name and what it does (for example `Hawkeye` and `QA`)
+- `[/absolute/path/to/A2AL]/library/`: the library path you chose in Step 1
   - Option A: `/path/to/cloned/A2AL/library/`
   - Option B: `<project-root>/.claude/a2al-library/` or `~/.claude/a2al-library/`
-- `[/absolute/path/to/your-inbox/]` — only if peers can send you messages; otherwise delete the Inbox / outbox subsection
+- `[/absolute/path/to/your-inbox/]`: only if peers can send you messages. Otherwise delete the Inbox / outbox subsection.
 
-If you chose **Option B (copy-locally)** and don't have the A2AL repo cloned, replace the spec / validator paths in the Reference subsection with the GitHub URLs:
+If you chose Option B (copy-locally) and don't have the A2AL repo cloned, replace the spec and validator paths in the Reference subsection with the GitHub URLs:
 
 - Spec: `https://github.com/mcornelison/A2AL/blob/main/specs/A2A-Core.md`
-- Validator: not applicable (you don't have local `tools/`); use the upstream PR check instead
+- Validator: not applicable, since you don't have `tools/` locally. Rely on the upstream PR check instead.
 
-## Step 4 — Verify
+## Step 4: Check it worked
 
-Restart Claude Code, then prompt the agent:
+Restart Claude Code, then give the agent this prompt:
 
 ```
 Verify A2AL is wired up:
@@ -168,45 +168,45 @@ Verify A2AL is wired up:
 3. Confirm /a2al is registered as a slash command.
 ```
 
-Expected:
-- ~77 entries reported (sample terms like `done`, `merge`, `PR`)
-- Two-line output: `from=<You>; to=Agent2; date=...; topic=...; audience=agent` then `tests pass; build green; PR ready -- merge?`
+You should see:
+- About 87 entries reported, with sample terms like `done`, `merge` and `PR`
+- Two lines of output: `from=<You>; to=Agent2; date=...; topic=...; audience=agent` and then `tests pass; build green; PR ready -- merge?`
 - `/a2al` recognized
 
-If any step fails:
-- Step 1 fail → the library path in CLAUDE.md is wrong, or files weren't copied
-- Step 2 fail → the skill wasn't loaded (check `.claude/skills/a2al/SKILL.md` exists; restart Claude Code)
-- Step 3 fail → the command wasn't loaded (check `.claude/commands/a2al.md` exists; restart Claude Code)
+If a step fails:
+- Step 1 fails: the library path in CLAUDE.md is wrong, or the files weren't copied
+- Step 2 fails: the skill didn't load (check that `.claude/skills/a2al/SKILL.md` exists, then restart Claude Code)
+- Step 3 fails: the command didn't load (check that `.claude/commands/a2al.md` exists, then restart Claude Code)
 
-## Updating if the library moves
+## If the library moves
 
-The skill and command files have no hardcoded library paths. Only CLAUDE.md does. If you change the library location:
+Only CLAUDE.md has the library path. The skill and command files don't. If you move the library:
 
-1. Edit your CLAUDE.md — find the `### Library location` subsection inside the `## A2AL/0.5.1` block; update the path on the first line. Also update the path in the `### Reference` subsection if applicable.
-2. No changes to `skills/a2al/SKILL.md` or `commands/a2al.md`.
-3. Restart Claude Code so the new CLAUDE.md is reloaded.
+1. Edit your CLAUDE.md. Find the `### Library location` subsection inside the `## A2AL/0.5.1` block and update the path on its first line. Update the path in the `### Reference` subsection too, if it's there.
+2. Leave `skills/a2al/SKILL.md` and `commands/a2al.md` alone.
+3. Restart Claude Code so it reloads CLAUDE.md.
 
-## Multi-agent setup
+## Several agents
 
-If multiple agents talk peer-to-peer in the same workspace, each agent has its own `.claude/` directory (or shares a user-global `~/.claude/`) with its own CLAUDE.md. The path to the A2AL library is the same across agents (one copy serves all of them); only `[AgentName]/[role]` and inbox paths differ per agent.
+If several agents talk to each other in the same workspace, each one has its own `.claude/` directory (or they share a user-global `~/.claude/`) with its own CLAUDE.md. The library path is the same for all of them, since one copy serves everyone. Only `[AgentName]/[role]` and the inbox paths change from agent to agent.
 
 ## Troubleshooting
 
 | Symptom | Likely cause |
 |---|---|
-| Agent writes Markdown to a peer when it should write A2AL | A2AL block missing or placed too late in CLAUDE.md (move it to right after the first H2) |
-| Agent doesn't recognize a vocabulary term | Library file for that term's domain not loaded — instruct: "Load `library/<domain>.yaml`" |
-| `/a2al` not recognized | Command file not in `.claude/commands/` or Claude Code not restarted |
-| Skill never triggers | Skill file not in `.claude/skills/a2al/SKILL.md` or Claude Code not restarted |
-| Agent writes A2AL when a human will read | A human is in the audience; switch to Markdown — the audience rule is binary |
+| Agent writes Markdown to a peer when it should write A2AL | The A2AL block is missing or too far down in CLAUDE.md (move it to right after the first H2) |
+| Agent doesn't recognize a vocabulary term | The library file for that term's domain isn't loaded. Tell it: "Load `library/<domain>.yaml`" |
+| `/a2al` not recognized | The command file isn't in `.claude/commands/`, or Claude Code wasn't restarted |
+| Skill never triggers | The skill file isn't at `.claude/skills/a2al/SKILL.md`, or Claude Code wasn't restarted |
+| Agent writes A2AL when a person will read it | A person is in the audience, so switch to Markdown. The audience rule has no middle ground |
 
 ## Reference
 
 - Spec: [`../specs/A2A-Core.md`](../../specs/A2A-Core.md)
 - Library: [`../library/`](../../library)
 - Library schema: [`../library/README.md`](../../library/README.md)
-- Validator: `python tools/validate_library.py` (run from the cloned A2AL repo root)
+- Validator: `python tools/validate_library.py` (run it from the root of your A2AL clone)
 
-## Historical
+## Older versions
 
-The /0.3.0 JSON-envelope skill and command are archived at tag [`v0.3.0-archive`](https://github.com/mcornelison/A2AL/tree/v0.3.0-archive/archive/0.3.0/examples/ClaudeCode) for reference.
+The /0.3.0 JSON-envelope skill and command are kept at tag [`v0.3.0-archive`](https://github.com/mcornelison/A2AL/tree/v0.3.0-archive/archive/0.3.0/examples/ClaudeCode) if you want to look at them.

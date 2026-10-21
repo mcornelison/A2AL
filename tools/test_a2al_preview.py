@@ -110,7 +110,7 @@ def without_tiktoken():
 
 
 def test_heuristic_fallback() -> None:
-    """get_counter degrades to the heuristic and says so -- it never exits."""
+    """get_counter falls back to the heuristic and says so. It never exits."""
     with without_tiktoken():
         fn, backend, measured = P.get_counter()
         check("get_counter: falls back to heuristic", fn is P.estimate_tokens, backend)
@@ -195,7 +195,7 @@ def test_detect_shapes() -> None:
         ("merge?", "question / ask"),
         ("tests 21/21; preflight 878/878", "status report"),
         ("merge ralph/auth-fix", "action directive"),
-        # Directives are not software-only -- 0.5.1's industry-neutral theme.
+        # Directives aren't software-only (0.5.1's industry-neutral theme).
         ("escalate RFI-18 to the authority having jurisdiction", "action directive"),
         ("approve change-order 4", "action directive"),
         ("schedule the site inspection", "action directive"),

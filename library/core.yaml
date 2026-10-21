@@ -1,7 +1,7 @@
 # Universal vocabulary used across all agent communication.
 # Always loaded by any A2AL agent. Domain extensions are opt-in.
 domain: core
-description: Universal A2AL vocabulary — states, actions, severity, and tech abbreviations every agent should know.
+description: Universal A2AL vocabulary. States, actions, severity and tech abbreviations every agent should know.
 
 entries:
   # ---- States ----

@@ -1,25 +1,25 @@
 """A2AL library lookup.
 
 Two agents reported the same gap in specs/feedback/: the library exists, and
-neither of them ever opened it. Ledger -- "I have not actually consulted
-library/*.yaml during composition" -- and Claude, who asked for "a list of the
-concepts that have already been added, so I see what's there before writing
-duplicates" and "a 'Did you mean...' reflex when I'm about to invent a new
-term". Both had zero library contributions. Curation that nobody reads is
-curation that is not paying off.
+neither of them ever opened it. Ledger wrote "I have not actually consulted
+library/*.yaml during composition". Claude asked for "a list of the concepts
+that have already been added, so I see what's there before writing duplicates"
+and "a 'Did you mean...' reflex when I'm about to invent a new term". Neither
+had contributed a single library entry. A library nobody reads isn't doing
+its job.
 
-This makes the library cheap to consult at composition time:
+This makes the library cheap to check while you're writing a message:
 
   search <query>        find terms by term, expansion, example or notes
-  check <candidate>     before you coin a shortening -- is it already covered?
+  check <candidate>     is it already covered? Run it before you coin a term
   list [--domain X]     what is in here
   stats                 entry counts per domain
 
-Stdlib only, deliberately. Needing `pip install` before you can check a word is
+Stdlib only, on purpose. Needing `pip install` before you can check a word is
 exactly the friction that produced the zero-consultation finding. The strict
 schema check lives in validate_library.py (which does use PyYAML and runs in
-CI); this reads the same files with a small parser and stays instantly runnable
-anywhere the repo is checked out.
+CI). This reads the same files with a small parser, so it runs anywhere the
+repo is checked out.
 
 Run: python tools/a2al_lookup.py check design-review
 """
@@ -137,7 +137,7 @@ def search(entries: list[dict], query: str) -> list[dict]:
 
 
 # --------------------------------------------------------------------------
-# check -- the "did you mean" reflex
+# check: the "did you mean" reflex
 # --------------------------------------------------------------------------
 
 _STOPWORDS = {"a", "an", "the", "of", "or", "and", "to", "in", "for", "is", "be"}
@@ -148,9 +148,9 @@ def check_candidate(entries: list[dict], candidate: str, expansion: str | None =
     """Is a proposed shortening already covered by the library?
 
     Three passes, cheapest first: exact term, near-miss term, and meaning
-    overlap against existing expansions. The last is what catches the real
-    duplicate -- coining `DR=design-review` when `design-review` already sits
-    in some entry's expansion.
+    overlap against existing expansions. The last one catches the real
+    duplicates, like coining `DR=design-review` when `design-review` already
+    sits in some entry's expansion.
     """
     cand = candidate.strip().lower()
     by_term = {e["term"].lower(): e for e in entries}

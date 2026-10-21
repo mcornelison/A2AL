@@ -2,9 +2,9 @@
 
 Stdlib only, same shape as the other suites in this directory.
 
-The load-bearing test is `test_parser_agrees_with_pyyaml`: a2al_lookup.py reads
-the library with a hand-rolled line parser so it needs no dependency, which is
-only safe if that parser agrees with the real YAML parser. When PyYAML is
+The test that matters most is `test_parser_agrees_with_pyyaml`. a2al_lookup.py
+reads the library with a hand-rolled line parser so it needs no dependency.
+That's only safe if the parser agrees with the real YAML parser. When PyYAML is
 available the two are compared entry by entry; when it is not, that case skips.
 
 Run: python tools/test_a2al_lookup.py

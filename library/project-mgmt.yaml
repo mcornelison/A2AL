@@ -1,10 +1,10 @@
 # Cross-industry project and program management vocabulary.
-# Deliberately industry-neutral: these terms carry the same meaning on a
-# construction programme, a clinical rollout, a marketing campaign, or a
+# These are industry-neutral on purpose. Each term means the same thing on a
+# construction programme, a clinical rollout, a marketing campaign or a
 # software delivery. Software-specific roles live in programming.yaml;
 # service-operations metrics live in infrastructure.yaml.
 domain: project-mgmt
-description: Cross-industry project and program management vocabulary — planning, scope, and governance.
+description: Cross-industry project and program management vocabulary for planning, scope and governance.
 
 entries:
   # ---- Planning and schedule ----

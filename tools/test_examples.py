@@ -1,9 +1,9 @@
 """Conformance tests for the example corpus.
 
-A2AL never validates messages, by design -- agents must be liberal in what they
-accept. This suite does not change that. It validates *this repository's own
-examples*, which is a different thing: the examples are documentation, and
-documentation that contradicts the spec is a bug.
+A2AL never validates messages, by design: agents should be liberal in what
+they accept. This suite doesn't change that. It validates *this repository's
+own examples*. The examples are documentation, and documentation that
+contradicts the spec is a bug.
 
 Three assertions:
 
@@ -12,15 +12,15 @@ Three assertions:
 
   2. Every header field the spec documents appears in at least one example.
      The field list is parsed out of specs/A2A-Core.md sections 3.1 and 3.2, so
-     the test cannot drift from the spec -- add a field to the spec table
-     without exercising it and this fails.
+     the test can't drift from the spec. Add a field to the spec table
+     without using it in an example and this fails.
 
   3. Every term introduced by a release appears in at least one example.
-     Shipping vocabulary nobody demonstrates is how 8 of the 10 terms added in
-     0.5.0 came to exist only inside the changelog that announced them.
+     I added this after finding that 8 of the 10 terms added in 0.5.0 existed
+     only inside the changelog that announced them.
 
-Assertions 2 and 3 are the ones that fail loudly on the *next* release. That is
-the point: they turn "we shipped a feature" into something CI can prove.
+Assertions 2 and 3 are the ones that fail on the *next* release, and I want
+that. They turn "I shipped a feature" into something CI can check.
 
 Run: python tools/test_examples.py
 """
@@ -50,7 +50,7 @@ NEW_IN_RELEASE: dict[str, list[str]] = {
     ],
     # 0.5.1 re-scoped project-mgmt from SRE/ops to cross-industry project
     # management. These carry the theme, so they must be demonstrated by
-    # examples that are not software -- that is the whole point of the release.
+    # examples that are not software, since that's what the release is about.
     "0.5.1": [
         "milestone", "critical-path", "baseline", "variance", "kickoff",
         "go-live", "deliverable", "scope-change", "change-order", "SOW",
@@ -105,7 +105,7 @@ def extract_messages(path: pathlib.Path) -> list[dict]:
     """Pull every A2AL message out of a file.
 
     A message starts at a routing-header line and runs until a fence, a blank
-    line, the next header, or EOF -- which covers both bare .txt messages and
+    line, the next header, or EOF. That covers both bare .txt messages and
     messages shown inside fenced blocks in .md walkthroughs.
     """
     lines = path.read_text(encoding="utf-8").splitlines()

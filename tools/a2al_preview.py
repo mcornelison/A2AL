@@ -1,8 +1,8 @@
 """A2AL composition-time preview.
 
-Answers the question two independent agents asked for before they would adopt
-the protocol: *what does A2AL actually buy me on THIS message, before I pay the
-composition cost?*
+Two agents, independently, asked me the same thing before they'd adopt A2AL:
+what does it actually buy me on THIS message, before I pay the cost of writing
+it? This tool answers that.
 
 Three subcommands:
 
@@ -18,14 +18,14 @@ Everything runs without dependencies. Install tiktoken for a sharper answer:
 
     pip install tiktoken
 
-No tokenizer is "exact" for Claude -- Anthropic's vocabulary is not published,
+No tokenizer is "exact" for Claude. Anthropic's vocabulary is not published,
 so cl100k_base is the long-standing proxy (testing/tools/CROSS-LLM-RESULTS.md).
 What makes the conclusion safe is that the A2AL/Markdown ratio held at 0.73-0.84
 across four tokenizers, so it does not hinge on which one you pick. Use
 --encoder to count with another (o200k_base, etc.).
 
-`scan` is sound on the stdlib heuristic. It reports a *share within one
-document* -- padding tokens over total tokens, both counted the same way -- so
+`scan` is fine on the stdlib heuristic. It reports a *share within one
+document* (padding tokens over total tokens, both counted the same way), so
 the error cancels. Verified across this repo's corpus: the reported share moves
 by at most 0.6 percentage points versus cl100k_base.
 
@@ -35,10 +35,10 @@ under-counts A2AL by ~9% and over-counts Markdown prose by ~2%, inflating the
 ratio by ~11%. That is enough to report a real 26% saving as 34% and cross a 30%
 threshold the wrong way. So without a tokenizer `compare` reports a +/-12 point
 band instead of a point estimate, and returns "inconclusive" (exit 3) when the
-threshold falls inside it, rather than guessing.
+threshold falls inside it. It doesn't guess.
 
-This tool validates nothing about message shape. A2AL never validates messages
-by design -- only the library is validated (tools/validate_library.py). The
+This tool validates nothing about message shape. A2AL never validates messages,
+by design. Only the library is validated (tools/validate_library.py). The
 header check in `compare` is an advisory conformance note, not a gate.
 
 Run: python tools/a2al_preview.py scan draft.md
@@ -110,13 +110,13 @@ def get_counter(encoding: str = _TIKTOKEN_ENCODING) -> tuple[callable, str, bool
 
     `measured` is True when a real tokenizer is doing the counting and False
     when the stdlib heuristic is. Callers whose output depends on the
-    difference must branch on it -- this never exits on its own.
+    difference must branch on it. This never exits on its own.
 
     No tokenizer here is "exact" for Claude: Anthropic's vocabulary is not
     published, so `cl100k_base` is the long-standing proxy (see
-    testing/tools/CROSS-LLM-RESULTS.md). The reassurance is that the
+    testing/tools/CROSS-LLM-RESULTS.md). What makes that OK is that the
     A2AL/Markdown ratio held at 0.73-0.84 across four tokenizers, so the
-    conclusion does not hinge on which one you pick.
+    conclusion doesn't hinge on which one you pick.
     """
     try:
         import tiktoken
@@ -132,7 +132,7 @@ def get_counter(encoding: str = _TIKTOKEN_ENCODING) -> tuple[callable, str, bool
 
 
 # --------------------------------------------------------------------------
-# Padding scan -- spec section 4.1 "Drops"
+# Padding scan: spec section 4.1 "Drops"
 # --------------------------------------------------------------------------
 
 # (category, compiled pattern, note). Patterns are case-insensitive and matched
@@ -227,7 +227,7 @@ def scan_padding(text: str, count) -> dict:
 
 
 # --------------------------------------------------------------------------
-# Routing header -- spec section 3
+# Routing header: spec section 3
 # --------------------------------------------------------------------------
 
 _REQUIRED_HEADER = ["from", "to", "date", "topic"]
@@ -274,7 +274,7 @@ def check_header(text: str) -> dict:
 
 
 # --------------------------------------------------------------------------
-# Shape detection -- spec section 7 patterns
+# Shape detection: spec section 7 patterns
 # --------------------------------------------------------------------------
 
 _SHAPES = [
@@ -304,7 +304,7 @@ def detect_shapes(body: str) -> list[str]:
 
 
 # --------------------------------------------------------------------------
-# Anti-patterns -- spec section 4.4
+# Anti-patterns: spec section 4.4
 # --------------------------------------------------------------------------
 
 # Matches `  - term: foo` in library/*.yaml without needing PyYAML.
@@ -334,10 +334,10 @@ def load_library_terms(library_dir: pathlib.Path) -> set[str]:
 def check_antipatterns(body: str, count, library_dir: pathlib.Path) -> dict:
     """Flag spec section 4.4 anti-patterns that cost tokens rather than saving them.
 
-    Uses the tokenizer as the oracle: a short word that costs more than one
-    token is, by definition, not something the vocabulary handles well. If it
-    is also absent from the library, it is an invented abbreviation -- exactly
-    the case the spec warns about, where the full word would have been cheaper.
+    Uses the tokenizer as the judge: a short word that costs more than one
+    token isn't something the vocabulary handles well. If it's also missing
+    from the library, it's an invented abbreviation. That's the case the spec
+    warns about, where the full word would have been cheaper.
     """
     terms = load_library_terms(library_dir)
 
