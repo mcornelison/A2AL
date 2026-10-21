@@ -1,7 +1,7 @@
 # Universal vocabulary used across all agent communication.
 # Always loaded by any A2AL agent. Domain extensions are opt-in.
 domain: core
-description: Universal A2AL vocabulary — states, actions, severity, and tech abbreviations every agent should know.
+description: Universal A2AL vocabulary. States, actions, severity and tech abbreviations every agent should know.
 
 entries:
   # ---- States ----
@@ -22,7 +22,7 @@ entries:
     example: "deployed to staging"
   - term: merged
     expansion: merged into target branch
-    example: "merged ralph/auth-fix -> main"
+    example: "merged pell/auth-fix -> main"
   - term: released
     expansion: released
     example: "v1.4 released"
@@ -52,7 +52,7 @@ entries:
     example: "review pending"
   - term: waiting
     expansion: waiting on a dependency or response
-    example: "waiting on Hawkeye sign-off"
+    example: "waiting on Juno sign-off"
   - term: queued
     expansion: queued
     example: "deploy queued"
@@ -102,7 +102,7 @@ entries:
   # ---- Actions ----
   - term: merge
     expansion: merge a branch
-    example: "merge ralph/auth-fix"
+    example: "merge pell/auth-fix"
   - term: ship
     expansion: ship to production
     example: "ship the hotfix"
@@ -126,7 +126,7 @@ entries:
     example: "rollback prod -- regression"
   - term: review
     expansion: review
-    example: "Hawkeye: review US-713 PR"
+    example: "Juno: review US-713 PR"
   - term: approve
     expansion: approve
     example: "approve US-713 sign-off"
@@ -150,7 +150,7 @@ entries:
     example: "escalate to PMO -- security finding"
   - term: assign
     expansion: assign work
-    example: "assign US-720 -> Byte"
+    example: "assign US-720 -> Tamsin"
   - term: claim
     expansion: claim a task
     example: "claim US-721"
@@ -198,6 +198,22 @@ entries:
   - term: supersede
     expansion: replace with a newer item
     example: "supersede prior route-to-pm wording"
+  - term: ASK
+    expansion: "a question or request that needs an answer; ASK-n numbers several, ASK(<person>) marks one only that person can answer"
+    example: "ASK-1: pick A|B. ASK(Dana): ship this sprint or next?"
+    notes: "Spec 2.6 and 7.11. Numbered ids let a reply or supersedes= point at one item."
+  - term: relay
+    expansion: "words passed on from someone else, quoted exactly; unconfirmed until that person confirms"
+    example: "relay(Dana): \"add the run log this sprint\""
+    notes: "Spec 2.6. A relayed human request is a proposal until the person confirms it."
+  - term: void-if
+    expansion: this ruling no longer stands if the condition becomes true
+    example: "void-if bench test shows coolant above 105C"
+    notes: "Spec 7.11. Last line of a ruling."
+  - term: blocks
+    expansion: this item is holding up the named work
+    example: "blocks B-765 grooming"
+    notes: "Spec 7.11. Last line, alongside urgency=."
   - term: heads-up
     expansion: informational notice, no action needed
     example: "heads-up: master-gold stale"
@@ -246,16 +262,16 @@ entries:
     example: "21/21 DQ tests"
   - term: PM
     expansion: project manager
-    example: "Ledger (PM): merge?"
+    example: "Wren (PM): merge?"
   - term: QA
     expansion: quality assurance
-    example: "Hawkeye (QA): review observations"
+    example: "Juno (QA): review observations"
   - term: DEV
     expansion: developer
-    example: "Byte (DEV): US-719 started"
+    example: "Tamsin (DEV): US-719 started"
   - term: SEC
     expansion: security
-    example: "Audrey (SEC): risk-brief"
+    example: "Sable (SEC): risk-brief"
   - term: DEVOPS
     expansion: devops
     example: "DEVOPS: rollback prod"

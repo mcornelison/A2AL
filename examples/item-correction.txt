@@ -1,0 +1,5 @@
+from=Calder(Arch); to=Wren(PM); cc=Pell(DEV); date=2026-10-21; topic=B-765 rulings - item 3 corrected; audience=agent; supersedes=calder-B765-rulings-1012#3; in-reply-to=wren-B765-review-1020
+# 3 corrected: retry budget 5, not 3 -- bench showed 3 drops valid reconnects.
+# 1, # 2, # 4 stand unchanged.
+Pell: update retry const before merge.
+void-if field logs show reconnect storms above 5/min.

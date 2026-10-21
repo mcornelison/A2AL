@@ -12,6 +12,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pyyaml
+      - run: pip install pyyaml tiktoken
       - run: python tools/validate_library.py --strict
       - run: python tools/test_validate_library.py
+      - run: python tools/test_a2al_preview.py
+      - run: python tools/test_a2al_lookup.py
+      - run: python tools/test_a2al_lint.py
+      - run: python tools/test_examples.py

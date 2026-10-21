@@ -1,0 +1,7 @@
+from=Meridian(programme-lead); to=Castell(site-lead); cc=Nadia(compliance); date=2026-10-02; topic=Bldg-C go-live readiness; audience=agent; status=blocked; priority=P1; thread=BLDG-C; refs=RFI-18, change-order-4
+go-live 2026-10-19 at risk. milestone 3 done; milestone 4 blocked.
+RFI-18 open 9d -- fire-suppression sign-off sits on critical-path.
+change-order-4 approved; baseline reset; variance +12d schedule, +4% cost.
+deliverable 2 accepted. deliverable 3 PARTIAL -- east wing only.
+escalate RFI-18 to the authority having jurisdiction today.
+Castell: confirm inspection window? Nadia: stakeholder brief before go-live.

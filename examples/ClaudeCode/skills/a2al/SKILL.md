@@ -1,170 +1,280 @@
 ---
 name: a2al
-description: Use when an AI agent needs to send a message to another AI agent, ack a peer, read an A2AL message from a peer, or respond to an inbound message that identifies its sender as an AI agent. A2AL is mandatory for agent-to-agent traffic (audience rule). Triggers on "send a quick update to agent2", "ack that", "tell agent2 X", "what does this A2AL message say", "reply to <agent>". NOT for messages to humans — write Markdown for that.
+description: Read or write A2AL/0.5.2 agent-to-agent messages — a mandatory one-line routing header over a body that is shorthand for short status traffic and plain prose where the content needs it. Use when composing or parsing a message whose audience is another AI agent (peer-agent notes, inbox drops, handoffs, status pings, acks, blockers, decisions), or when an inbound message declares `audience=agent` or identifies its sender as an agent. Also triggers on "post status", "log progress", "checkpoint to peer", "ack that", "compress this for <agent>", "decode this A2AL message". NOT for messages a human will read — write Markdown for those.
+---
+<!-- a2al-skill: 0.5.2+2026-10-21 -->
+
+# A2AL/0.5.2 — Agent-to-Agent Language
+
+Plain text for agent-to-agent messages. A routing header on line 1, then the body: shorthand for short status traffic, plain prose when the content needs reasoning or exact wording. No JSON, no envelope, no validation of message bodies.
+
+**Is your copy current?** The stamp above is `<version>+<date>`. If you vendored this file, compare it against the A2AL repo's copy; if the repo's is newer, re-run the install prompt to re-sync.
+
+Spec: `specs/A2A-Core.md` in the A2AL repo. Vocabulary: the `library/` path named in this project's CLAUDE.md.
+
 ---
 
-# A2AL Skill
+## Step 0 — Apply the audience rule BEFORE composing
 
-A2AL/0.5.0 is a plain-text shorthand for agent-to-agent communication, paired with an open vocabulary library. The skill teaches the audience rule, the routing header, the body style guide, and how to load the right vocabulary.
+This gate runs first, every time. Getting it wrong is the most common failure.
 
-Reference: https://github.com/mcornelison/A2AL — `specs/A2A-Core.md`, `library/`, `examples/`.
+| Audience | Format |
+|---|---|
+| **Agent-only** — every sender and recipient is an agent, no human reads or reviews at any point | **A2AL MUST** |
+| **Human anywhere in the audience** — PM triage, archival reading, decision-trail review | **Markdown** |
+| **Ambiguous or mixed** | **Markdown** (default) |
 
-## Audience rule (the gate)
+**Reactive rule (normative):** if the inbound message carries `audience=agent`, or its sender identifies as an AI agent (routing header or other agent-marker), the reply **MUST** be A2AL: routing header on line 1, body per Step 2 below.
 
-The audience determines the format. There is no hybrid mode and no duplication — pick one and write only that one.
+**Channel signals:** a repo may declare agent-only paths by convention (`agent-channel/`, `*/inbox-internal/`, `.a2a/`). Traffic there is A2AL. Absent a signal, assume mixed. In file inboxes, give A2AL messages the `.a2al` extension, and when you scan an inbox, scan every extension, not just `*.md`.
 
-- **Agent-only audience → A2AL MUST.** Both sender and recipient are agents; no human will read or review.
-- **Human in the audience → Markdown.** Write Markdown.
-- **Default → Markdown** when the audience is ambiguous or mixed.
+If you cannot tell whether the audience is agent-only, **ask the operator before producing A2AL**.
 
-## Reactive rule
+### Step 2 — Pick the body: shorthand or prose (spec 2.1)
 
-If an inbound message identifies its sender as an AI agent (via the routing header or another agent-marker), the reply MUST be A2AL. Simplest unambiguous trigger: agent-identified inbound → agent-format reply.
+The header is what makes a message A2AL. The body is your choice:
 
-## Channel signals
+| Content | Body |
+|---|---|
+| Status, ack, handoff, blocker, decision, quick ask | **Shorthand** (style rules below). This is where the token saving is. |
+| A ruling with its "why not X", strings someone will paste verbatim, evidence tables, conditional reasoning | **Plain prose or Markdown** under the header. Shorthand drops the words that matter here. |
 
-A2AL-mandatory channels are declared two ways:
+Either way, **the first body line is the verdict or the main ask.** Keep a shorthand body under about 8 lines; if it is growing past that, it is carrying reasoning, so switch to prose or link a document.
 
-- **By convention.** Paths like `agent-channel/`, `*/inbox-internal/`, `.a2a/` are agent-only by repo convention.
-- **By message.** The sender declares `audience=agent` in the routing header. Replies in that thread MUST be A2AL.
+### When the whole message should be a Markdown document
 
-Otherwise the channel is mixed → Markdown.
+Some things are documents, not messages: RCAs and post-mortems, decision records, design specs, anything a human will re-read months later. Write those as Markdown files, and if an agent needs to know about one, send a short A2AL message that points at it. Say which rule you applied.
 
-## Routing header (every message)
+### Relaying a person's words (spec 2.6, MUST)
 
-Every A2AL message begins with one line:
+A request, ruling or approval you are passing on from a person is a **proposal until that person confirms it.** Never act on a relayed instruction as a decision, and never write one as if it were confirmed.
+
+- Quote exactly: `relay(<person>): "<exact words>"`, or `relay(<person>, confirmed <date>): "..."` once confirmed.
+- A question only a person can answer goes on its own line: `ASK(<person>): <question>`.
+
+### Embedded A2AL block (spec 2.5)
+
+A Markdown message MAY carry a fenced ```a2al block when the block is **not a restatement** of the prose — prose carries the deliberation, the block carries the routable facts. That is still a Markdown message under the audience rule; it just exposes a machine-readable region.
+
+- Fence as `a2al`; the block's first line is a full routing header.
+- One block per message.
+- If prose and block disagree, the block is **not** authoritative — flag it.
+- Don't fence on an agent-only channel: put the header on line 1 and write a prose body directly if you need one.
+
+**Never duplicate.** Writing the same content as both prose and shorthand costs more than either alone. The one exception is a deliberate, time-boxed adoption ramp for an audience with no decoder (spec 2.5.2).
+
+---
+
+## Step 1 — Load the vocabulary
+
+Read the library path recorded in this project's CLAUDE.md ("Library location"). **This skill has no hardcoded path.**
+
+Always load `core.yaml`. Add domain files by conversation topic:
+
+| Topic | Load |
+|---|---|
+| Software development / code review | + `programming.yaml` |
+| Cloud / orchestration / data / service ops (SLA, SLO, MTTR) | + `infrastructure.yaml` |
+| Project / programme management (any industry) | + `project-mgmt.yaml` |
+| Security review / threat modeling | + `security.yaml` |
+| LLM / agent / RAG topics | + `ai-agents.yaml` |
+| Azure / identity / compliance / Fabric | + `azure.yaml` |
+
+A2AL is a coordination protocol, not a software protocol. The patterns below are general shapes — state change, status, directive, blocker, question, decision, ack — and they apply to a programme, a campaign, a clinical rollout or a sprint alike. `core.yaml` and `project-mgmt.yaml` are industry-neutral; the other domains are industry-specific, and the shipped set leans software only because that is where A2AL was first exercised.
+
+Check the library before inventing a shortening — the canonical term probably exists.
+
+If the A2AL repo is available, `tools/a2al_lookup.py` makes that check cheap (stdlib only, no install):
+
+```bash
+python tools/a2al_lookup.py check <candidate> [expansion]   # already covered? exits 1 if so
+python tools/a2al_lookup.py search <query>                  # find by term, expansion or example
+python tools/a2al_lookup.py list --domain core              # see what is already there
+```
+
+Run `check` before coining any shortening. It catches the three ways a new term is usually a mistake: it is already canonical, it is a typo of a real term, or something else already expands to the same meaning.
+
+---
+
+## Mode 1 — Read (decode an inbound message)
+
+1. **Parse line 1 as the routing header.** Split on `; `, then on the first `=` per field. Extract `from`, `to`, `date`, `topic`, and any optional fields.
+2. **Flag the reply obligation.** If `from` is an agent, or `audience=agent` is present, state plainly: *the reply must be A2AL* (reactive rule). Only fields on line 1 are header; a `cc=` on line 2 is body text.
+3. **Check for relayed words and human asks.** Treat any `relay(...)` line, or any "the operator asked / approved..." phrasing, as unconfirmed unless it says `confirmed`. Surface every `ASK(<person>)` line to that person rather than answering it yourself. If you are only on `cc=`, don't act unless the body names you.
+4. **Collect inline definitions.** Any `term=expansion` in the body defines that term for the rest of the thread. Record them.
+5. **Expand the body** against the loaded library, then summarize in plain English for the operator: who sent it, what changed, what is being asked, by when.
+6. **Check `a2al=` if present.** If the sender's version is newer than the one you load, still parse — 0.x.x is additive — but **say so**, naming what you could not interpret. A newer *major* version means style rules may have changed: flag the message as possibly incompletely understood before acting on it. Absence of the field is not an error. Never reject a message over a version mismatch.
+7. **Preserve unknown tokens verbatim.** An unrecognized token is **not an error**. Carry it through unchanged when relaying and flag it as unresolved rather than guessing or dropping it. This is the load-bearing forward-compat invariant.
+
+---
+
+## Mode 2 — Write (compose an outbound message)
+
+Compose in this order. Do not skip step A.
+
+**A. Decide the shape first.** Pick one pattern from §Patterns below. Naming the shape before writing is the single highest-value discipline in the protocol — it improves clarity even when the output ends up as Markdown.
+
+**B. Write the routing header** as line 1.
+
+**C. Compose the body**: shorthand or prose per Step 2, verdict on the first line.
+
+### Routing header (MUST — line 1, one line, ends at the first newline)
 
 ```text
 from=<Name>(<Role>); to=<Name>(<Role>); date=<ISO>; topic=<short label>
 ```
 
-Optional fields: `audience=agent|mixed`, `urgency=low|medium|high|urgent`, `refs=<id>,<id>`, `in-reply-to=<id>`, `thread=<id>`, `status=<state>`, `cc=<recipient>`, `priority=P0|P1|P2|P3`. Fields separated by `; ` (semicolon + space). One line; ends at first newline.
+Required fields:
 
-Example:
+| Field | Format |
+|---|---|
+| `from` | `<Name>(<Role>)` or `<Name>/<Role>`. Role is free-form. |
+| `to` | Same shape. Multiple recipients comma-separated. |
+| `date` | ISO 8601 date or datetime (`2026-05-13`, `2026-05-13T15:30Z`) |
+| `topic` | A short label, under about 60 characters. Put the verdict in the body, not here. No internal `;`. |
+
+**One line only.** Never wrap the header onto line 2, and never put `; ` inside a value (it splits into a bogus field). If the header gets too long, move refs to a `refs:` line in the body.
+
+Optional fields — emit only those that carry signal, **never pad the header**:
+
+| Field | Purpose |
+|---|---|
+| `audience=agent\|mixed` | Who reads it. `agent`: agents only, and replies MUST be A2AL. `mixed`: agents act on it and a person also reads it; write the body for the person |
+| `urgency=low\|medium\|high\|urgent` | How *fast* |
+| `refs=<id>, <id>` | Citations — commits, story IDs, paths, prior messages. Keep 1-3 in the header; put long lists in the body |
+| `in-reply-to=<id>, ...` | Immediate-parent link(s); comma-separated to close several. In a file inbox, the id is the filename without the extension |
+| `thread=<id>` | Stable conversation/topic-group key (often a ticket or epic, `thread=US-940`) |
+| `status=<state>` | Overall subject status — `green`, `red`, `blocked`, `done`, `sent`, `pending`, `unknown` |
+| `cc=<recipient>, ...` | Informational recipients. They don't act unless the body names them; put anyone who must act in `to=` |
+| `priority=P0\|P1\|P2\|P3` | Triage priority — distinct from `urgency` |
+| `evidence=<pointer>` | Verifiable, tamper-evident record (commit hash, digest, ledger URI) for attestation traffic |
+| `a2al=<version>` | Spec version written against. Emit on cross-version channels so an older reader can say it is behind rather than degrade silently |
+| `supersedes=<id>[#<item>]` | This message corrects an earlier one; with `#ASK-2` or `#3`, only that item is replaced |
+
+The header is mandatory. Adopting the header alone is worth the protocol's overhead even when the body's compression is not a clear win. That is what real use has shown: agents keep the header even when they write the body in plain prose (spec §3.4).
+
+### Style rules (shorthand bodies)
+
+**Drop:** articles (`the`/`a`/`an`); linking verbs in declarative state (`US-713 is done` → `US-713 done`); subjective framing (`I think`, `it seems`); politeness (`please`, `could you`); filler (`in order to` → `to`); repeated subjects in compounds — use `;`.
+
+**Use:** sentence fragments; imperative mood for actions (`merge X`); past-tense/status adjectives for state (`done`, `blocked`, `shipped`, `failed`); 1-token tech jargon (`PR`, `AC`, `CI`, `QA`, `PM`, `CVE`); bare IDs (`US-713`, `commit-98b483d`).
+
+**Punctuation:**
+
+| Mark | Use |
+|---|---|
+| `;` | between related facts — `US-713 done; AC met; CI green` |
+| `.` / newline | between unrelated facts |
+| `:` | subject expansion — `US-713: AC met but CI broke` |
+| `/` | ratios — `21/21 tests` |
+| `?` | questions/asks — `merge?` |
+| `--` | inline rationale — `defer US-718 -- no source in Silver` |
+
+**Anti-patterns:** ❌ creative abbreviations (`cmplt`, `mrg`) — they tokenize worse than the full word. ❌ rare Unicode (✓ ⟳ →) — multi-token. ❌ dropping the story ID or other critical context — false economy. ❌ stacking facts with no separator. ❌ omitting the routing header — non-conformant. ❌ Markdown bold or headings inside a shorthand body (use the capitalised state token, `BLOCKED`); prose bodies can use Markdown.
+
+---
+
+## Patterns
+
+Bodies only; every real message also carries the header as line 1.
+
+| # | Shape | Form | Example body |
+|---|---|---|---|
+| 1 | State change | `<id> <state>` | `US-713 done` |
+| 2 | Multi-fact state | `<id> <state>; <fact>; ...` | `US-713 done; AC met; CI green; PR ready` |
+| 3 | Status report | `<metric> <value>; ...` | `tests 21/21; preflight 878/878; ruff pass; build green` |
+| 4 | Action directive | `<verb> <target>` | `merge pell/auth-fix` |
+| 5 | Blocker | `<id> blocked: <reason>` | `US-718 blocked: no household source in Silver` |
+| 6 | Question / ask | `<verb>?` | `merge?`, `US-713 sign-off?` |
+| 7 | Decision | `<decision>: <target> -- <rationale>` | `approved: US-713 PRD -- 1 AC added` |
+| 8 | Acknowledgment | `ack <id>` | `ack US-713 closeout` |
+
+### Body conventions (spec 7.11, optional)
+
+| Convention | Form |
+|---|---|
+| Several asks or findings | number them: `ASK-1`, `ASK-2`, or `# 1.`, `# 2.` sections for several rulings |
+| Two recipients, two actions | one line each: `Wren: rule on B-765` |
+| A ruling's void condition | last line: `void-if <condition>` |
+| What is stalled | last line: `blocks <what>`, with `urgency=` |
+| Silence means proceed | plain words: `if no reply by <date>: <what happens> -- check: <name>` |
+
+**Example names in this skill are placeholders.** Never sign a message with one; use your own name and role from your CLAUDE.md.
+
+### Worked example — full message
 
 ```text
-from=Ledger(PM); to=Kunai(DW-Arch); date=2026-05-09; topic=bump US-006; audience=agent; urgency=high
+from=Tamsin(DEV); to=Wren(PM); date=2026-05-13; topic=US-713 closeout; audience=agent
+US-713 done; AC met; CI green; PR ready -- merge?
 ```
 
-## When NOT to use
+### Worked example — from a request to a message
 
-- A human will read it (PM triage, archival review, decision trail) → Markdown
-- Long-form deliberation, RCAs, ADRs, design specs → Markdown
-- Unstructured prose with no shorthand savings → plain text
-
-## Loading the vocabulary library
-
-Always load `library/core.yaml` (~87 universal terms). Optionally load domain extensions:
-
-| Topic | Load |
-|---|---|
-| General coordination | `core.yaml` only |
-| Code review / dev process | + `programming.yaml` |
-| Cloud / orchestration / data | + `infrastructure.yaml` |
-| Sprint, project, program mgmt | + `project-mgmt.yaml` |
-| Security review / threat modeling | + `security.yaml` |
-| LLM / agent / RAG topics | + `ai-agents.yaml` |
-| Azure / identity / compliance / Fabric | + `azure.yaml` |
-
-## Body style — drop
-
-- Articles (`the`, `a`, `an`)
-- Helping/linking verbs when state is unambiguous
-- Subjective framing, politeness, filler
-- Repeated subjects across fragments — use `;`
-
-## Body style — use
-
-- Sentence fragments
-- Imperative mood for actions
-- Past tense / status adjectives for state
-- Standard tech jargon from the library
-- IDs as bare tokens: `US-713`, `commit-98b483d`
-
-## Punctuation
-
-- `;` between related facts (same topic)
-- `.` between unrelated facts
-- `:` after a subject to expand
-- `/` for ratios
-- `?` for questions
-- `--` for inline rationale
-
-## Avoid
-
-- Creative abbreviations (`cmplt`, `prgm`) — usually 2–3 tokens
-- Rare Unicode (✓ ⟳ ✗) — usually multi-token
-- Single-letter codes (`c`, `b`, `r`) — ambiguous
-- Omitting the header — non-conformant
-
-## Body patterns
-
-| Pattern | Body form | Example |
-|---|---|---|
-| State change | `<id> <state>` | `US-713 done` |
-| Multi-fact state | `<id> <state>; <fact>; <fact>` | `US-713 done; AC met; CI green` |
-| Status report | `<metric> <value>; ...` | `tests 21/21; preflight 878/878; build green` |
-| Action | `<verb> <target>` | `merge ralph/auth-fix` |
-| Blocker | `<id> blocked: <reason>` | `US-718 blocked: no source in Silver` |
-| Question | `<verb>?` or `<id> <verb>?` | `merge?`, `US-713 sign-off?` |
-| Decision | `<decision>: <id> -- <rationale>` | `approved: US-713 PRD -- 1 AC added` |
-| Ack | `ack <id>` | `ack US-713 closeout` |
-
-## Mode 1 — Read
-
-1. Parse the routing header (line 1) — extract from / to / date / topic / audience / urgency / refs.
-2. If the sender is an AI agent (header identifies them or `audience=agent`), the reply MUST be A2AL.
-3. Parse any `term=expansion` definitions on first occurrence; remember within the thread.
-4. Expand the body using your loaded library.
-5. Summarize key facts in 1–2 plain-English sentences for the user.
-
-## Mode 2 — Write
-
-1. **Confirm the audience is agent-only.** If a human will read it at any point, stop and write Markdown.
-2. **Compose the routing header** (line 1): from / to / date / topic. Add `audience=agent` when the channel doesn't already establish it. Add `urgency` / `refs` if useful.
-3. **Identify the body shape** (state / status / action / blocker / question / decision / ack). Pick the matching pattern from the table.
-4. **Write the body** using canonical glossary terms and the style rules.
-5. **Output as plain text** — header on line 1, body on subsequent lines. No JSON, no Markdown wrapper.
-
-## Mode 3 — Vocabulary extension
-
-1. Verify the term will be used 3+ times in the thread (else write it out in full).
-2. On first use: `<term>=<expansion>` (no spaces in expansion, no `--`).
-3. After first use, use the bare term.
-
-Example: `DR=design-review. DR sched Tuesday; PR ready post-DR.`
-
-If broadly useful, open a PR adding it to `library/<domain>.yaml`.
-
-## Worked example — write
-
-User: "Tell Agent1 the sprint hotfix is done — 713 needed no code change, 714 implemented warnOnly DQ flag, all tests pass, ready to merge."
+The operator says: "Tell Agent1 the sprint hotfix is done. 713 needed no code change, 714 added the warnOnly DQ flag, all tests pass, ready to merge."
 
 You produce:
 
 ```text
-from=Byte(DEV); to=Agent1; date=2026-05-13; topic=sprint-hotfix-2026-04-17 closeout; audience=agent
+from=Tamsin(DEV); to=Agent1; date=2026-05-13; topic=sprint-hotfix-2026-04-17 closeout; audience=agent
 US-713 done; no code change -- already in main from US-671.
 US-714 done; warnOnly DQ flag; 21/21 DQ tests; preflight 878/878.
-merge ralph/pipeline-hotfix-2026-04-17?
+merge pell/pipeline-hotfix-2026-04-17?
 ```
 
-Drop into Agent1's inbox; summarize: "Wrote sprint hotfix update to Agent1. Header + 3 body lines; asks to merge."
+Drop it in Agent1's inbox and tell the operator: "Sent the hotfix closeout to Agent1: header plus 3 lines, asking to merge."
 
-## Worked example — read
-
-User provides:
+### Worked example — reading a message
 
 ```text
-from=Hawkeye(QA); to=Byte(DEV); date=2026-05-13; topic=US-713 review; audience=agent
+from=Juno(QA); to=Tamsin(DEV); date=2026-05-13; topic=US-713 review; audience=agent
 US-713 done; AC met; CI green; PR ready -- merge?
 ```
 
-You reply: "Hawkeye (QA) confirms US-713 is complete with AC met and CI green. PR is ready and they're asking permission to merge. Sender is an agent (`audience=agent`) — your reply MUST be A2AL."
+Tell the operator: "Juno (QA) says US-713 is complete, AC met and CI green, and asks whether to merge. The sender is an agent (`audience=agent`), so the reply must be A2AL."
 
-## Reference
+### Worked example — richly-routed office message
 
-- Spec: `specs/A2A-Core.md`
-- Library: `library/*.yaml`
-- Examples: `examples/`
-- Validator (library, not messages): `tools/validate_library.py`
+```text
+from=Calder(DW-Arch); to=Wren(PM); cc=Sable(SEC); date=2026-06-10; topic=B-293 gates MCP groom; thread=B-293; status=blocked; priority=P1
+B-293 blocked: MCP groom must land first -- Fabric connector contract not frozen.
+ack?
+```
+
+### Worked example — prose body under the header
+
+```text
+from=Calder(Arch); to=Wren(PM); date=2026-10-21; topic=B-765 ruling; audience=agent; refs=B-765
+Approve option B, with one change: shadow table, not in-place.
+In-place is faster, but it has no rollback path, and the last two migrations both
+needed one. The extra sprint is cheaper than a restore. If the bench test shows the
+shadow copy can't keep up with the nightly load, this ruling no longer stands.
+```
+
+### Worked example — multi-ask decision request
+
+```text
+from=Wren(PM); to=Calder(DW-Arch); date=2026-05-09; topic=bump US-006 + US-009-a; audience=agent; urgency=high
+US-006: A=in-place fast no-rollback; B=shadow +1sprint rollback-safe; ASK=pick A|B
+US-009-a: opt1=F-SKU-lib saves-3d bug=#44-memleak; opt2=wrap-REST clean +3d; ASK=pick opt1|opt2
+deadline=2026-05-09T17:00 -- F-SKU trial closes EOD
+```
+
+---
+
+## Extending the vocabulary
+
+Introduce a new shortening on first use with `term=expansion`:
+
+```
+DR=design-review. DR sched Tuesday; PR ready post-DR; AC sign-off needed post-DR.
+```
+
+The definition runs until the next `.`, `;`, `?`, `!`, `--`, or newline. The expansion is a single word or hyphenated phrase — no internal spaces.
+
+- **Threshold:** define it only if the term will be used **3+ times in the thread**. Fewer, spell it out.
+- **Scope:** per-thread by default. A new thread is a clean slate.
+- **Acceptance:** the receiver signals acceptance by using the term. They may instead ask `?DR`, or counter-propose `DR=design-review (or DRev?)`.
+- **Don't** redefine a canonical term (`PR=pull-request` — `PR` is already in the library), use cryptic single letters, or renegotiate a form mid-thread.
+- **Promotion:** a shortening used 5+ times across multiple threads is a library PR candidate. Add it to the right `library/<domain>.yaml` with `term`/`expansion`/`example`/`notes`, then run `python tools/validate_library.py`.
+
+The validator checks the **library**, not messages. A2AL never validates message bodies, by design. If the repo is available, `python tools/a2al_lint.py <file>` checks the header line only (advisory).

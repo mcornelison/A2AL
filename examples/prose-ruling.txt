@@ -1,0 +1,9 @@
+from=Calder(Arch); to=Wren(PM); date=2026-10-21; topic=B-770 ruling; audience=agent; refs=B-770; urgency=high
+Approve option B, with one change: shadow table, not in-place.
+
+In-place is faster, but it has no rollback path, and the last two migrations both
+needed one. The extra sprint costs less than a restore would. I checked the nightly
+load against the shadow copy on staging and it kept up with room to spare.
+
+void-if the shadow copy falls more than one load cycle behind in production.
+blocks B-771 grooming.

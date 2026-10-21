@@ -1,0 +1,10 @@
+from=Sable(SEC); to=Calder(DW-Arch); cc=Wren(PM); date=2026-06-22; topic=Fabric workspace access review; audience=agent; status=pending; priority=P2; thread=SEC-77; urgency=medium
+Entra app registration reviewed; SPN retired -- MI now the only principal.
+MI granted OneLake lakehouse read on Silver + Gold; Bronze excluded.
+OBO flow removed from the connector -- no user-delegated path to PHI.
+MSAL upgraded; JWT aud claim pinned to the Fabric resource; SSO unchanged.
+FIC configured for the MI -- no client secret remains.
+RLS + CLS applied on the PII columns; SCD2 history tables inherit both.
+DLP policy scoped to PHI + PII; Purview lineage scan green; UAL retention 365d.
+BAA on file; ZDR asserted with the model vendor -- ZDR is a retention control, not a waiver.
+Calder: confirm the Bronze exclusion is intentional? ack

@@ -1,28 +1,67 @@
+# Cross-industry project and program management vocabulary.
+# These are industry-neutral on purpose. Each term means the same thing on a
+# construction programme, a clinical rollout, a marketing campaign or a
+# software delivery. Software-specific roles live in programming.yaml;
+# service-operations metrics live in infrastructure.yaml.
 domain: project-mgmt
-description: Project management, SRE, and operational-metrics vocabulary.
+description: Cross-industry project and program management vocabulary for planning, scope and governance.
 
 entries:
-  - term: EM
-    expansion: engineering manager
-    example: "EM on vacation next week"
-  - term: TPM
-    expansion: technical program manager
-    example: "TPM tracking dependencies"
-  - term: SRE
-    expansion: site reliability engineer
-    example: "SRE escalation requested"
-  - term: SLA
-    expansion: service level agreement
-    example: "SLA breach imminent"
-  - term: SLO
-    expansion: service level objective
-    example: "SLO target 99.99%"
-  - term: SLI
-    expansion: service level indicator
-    example: "SLI: latency p99"
-  - term: MTTR
-    expansion: mean time to recovery
-    example: "MTTR under 30min"
+  # ---- Planning and schedule ----
+  - term: milestone
+    expansion: scheduled checkpoint with a defined outcome
+    example: "milestone 3 slipped 2w"
+    notes: Industry-neutral; a milestone is a date plus a deliverable, not a task.
+  - term: critical-path
+    expansion: sequence of dependent work that sets the end date
+    example: "permit sits on critical-path"
+  - term: baseline
+    expansion: approved plan a variance is measured against
+    example: "baseline reset after change-order 4"
+  - term: variance
+    expansion: deviation from baseline
+    example: "variance +12d schedule, +4% cost"
+  - term: kickoff
+    expansion: formal project start
+    example: "kickoff 2026-10-01; charter signed"
+  - term: go-live
+    expansion: date a deliverable enters real use
+    example: "go-live blocked: inspection pending"
+    notes: Applies to a building opening, a clinic protocol, a campaign launch, a system cutover.
+
+  # ---- Scope and change ----
+  - term: deliverable
+    expansion: defined output a party is accountable for
+    example: "deliverable 2 accepted; deliverable 3 PARTIAL"
+  - term: scope-change
+    expansion: agreed change to committed scope
+    example: "scope-change requested -- needs sign-off"
+  - term: change-order
+    expansion: formal authorization of a scope, cost, or schedule change
+    example: "change-order 4 approved; baseline reset"
+    notes: Standard in construction, consulting, manufacturing, and procurement contracts.
+  - term: SOW
+    expansion: statement of work
+    example: "SOW amended; new deliverable added"
+  - term: WBS
+    expansion: work breakdown structure
+    example: "WBS 3.2 owns the inspection gate"
+
+  # ---- Governance and risk ----
+  - term: stakeholder
+    expansion: party with a decision or approval interest
+    example: "stakeholder review before go-live"
+  - term: RAID
+    expansion: risks, assumptions, issues, dependencies
+    example: "RAID log updated; 2 new issues"
+  - term: RFI
+    expansion: request for information
+    example: "RFI 18 open 9d -- blocks the submittal"
+    notes: Standard in construction, procurement, and government contracting.
   - term: RCA
     expansion: root cause analysis
     example: "RCA due Friday"
+    notes: Universal across engineering, manufacturing, healthcare, and aviation.
+  - term: lessons-learned
+    expansion: post-completion review findings
+    example: "lessons-learned captured; 3 process changes"

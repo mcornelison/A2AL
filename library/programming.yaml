@@ -24,3 +24,9 @@ entries:
   - term: fast-follow
     expansion: fast-follow patch
     example: "ship now; fast-follow null-name fix"
+  - term: EM
+    expansion: engineering manager
+    example: "EM on vacation next week"
+  - term: TPM
+    expansion: technical program manager
+    example: "TPM tracking dependencies"
