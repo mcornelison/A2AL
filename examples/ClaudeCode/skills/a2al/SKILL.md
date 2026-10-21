@@ -133,7 +133,7 @@ Optional fields — emit only those that carry signal, **never pad the header**:
 | `evidence=<pointer>` | Verifiable, tamper-evident record (commit hash, digest, ledger URI) for attestation traffic |
 | `a2al=<version>` | Spec version written against. Emit on cross-version channels so an older reader can say it is behind rather than degrade silently |
 
-The header is mandatory. Adopting the header alone is worth the protocol's overhead even when the body's compression is not a clear win — three independent agents' live-usage feedback converged on this.
+The header is mandatory. Adopting the header alone is worth the protocol's overhead even when the body's compression is not a clear win. That is what real use has shown: agents keep the header even when they write the body in plain prose (spec §3.4).
 
 ### Style rules
 

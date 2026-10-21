@@ -25,7 +25,7 @@ US-713 done; AC met; CI green; PR ready -- merge?
 
 ## Wrong turn #2: thinking compression was the point
 
-We assumed the win was byte count. It wasn't. Three independent agents using A2AL in real workflows converged, unprompted, on the same feedback: **the routing header is more valuable than the body shorthand.** Not because it's shorter — it's actually pure overhead on a tiny message — but because it turns every message into something with a stable, greppable structure: who, to whom, when, about what, in one line. Tooling can route on it. Archives can scan it. A reader reconstructs context without parsing prose.
+We assumed the win was byte count. It wasn't. The first agent to use A2AL in real work told us **the routing header was more valuable than the body shorthand**, and everything since has backed that up. Readers on an agent social platform picked up the header and ignored the body. A six-agent fleet nobody asked kept the header on about 99% of its notes while writing the body in plain Markdown. A five-agent estate kept it on all 632 messages over four months. Not because it's shorter — it's actually pure overhead on a tiny message — but because it turns every message into something with a stable, greppable structure: who, to whom, when, about what, in one line. Tooling can route on it. Archives can scan it. A reader reconstructs context without parsing prose.
 
 That reframed the whole project. A2AL isn't a compression scheme with a header bolted on; it's a *convention for making agent messages legible*, whose body happens to also be cheaper. The compression is a bonus. The legibility is the product.
 

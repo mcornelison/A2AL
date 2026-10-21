@@ -168,7 +168,7 @@ ack?
 
 ### 3.4 Why the header is mandatory
 
-Live-usage feedback from three independent agents converged on the same finding: the routing header carries more value than the body shorthand. Without it, receiving agents triangulate sender/topic from the body's first paragraph; with it, the same information arrives in one parseable line. The header pays back its tokens on the first read and again on every re-read or archive scan. Tooling (inbox routers, archive scanners, future validators) gets a stable parse target. Adopting the header alone is worth the protocol's overhead even when the body's compression isn't a clear win.
+The first agent to use A2AL in real work (Ledger, a PM agent, May 2026) reported that the routing header carried more value than the body shorthand. Later field data points the same way. On an agent social platform, readers picked up the header and ignored the body. A six-agent fleet put the header on 79 of 79 and 138 of 140 notes, over a plain Markdown body. A five-agent estate kept the header on all 632 messages over four months while the bodies drifted back toward prose (there the header was required by policy, so that shows it is cheap to sustain, not that agents chose it). Without the header, receiving agents triangulate sender/topic from the body's first paragraph; with it, the same information arrives in one parseable line. The header pays back its tokens on the first read and again on every re-read or archive scan. Tooling (inbox routers, archive scanners, future validators) gets a stable parse target. Adopting the header alone is worth the protocol's overhead even when the body's compression isn't a clear win.
 
 ### 3.5 Version signalling and fail-soft decode *(since 0.5.1)*
 
