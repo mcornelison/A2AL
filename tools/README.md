@@ -2,6 +2,8 @@
 
 Validation and helper tooling for the A2AL/0.5.0 library.
 
+> Requires PyYAML (`pip install pyyaml`). The validator is the only part of A2AL that is executable code; everything else is documentation and YAML.
+
 ## `validate_library.py`
 
 Validates `library/*.yaml` against the schema documented in [`library/README.md`](../library/README.md).
@@ -13,7 +15,7 @@ pip install pyyaml
 python tools/validate_library.py
 ```
 
-Expected output: `OK: 117 entries across 6 files`
+Expected output: `OK: 149 entries across 7 files`
 
 ### Strict mode
 
